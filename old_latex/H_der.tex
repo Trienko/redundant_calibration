@@ -1,0 +1,157 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amssymb,graphicx,subfigure}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{lscape}
+%opening
+\title{SPARC: SpArse Redundant Calibration}
+\author{T.L. Grobler}
+
+\begin{document}
+
+\maketitle
+
+%\begin{abstract}
+
+%\end{abstract}
+
+\begin{section}{No Name}
+
+\begin{equation}
+\boldsymbol{H} = 
+\begin{bmatrix}
+\boldsymbol{A} & \boldsymbol{B}\\
+\boldsymbol{B}^* & \boldsymbol{A}
+\end{bmatrix}
+\end{equation}
+
+With 
+
+\begin{equation}
+\boldsymbol{A} = 
+\begin{bmatrix}
+\boldsymbol{C} & \boldsymbol{D}\\
+\boldsymbol{D^H} & \boldsymbol{E}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{B} = 
+\begin{bmatrix}
+\boldsymbol{F} & \boldsymbol{G}\\
+\boldsymbol{G}^T & \boldsymbol{0}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{C}]_{ij} = 
+\begin{cases}
+ \sum_{k \neq i} \left | g_k \right |^2 \left | y_{|i-k|} \right |^2 & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{D}]_{ij} = 
+\begin{cases}
+ g_i y_j^*  \left | g_{i+j} \right |^2  & \textrm{if} ~ i<j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{E}]_{ij} = 
+\begin{cases}
+ \sum_{pq \in \mathcal{I}_i} \left | g_p \right |^2 \left | g_q \right |^2  & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{F}]_{ij} = 
+\begin{cases}
+ g_i g_j  \left | y_{|i-j|} \right |^2  & \textrm{if} ~ i \neq j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{G}]_{ij} = 
+\begin{cases}
+ g_i y_j  \left | g_{i-j} \right |^2  & \textrm{if} ~ i > j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+Moreover, 
+
+\begin{equation}
+\mathcal{I}_i = \left\{pq|(q - p) = i \right\}
+\end{equation}
+
+The dimensions of the matrices:
+
+\begin{enumerate}
+\item $\boldsymbol{H}$: is a $(4N-2)\times(4N-2)$ or a $P \times P$ matrix. $N$ denotes the number of antennas and $P$ denotes the number of parameters. This matrix
+contains $6N^2 - 2N - 2$ non-zero entries. It contains $16N^2 - 16N + 4$ entries. We can construct this matrix with $4N^2 -  4N$ or $\frac{1}{4} P^2 -1$ elementary operations.
+\item $\boldsymbol{A}$: is a $(2N-1)\times(2N-1)$ matrix. This matrix has $N^2 + N - 1$ non-zero entries. We can construct this matrix with $2\frac{1}{2} (N^2 -  N)$ elementary operations.  
+\item $\boldsymbol{B}$: is a $(2N-1)\times(2N-1)$ matrix. This matrix has $2N^2 - 2N$ non-zero entries. We can construct this matrix with $1\frac{1}{2} (N^2 -  N)$ elementary operations.
+\item $\boldsymbol{C}$: is a $N\times N$ matrix. This matrix has $N$ non-zero entries. We can construct this matrix with $N^2-N$ elementary operations.
+\item $\boldsymbol{D}$: is a $N \times (N-1)$ matrix. This matrix has $\frac{1}{2} (N^2 -  N)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations. 
+\item $\boldsymbol{E}$: is a $(N-1) \times (N-1)$ matrix. This matrix has $(N-1)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.  
+\item $\boldsymbol{F}$: is a $N \times N$ matrix. This matrix has $N^2 - N$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.
+\item $\boldsymbol{G}$: is a $N \times (N-1)$ matrix. This matrix has $\frac{1}{2} (N^2 -  N)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.
+\item $\boldsymbol{0}$: is a $(N-1) \times (N-1)$ all zero matrix. 
+\end{enumerate}
+
+We can construct $\boldsymbol{C}-\boldsymbol{G}$ in $O(N^2)$ 
+
+
+The sparsity ratio of $\boldsymbol{H}$ is equal to
+\begin{equation}
+\gamma_N = \frac{10N^2-14N+6}{16N^2-16N+4} 
+\end{equation}
+
+The asymptotic sparsity ratio of $\boldsymbol{H}$ is equal to
+
+\begin{equation}
+\gamma = \lim_{N\rightarrow \infty}\frac{5N^2-7N+3}{8N^2-8N+2} = \frac{5}{8}
+\end{equation}
+
+Asymptotically the computational cost of the matrix-vector product between $\boldsymbol{H}$ and a vector of appropriate size is $O(P^2)$. However, the computational cost converges 
+very slowly to its asymptotic value, and in general is equal to $O(P^{k_N})$, where $k_N < 2$.
+
+\begin{eqnarray}
+P^{k_N}_N &=& (1 - \gamma_N)P^2_N\\
+k_N &=& \log_{P_N}(1 - \gamma_N) + 2\\
+k &=& \lim_{N\rightarrow \infty} \log_{P_N}(1 - \gamma_N) + 2 = 2
+\end{eqnarray}
+
+Moreover,
+
+\begin{eqnarray}
+P^{c_N}_N &=& \frac{1}{4} P_N^2 -1\\
+c_N &=& \log_{P_N}\left (\frac{1}{4} P_N^2-1 \right )\\
+c &=& \lim_{N\rightarrow \infty} \log_{P_N}\left (\frac{1}{4} P_N^2-1\right ) = 2
+\end{eqnarray}
+
+NB $P_c$ IS WRONG HERE DID NOT TAKE INTO ACCOUNT THE CONJUGANTION OF $\boldsymbol{B}$ (need multiply its computational complexity by two).
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{sparsity_factor.png}
+  \caption{Sparsity factor $\gamma_N$.}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{k_N.png}
+  \caption{Computation complexity order of matrix-vector product and construction.}
+\end{figure}
+
+
+
+
+
+
+\end{section}
+\end{document}
