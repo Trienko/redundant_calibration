@@ -1,0 +1,72 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amssymb,graphicx,subfigure}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{lscape}
+%opening
+\title{LINCAL and Gauss-Newton}
+\author{T.L. Grobler}
+
+\begin{document}
+
+\maketitle
+
+
+\begin{equation}
+c_{ij} = y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
+\end{equation}
+
+\begin{eqnarray}
+\frac{c_{ij}}{\partial \eta_i} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
+\frac{c_{ij}}{\partial \varphi_i} &=&  -i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
+\frac{c_{ij}}{\partial \eta_j} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
+\frac{c_{ij}}{\partial \varphi_j} &=&  i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
+\frac{y_{i-j}}{\partial \varphi_j} &=&  e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
+\end{eqnarray}
+
+The Wirtinger derivative is used in the last equation.
+
+\begin{eqnarray}
+c_{ij} &\approx& c_{ij}^0 + \Delta \eta_i(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) + \Delta \eta_j(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+&& -i\Delta\varphi_i (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) +i\Delta\varphi_j (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+&& y_{i-j}^1(y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+&\approx&  c_{ij}^0 + e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i))
+\end{eqnarray}
+
+\begin{equation}
+\label{eq:residual}
+r_{ij} = \delta_{ij} = c_{ij}-c_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i)) 
+\end{equation}
+
+Eq.~\ref{eq:residual} allows us to construct the following linear system:
+
+\begin{equation}
+\boldsymbol{J}[\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = \boldsymbol{r}, 
+\end{equation}
+
+where $\boldsymbol{J}$ is equal to 
+\begin{equation}
+\boldsymbol{J} = \bigg [\overbrace{\frac{c_{pq}}{\partial \eta_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial \varphi_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial y_{t}}}^{t=1\cdots r_s} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q) 
+\end{equation}
+or
+\begin{equation}
+\boldsymbol{J} = \bigg [\frac{c_{pq}}{\partial \boldsymbol{\eta}},~\frac{c_{pq}}{\partial \boldsymbol{\varphi}},~\frac{c_{pq}}{\partial \boldsymbol{y}} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q). 
+\end{equation}
+
+The last column is again a Wirtinger derivative.
+
+Which means we can obtain the least-squares estimate as follows:
+
+\begin{equation}
+[\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = [\boldsymbol{J}^H\boldsymbol{J}]^{-1}\boldsymbol{J}^H\boldsymbol{r}.
+\end{equation}
+
+What is interesting about LINCAL is that it seems to be a combination of standard least-squares (splitting the problem into amplitude and phase) and 
+complex least-squares. The gains are solved with a standard approach (splitting into amp and phase) and the redundant visibilities use a Wirtinger derivative. What is strange though is that in normal complex optimization, if we optimize towards a complex variable x we also need to optimize towards
+its complex conjugate. My best guess is that LINCAL works in any case since the conjugate redundant baselines are not used to calibrate ($p<q$). The only difference between the framework I was using is that
+we regard the whole problem as complex, we construct our Jacobian by calculating the derivative towards $g$ and its conjugate as well as $y$ and its conjugate - Smirnov \& Tasse (2016). 
+
+Now that the relation between LINCAL and GN has been shown we can start focusing on the speedup that the conjugate gradient method provides as Liu (2010) originally proposed.
+Also worth checking: whether using an LM step instead of a GN step improves your convergence properties.
+\end{document}
