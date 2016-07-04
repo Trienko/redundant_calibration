@@ -9,8 +9,17 @@ class Hgrid():
     def hex_grid(self,hex_dim,l):
         side = hex_dim + 1
         ant_main_row = side + hex_dim
-        ant_x = np.zeros((6*hex_dim+1,),dtype=float)
-        ant_y = np.zeros((6*hex_dim+1,),dtype=float)
+        
+        elements = 1
+
+        #summing the antennas in hexactoganal rings 
+        for k in xrange(hex_dim):
+            elements = elements + (k+1)*6
+                
+        ant_x = np.zeros((elements,),dtype=float)
+        ant_y = np.zeros((elements,),dtype=float)
+        print "len(ant_x) = ",len(ant_x)
+        print "len(ant_y) = ",len(ant_y)
         x = 0.0
         y = 0.0
 
@@ -43,7 +52,7 @@ class Hgrid():
 
 if __name__ == "__main__":
    h = Hgrid()
-   ant_x,ant_y = h.hex_grid(1,20)
+   ant_x,ant_y = h.hex_grid(4,20)
    plt.plot(ant_x,ant_y,"ro")
    plt.show()
    print "Hallo"
