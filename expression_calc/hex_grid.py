@@ -8,7 +8,7 @@ class Hgrid():
 
     def hex_grid(self,hex_dim,l):
         side = hex_dim + 1
-        ant_main_row = side + (side+1)
+        ant_main_row = side + hex_dim
         ant_x = np.zeros((6*hex_dim+1,),dtype=float)
         ant_y = np.zeros((6*hex_dim+1,),dtype=float)
         x = 0.0
