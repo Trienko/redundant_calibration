@@ -47,7 +47,12 @@ class Hgrid():
             y = y + (np.sqrt(3)/2.0)*l                 
             ant_main_row = ant_main_row - 1
     
-        return ant_x,ant_y 
+        return ant_x,ant_y
+
+    def calculate_phi(self,ant_x,ant_y):
+        for k in xrange(len(ant_x)):
+            for j in xrnage(k+1,len(ant_x)) 
+
 
 
 if __name__ == "__main__":
