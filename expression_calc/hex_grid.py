@@ -86,7 +86,7 @@ class Hgrid():
 
 if __name__ == "__main__":
    h = Hgrid()
-   ant_x,ant_y = h.hex_grid(3,20)
+   ant_x,ant_y = h.hex_grid(1,20)
    plt.plot(ant_x,ant_y,"ro")
    plt.show()
    h.calculate_phi(ant_x,ant_y)
