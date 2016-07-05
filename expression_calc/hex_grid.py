@@ -57,15 +57,16 @@ class Hgrid():
             if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
                return red_vec_x,red_vec_y,l+1
 
-        red_vec_x = np.append(red_vec_x,np.array[red_x])
-        red_vec_y = np.append(red_vec_y,np.array[red_y])
+        red_vec_x = np.append(red_vec_x,np.array([red_x]))
+        red_vec_y = np.append(red_vec_y,np.array([red_y]))
         return red_vec_x,red_vec_y,len(red_vec_x) 
 
     def calculate_phi(self,ant_x,ant_y,plot=True):
         phi = np.zeros((len(ant_x),len(ant_y)))
-        
+        red_vec_x = np.array([])
+        red_vec_y = np.array([])
         for k in xrange(len(ant_x)):
-            for j in xrnage(k+1,len(ant_x))
+            for j in xrange(k+1,len(ant_x)):
                 red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
                 phi[j,k] = phi[k,j]
 
