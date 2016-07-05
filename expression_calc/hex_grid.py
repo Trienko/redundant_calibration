@@ -49,10 +49,29 @@ class Hgrid():
     
         return ant_x,ant_y
 
-    def calculate_phi(self,ant_x,ant_y):
+    def determine_phi_value(self,red_vec_x,red_vec_y,ant_x_p,ant_x_q,ant_y_p,ant_y_q):
+        red_x = ant_x_q - ant_x_p
+        red_y = ant_y_q - ant_y_p
+
+        for l in xrange(len(red_vec_x)):
+            if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
+               return red_vec_x,red_vec_y,l+1
+
+        red_vec_x = np.append(red_vec_x,np.array[red_x])
+        red_vec_y = np.append(red_vec_y,np.array[red_y])
+        return red_vec_x,red_vec_y,len(red_vec_x) 
+
+    def calculate_phi(self,ant_x,ant_y,plot=True):
+        phi = np.zeros((len(ant_x),len(ant_y)))
+        
         for k in xrange(len(ant_x)):
-            for j in xrnage(k+1,len(ant_x)) 
- 
+            for j in xrnage(k+1,len(ant_x))
+                red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
+                phi[j,k] = phi[k,j]
+
+        if plot:
+           plt.imshow(phi)
+           plt.show()
 
 
 if __name__ == "__main__":
@@ -60,5 +79,6 @@ if __name__ == "__main__":
    ant_x,ant_y = h.hex_grid(4,20)
    plt.plot(ant_x,ant_y,"ro")
    plt.show()
-   print "Hallo"
+   h.calculate_phi(ant_x,ant_y)
+   #print "Hallo"
 
