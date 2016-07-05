@@ -15,15 +15,28 @@ class factor():
                 index = 1, 
                 exponent = 1,
                 conjugate_value = False,
-                mag = False):
+                mag = False,
+                ant_p = 0,
+                ant_q = 0,
+                print_f = True):
                 self.type_factor = type_factor
                 self.index = index
                 self.exponent = exponent
                 self.conjugate_value = conjugate_value
                 self.mag = mag
+                self.ant_p = ant_p
+                self.ant_q = ant_q
+                self.print_f = print_f 
+             
 
     def to_string(self):
-        string_out = self.type_factor + "_" + str(self.index)
+        if self.print_f:
+           if self.type_factor == "y":
+              string_out = self.type_factor + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
+           else:
+              string_out = self.type_factor + "_" + str(self.index)
+        else:   
+           string_out = self.type_factor + "_" + str(self.index)
         if self.conjugate_value:
            string_out = string_out + "^" + "*"
            if self.exponent > 1:
@@ -563,7 +576,7 @@ class redundant():
                   J_temp[r,c].conjugate()
           self.JH = J_temp.transpose()   
           
-      def create_regular(self):
+      def create_regular(self,print_pq=False):
           spacing_vector = np.arange(self.N)[1:]  
           redundant_baselines = spacing_vector[::-1]          
           
@@ -573,9 +586,9 @@ class redundant():
               ant1 = 1
               for j in xrange(redundant_baselines[k]):
                   ant2 = ant1 + spacing_vector[k]
-                  g_fact = factor("g",ant1,1,False)
-                  y_fact = factor("y",spacing_vector[k],1,False)
-                  gc_fact = factor("g",ant2,1,True)
+                  g_fact = factor("g",ant1,1,False,False,0,0,False)
+                  y_fact = factor("y",spacing_vector[k],1,False,False,ant1,ant1,print_pq)
+                  gc_fact = factor("g",ant2,1,True,False,0,0,False)
                   t_temp = term()
                   t_temp.append_factor(g_fact)
                   t_temp.append_factor(y_fact)
@@ -583,15 +596,15 @@ class redundant():
                   self.regular_array = np.append(self.regular_array,t_temp)
                   ant1 = ant1 + 1
 
-      def create_normal(self):
+      def create_normal(self,print_pq=False):
           self.regular_array=np.array([],dtype=object)
           
           for p in xrange(1,self.N):
               y_counter = 1
               for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False) 
-                  y_fact = factor("y",y_counter,1,False)          
-                  gc_fact = factor("g",q,1,True)
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",y_counter,1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
                   t_temp = term()
                   t_temp.append_factor(g_fact)
                   t_temp.append_factor(y_fact)
@@ -599,15 +612,15 @@ class redundant():
                   self.regular_array = np.append(self.regular_array,t_temp)
                   y_counter = y_counter+1
 
-      def create_regular_config2(self):
+      def create_regular_config2(self,print_pq=False):
           self.regular_array=np.array([],dtype=object)
           
           for p in xrange(1,self.N):
               y_counter = 1
               for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False) 
-                  y_fact = factor("y",y_counter,1,False)          
-                  gc_fact = factor("g",q,1,True)
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",y_counter,1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
                   t_temp = term()
                   t_temp.append_factor(g_fact)
                   t_temp.append_factor(y_fact)
@@ -931,8 +944,8 @@ class redundant():
                     
 if __name__ == "__main__":
    r = redundant(5)
-   #r.create_regular_config2()
-   r.create_regular()
+   r.create_regular_config2(print_pq=True)
+   #r.create_regular()
    #r.create_normal()
    print r.to_string_regular()
    r.create_J1()
@@ -949,10 +962,10 @@ if __name__ == "__main__":
    #print r.to_string_J2()
    #print r.to_string_Jc1()
    #print r.to_string_Jc2()
-   #print r.to_string_J()
+   print r.to_string_J()
    #print r.to_string_JH()
-   #print r.to_string_H()
-   #print r.to_string_H(simplify=True)
+   print r.to_string_H()
+   print r.to_string_H(simplify=True)
    #r.to_latex_H(simplify=True)
    #r.to_latex_J()
    #r.to_latex_JH()
