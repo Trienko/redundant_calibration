@@ -381,12 +381,15 @@ class redundant():
           self.J = np.array([],dtype=object)
           self.JH = np.array([],dtype=object)
           self.H = np.array([],dtype=object)
+          self.phi = np.array([])
          
       def create_J1(self,type_v="RED"):
           rows = ((self.N*self.N) - self.N)/2
 
           if type_v == "RED":
              columns = self.N + (self.N-1)
+          elif type_v == "HEX":
+             columns = self.N + int(np.amax(self.phi))
           else:
              columns = self.N
  
@@ -427,6 +430,8 @@ class redundant():
           rows = ((self.N*self.N) - self.N)/2
           if type_v == "RED":
              columns = self.N + (self.N-1)
+          elif type_v == "HEX":
+             columns = self.N + int(np.amax(self.phi))
           else:
              columns = self.N
           self.J2 = np.empty((rows,columns),dtype=object)
@@ -465,6 +470,8 @@ class redundant():
           rows = ((self.N*self.N) - self.N)
           if type_v == "RED":
              columns = 2*(self.N + (self.N-1))
+          elif type_v == "HEX":
+             columns = 2*(self.N + int(np.amax(self.phi)))
           else:
              columns = 2*(self.N)
           self.J = np.empty((rows,columns),dtype=object)
@@ -576,6 +583,105 @@ class redundant():
                   J_temp[r,c].conjugate()
           self.JH = J_temp.transpose()   
           
+      def hex_grid(self,hex_dim,l):
+          side = hex_dim + 1
+          ant_main_row = side + hex_dim
+        
+          elements = 1
+
+          #summing the antennas in hexactoganal rings 
+          for k in xrange(hex_dim):
+              elements = elements + (k+1)*6
+                
+          ant_x = np.zeros((elements,),dtype=float)
+          ant_y = np.zeros((elements,),dtype=float)
+          print "len(ant_x) = ",len(ant_x)
+          print "len(ant_y) = ",len(ant_y)
+          x = 0.0
+          y = 0.0
+
+          counter = 0
+        
+          for k in xrange(side):
+              x_row = x
+              y_row = y
+              for i in xrange(ant_main_row):
+                  if k == 0:
+                     ant_x[counter] = x_row 
+                     ant_y[counter] = y_row
+                     x_row = x_row + l
+                     counter = counter + 1 
+                  else:
+                     ant_x[counter] = x_row
+                     ant_y[counter] = y_row
+                     counter = counter + 1
+                   
+                     ant_x[counter] = x_row
+                     ant_y[counter] = -1*y_row
+                     x_row = x_row + l
+                     counter = counter + 1   
+              x = x + l/2.0
+              y = y + (np.sqrt(3)/2.0)*l                 
+              ant_main_row = ant_main_row - 1
+    
+          return ant_x,ant_y
+
+      def determine_phi_value(self,red_vec_x,red_vec_y,ant_x_p,ant_x_q,ant_y_p,ant_y_q):
+          red_x = ant_x_q - ant_x_p
+          red_y = ant_y_q - ant_y_p
+
+          for l in xrange(len(red_vec_x)):
+              if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
+                 return red_vec_x,red_vec_y,l+1
+
+          red_vec_x = np.append(red_vec_x,np.array([red_x]))
+          red_vec_y = np.append(red_vec_y,np.array([red_y]))
+          return red_vec_x,red_vec_y,len(red_vec_x) 
+
+      def calculate_phi(self,ant_x,ant_y,plot=False):
+          phi = np.zeros((len(ant_x),len(ant_y)))
+          red_vec_x = np.array([])
+          red_vec_y = np.array([])
+          for k in xrange(len(ant_x)):
+              for j in xrange(k+1,len(ant_x)):
+                  red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
+                  phi[j,k] = phi[k,j]
+
+          if plot:
+             plt.imshow(phi,interpolation="nearest")
+             x = np.arange(len(ant_x))
+             plt.xticks(x, x+1)
+             y = np.arange(len(ant_x))
+             plt.yticks(y, y+1)
+             plt.colorbar() 
+             #plt.yticks(y, y+1)
+           
+             plt.show()
+
+          print "phi = ",phi
+          return phi
+
+      def create_hexagonal(self,hex_dim,l,print_pq=True):
+          self.regular_array=np.array([],dtype=object)
+
+          ant_x,ant_y = self.hex_grid(hex_dim,l)
+          self.N = len(ant_x)
+          #plt.plot(ant_x,ant_y,"ro")
+          #plt.show()
+          self.phi = self.calculate_phi(ant_x,ant_y)
+          
+          for p in xrange(1,self.N):
+              for q in xrange(p+1,self.N+1):
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",self.phi[p-1,q-1],1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.regular_array = np.append(self.regular_array,t_temp)
+                  
+
       def create_regular(self,print_pq=False):
           spacing_vector = np.arange(self.N)[1:]  
           redundant_baselines = spacing_vector[::-1]          
@@ -639,6 +745,8 @@ class redundant():
       def compute_H(self,type_v="RED"):
           if type_v == "RED":
              parameters = 2*(self.N + (self.N-1)) 
+          elif type_v == "HEX":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
           else:
              parameters = 2*(self.N) 
           self.H = np.empty((parameters,parameters),dtype=object)  
@@ -653,6 +761,8 @@ class redundant():
       def substitute_H(self,g,y,type_v="RED"):
           if type_v == "RED":
              parameters = 2*(self.N + (self.N-1)) 
+          elif type_v == "HEX":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
           else:
              parameters = 2*(self.N) 
           H_numerical = np.zeros((parameters,parameters),dtype=complex)  
@@ -665,6 +775,9 @@ class redundant():
           if type_v == "RED":
              parameters = 2*(self.N + (self.N-1))
              equations = (self.N**2 -self.N) 
+          elif type_v == "HEX":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
+             equations = (self.N**2 -self.N)
           else:
              parameters = 2*(self.N) 
              equations = (self.N**2 -self.N)
@@ -943,19 +1056,20 @@ class redundant():
 
                     
 if __name__ == "__main__":
-   r = redundant(5)
-   r.create_regular_config2(print_pq=True)
+   r = redundant(0)
+   r.create_hexagonal(1,20)
+   #r.create_regular_config2(print_pq=True)
    #r.create_regular()
    #r.create_normal()
    print r.to_string_regular()
-   r.create_J1()
-   r.create_J2()
+   r.create_J1(type_v="HEX")
+   r.create_J2(type_v="HEX")
    print r.to_string_J1()
    print r.to_string_J2()
    r.conjugate_J1_J2()
-   r.create_J()
+   r.create_J(type_v="HEX")
    r.hermitian_transpose_J()
-   r.compute_H()
+   r.compute_H(type_v="HEX")
    H_int = r.to_int_H()
    
    #print r.to_string_J1()
