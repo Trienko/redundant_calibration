@@ -71,13 +71,22 @@ class Hgrid():
                 phi[j,k] = phi[k,j]
 
         if plot:
-           plt.imshow(phi)
+           plt.imshow(phi,interpolation="nearest")
+           x = np.arange(len(ant_x))
+           plt.xticks(x, x+1)
+           y = np.arange(len(ant_x))
+           plt.yticks(y, y+1)
+           plt.colorbar() 
+           #plt.yticks(y, y+1)
+           
            plt.show()
+
+        print "phi = ",phi
 
 
 if __name__ == "__main__":
    h = Hgrid()
-   ant_x,ant_y = h.hex_grid(4,20)
+   ant_x,ant_y = h.hex_grid(3,20)
    plt.plot(ant_x,ant_y,"ro")
    plt.show()
    h.calculate_phi(ant_x,ant_y)
