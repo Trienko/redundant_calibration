@@ -22,7 +22,7 @@
 \boldsymbol{H} = 
 \begin{bmatrix}
 \boldsymbol{A} & \boldsymbol{B}\\
-\boldsymbol{B}^* & \boldsymbol{A}
+\boldsymbol{B}^* & \boldsymbol{A}^*
 \end{bmatrix}
 \end{equation}
 
@@ -148,9 +148,113 @@ NB $P_c$ IS WRONG HERE DID NOT TAKE INTO ACCOUNT THE CONJUGANTION OF $\boldsymbo
   \caption{Computation complexity order of matrix-vector product and construction.}
 \end{figure}
 
+THE POTENTIAL GENERAL FORMULATION
+
+Let $\phi_{pq}$ be the mapping that maps antenna indices to the redundant spacing indices of the array. Also note that this mapping is not symmetric as 
+$\phi_{pq} = 0$ if $p>q$. Moreover, let
+
+\begin{equation}
+\psi_{ij} = 
+\begin{cases}
+q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation},
+
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
+
+and
+
+\begin{equation}
+\zeta_{ij} = 
+\begin{cases}
+\phi_{ij}~\textrm{if}~i<j\\
+\phi_{ji}~\textrm{if}~i>j\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
 
 
 
+
+
+\begin{equation}
+\boldsymbol{H} = 
+\begin{bmatrix}
+\boldsymbol{A} & \boldsymbol{B}\\
+\boldsymbol{B}^* & \boldsymbol{A}^*
+\end{bmatrix}
+\end{equation}
+
+With 
+
+\begin{equation}
+\boldsymbol{A} = 
+\begin{bmatrix}
+\boldsymbol{C} & \boldsymbol{D}\\
+\boldsymbol{D^H} & \boldsymbol{E}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{B} = 
+\begin{bmatrix}
+\boldsymbol{F} & \boldsymbol{G}\\
+\boldsymbol{G}^T & \boldsymbol{0}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{C}]_{ij} = 
+\begin{cases}
+ \sum_{k \neq i} \left | g_k \right |^2 \left | y_{\zeta_{ij}} \right |^2 & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{D}]_{ij} = 
+\begin{cases}
+ g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ i<j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{E}]_{ij} = 
+\begin{cases}
+ \sum_{pq \in \mathcal{I}_i} \left | g_p \right |^2 \left | g_q \right |^2  & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{F}]_{ij} = 
+\begin{cases}
+ g_i g_j  \left | y_{\zeta_{ij}} \right |^2  & \textrm{if} ~ i \neq j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{G}]_{ij} = 
+\begin{cases}
+ g_i y_j  \left | g_{\xi_{ij}} \right |^2  & \textrm{if} ~ i > j\\
+ 0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+Moreover, 
+
+\begin{equation}
+\mathcal{I}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\} ?
+\end{equation}
 
 
 \end{section}

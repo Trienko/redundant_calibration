@@ -661,7 +661,7 @@ class redundant():
           print "phi = ",phi
           return phi
 
-      def create_hexagonal(self,hex_dim,l,print_pq=True):
+      def create_hexagonal(self,hex_dim,l,print_pq=False):
           self.regular_array=np.array([],dtype=object)
 
           ant_x,ant_y = self.hex_grid(hex_dim,l)
@@ -673,7 +673,7 @@ class redundant():
           for p in xrange(1,self.N):
               for q in xrange(p+1,self.N+1):
                   g_fact = factor("g",p,1,False,False,0,0,False) 
-                  y_fact = factor("y",self.phi[p-1,q-1],1,False,False,p,q,print_pq)          
+                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
                   gc_fact = factor("g",q,1,True,False,0,0,False)
                   t_temp = term()
                   t_temp.append_factor(g_fact)
@@ -743,6 +743,7 @@ class redundant():
           return string_out
 
       def compute_H(self,type_v="RED"):
+          print "ymax = ",np.amax(self.phi)
           if type_v == "RED":
              parameters = 2*(self.N + (self.N-1)) 
           elif type_v == "HEX":
@@ -1080,7 +1081,7 @@ if __name__ == "__main__":
    #print r.to_string_JH()
    print r.to_string_H()
    print r.to_string_H(simplify=True)
-   #r.to_latex_H(simplify=True)
+   r.to_latex_H(simplify=True)
    #r.to_latex_J()
    #r.to_latex_JH()
    
