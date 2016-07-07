@@ -55,7 +55,7 @@ With
 \begin{equation}
 [\boldsymbol{D}]_{ij} = 
 \begin{cases}
- g_i y_j^*  \left | g_{i+j} \right |^2  & \textrm{if} ~ i<j\\
+ g_i y_j^*  \left | g_{i+j} \right |^2  & \textrm{if} ~ i+j \leq N\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -221,7 +221,7 @@ With
 \begin{equation}
 [\boldsymbol{D}]_{ij} = 
 \begin{cases}
- g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ (i<j)\wedge(\psi_{ij}\neq0) \\
+ g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -255,6 +255,44 @@ Moreover,
 \begin{equation}
 \mathcal{I}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
+
+FOR AN EW ARRAY WE HAVE
+
+\begin{equation}
+\phi_{ij} = 
+\begin{cases}
+j - i & \textrm{if}~i<j\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\psi_{ij} = 
+\begin{cases}
+i+j & \textrm{if}~(0<i<N)\wedge(0<j<N)\wedge(0< i+j \leq N)\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\zeta_{ij} = 
+\begin{cases}
+j - i & \textrm{if}~i<j\\
+i - j & \textrm{if}~i>j\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+i-j & (0<i<N)\wedge(0<j<N)\wedge(i>j)\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+
+
 
 
 \end{section}
