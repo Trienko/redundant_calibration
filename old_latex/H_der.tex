@@ -150,7 +150,7 @@ NB $P_c$ IS WRONG HERE DID NOT TAKE INTO ACCOUNT THE CONJUGANTION OF $\boldsymbo
 
 THE POTENTIAL GENERAL FORMULATION
 
-Let $\phi_{pq}$ be the mapping that maps antenna indices to the redundant spacing indices of the array. Also note that this mapping is not symmetric as 
+Let $\phi_{pq}:\mathbb{N}^2\rightarrow\mathbb{N}$ be the mapping that maps antenna indices to the redundant spacing indices of the array. Also note that this mapping is not symmetric as 
 $\phi_{pq} = 0$ if $p>q$. Moreover, let
 
 \begin{equation}
@@ -213,7 +213,7 @@ With
 \begin{equation}
 [\boldsymbol{C}]_{ij} = 
 \begin{cases}
- \sum_{k \neq i} \left | g_k \right |^2 \left | y_{\zeta_{ij}} \right |^2 & \textrm{if} ~ i=j\\
+ \sum_{k \neq i} \left | g_k \right |^2 \left | y_{\zeta_{ik}} \right |^2 & \textrm{if} ~ i=j\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -221,7 +221,7 @@ With
 \begin{equation}
 [\boldsymbol{D}]_{ij} = 
 \begin{cases}
- g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ i<j\\
+ g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ (i<j)\wedge(\psi_{ij}\neq0) \\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -237,7 +237,7 @@ With
 \begin{equation}
 [\boldsymbol{F}]_{ij} = 
 \begin{cases}
- g_i g_j  \left | y_{\zeta_{ij}} \right |^2  & \textrm{if} ~ i \neq j\\
+ g_i g_j  \left | y_{\zeta_{ij}} \right |^2  & \textrm{if} ~ (i \neq j)\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -245,7 +245,7 @@ With
 \begin{equation}
 [\boldsymbol{G}]_{ij} = 
 \begin{cases}
- g_i y_j  \left | g_{\xi_{ij}} \right |^2  & \textrm{if} ~ i > j\\
+ g_i y_j  \left | g_{\xi_{ij}} \right |^2  & \textrm{if} ~ (i > j)\wedge(\xi_{ij}\neq0)\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -253,7 +253,7 @@ With
 Moreover, 
 
 \begin{equation}
-\mathcal{I}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\} ?
+\mathcal{I}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
 
 
