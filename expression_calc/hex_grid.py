@@ -119,6 +119,29 @@ class Hgrid():
 
         return ant_x,ant_y
 
+    def square_grid(self,side,l):
+        elements = side*side
+                
+        ant_x = np.zeros((elements,),dtype=float)
+        ant_y = np.zeros((elements,),dtype=float)
+        print "len(ant_x) = ",len(ant_x)
+        print "len(ant_y) = ",len(ant_y)
+        x = 0.0
+        y = 0.0
+
+        counter = 0
+        
+        for k in xrange(side):
+            x = 0.0
+            for i in xrange(side):
+                ant_x[counter] = x
+                ant_y[counter] = y 
+                x = x + l
+                counter = counter + 1
+            y = y + l 
+ 
+        return ant_x,ant_y
+
     def determine_phi_value(self,red_vec_x,red_vec_y,ant_x_p,ant_x_q,ant_y_p,ant_y_q):
         red_x = ant_x_q - ant_x_p
         red_y = ant_y_q - ant_y_p
@@ -156,7 +179,8 @@ class Hgrid():
 
 if __name__ == "__main__":
    h = Hgrid()
-   ant_x,ant_y = h.hex_grid_ver2(1,20)
+   #ant_x,ant_y = h.hex_grid_ver2(1,20)
+   ant_x,ant_y = h.square_grid(3,20)
    print "ant_x = ",ant_x
    print "ant_y = ",ant_y
    plt.plot(ant_x,ant_y,"ro")

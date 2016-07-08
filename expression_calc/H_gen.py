@@ -479,6 +479,34 @@ class redundant():
           self.J[:rows/2,columns/2:] = self.J2
           self.J[rows/2:,:columns/2] = self.Jc2
           self.J[rows/2:,columns/2:] = self.Jc1
+
+      #def create_J_L(self,type_v="RED"):
+      #    rows = ((self.N*self.N) - self.N)
+      #    if type_v == "RED":
+      #       columns = (self.N + (self.N-1))
+      #    elif type_v == "HEX":
+      #       columns = (self.N + int(np.amax(self.phi)))
+      #    else:
+      #       columns = (self.N)
+      #    self.J = np.empty((rows,columns),dtype=object)
+      #    self.J[:rows/2,:columns] = self.J1
+      #    self.J[:rows/2,columns/2:] = self.J2
+      #    self.J[rows/2:,:columns/2] = self.Jc2
+      #    self.J[rows/2:,columns/2:] = self.Jc1
+
+      #def create_special_J(self,type_v="RED"):
+      #    rows = ((self.N*self.N) - self.N)
+      #    if type_v == "RED":
+      #       columns = (self.N + (self.N-1))
+      #    elif type_v == "HEX":
+      #       columns = (self.N + int(np.amax(self.phi)))
+      #    else:
+      #       columns = (self.N)
+      #    self.J = np.empty((rows,columns),dtype=object)
+      #    self.J[:rows/2,:columns] = self.J1
+      #    self.J[:rows/2,columns/2:] = self.J2
+      #    self.J[rows/2:,:columns/2] = self.Jc2
+      #    self.J[rows/2:,columns/2:] = self.Jc1 
      
       def to_string_J1(self):
           string_out = " J1 = ["
