@@ -289,7 +289,6 @@ class solver():
                      sum_v = np.absolute(g[k])**2*np.absolute(y[zeta[k,i]-1])**2 + sum_v
               C[i,i] = sum_v
 
-
           #CONSTRUCTING E
           #**************
           E = np.zeros((R,R))
@@ -309,11 +308,32 @@ class solver():
                   if psi <> 0:
                      D[i,j] = g[i]*y[j]*np.absolute(g[psi])**2 
 
-          DH = D.transpose.conj()   
+          DH = D.transpose.conj()  
 
+          #CONSTRUCTING F
+          #**************
+          F = np.zeros((N,N))
+          for i in xrange(N):
+              for j in xrange(i,N):
+                  if i <> j:
+                     F[i,j] = g[i]*g[j]*y[phi[i,j]-1]
+                     F[j,i] = F[i,j] 
 
+          #CONSTRUCTING G
+          #**************
+          G = np.zeros((N,R))
+          for i in xrange(N):
+              for j in xrange(R):
+                  xi = xi_func_eval(i,j+1,phi)
+                  if xi <> 0:
+                     G[i,j] = g[j]*y[i]*np.absolute(g[xi])**2
 
-         
+           GT = G.transpose() 
+
+          #CONSTRUCTING Z
+          #**************
+          Z = np.zeros((R,R))
+        
 
       '''
       Creates the redundant Hessian from variables. Stores the result in self.H_sym
