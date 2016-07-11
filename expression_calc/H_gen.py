@@ -778,7 +778,49 @@ class redundant():
                   t_temp.append_factor(y_fact)
                   t_temp.append_factor(gc_fact)
                   self.regular_array = np.append(self.regular_array,t_temp)
+
+      def square_grid(self,side,l):
+          elements = side*side
+                
+          ant_x = np.zeros((elements,),dtype=float)
+          ant_y = np.zeros((elements,),dtype=float)
+          print "len(ant_x) = ",len(ant_x)
+          print "len(ant_y) = ",len(ant_y)
+          x = 0.0
+          y = 0.0
+
+          counter = 0
+        
+          for k in xrange(side):
+              x = 0.0
+              for i in xrange(side):
+                  ant_x[counter] = x
+                  ant_y[counter] = y 
+                  x = x + l
+                  counter = counter + 1
+              y = y + l 
+ 
+          return ant_x,ant_y
                   
+      def create_square(self,side,l,print_pq=False):
+          self.regular_array=np.array([],dtype=object)
+
+          ant_x,ant_y = self.square_grid(side,l)
+          self.N = len(ant_x)
+          #plt.plot(ant_x,ant_y,"ro")
+          #plt.show()
+          self.phi = self.calculate_phi(ant_x,ant_y)
+          
+          for p in xrange(1,self.N):
+              for q in xrange(p+1,self.N+1):
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.regular_array = np.append(self.regular_array,t_temp)
 
       def create_regular(self,print_pq=False):
           spacing_vector = np.arange(self.N)[1:]  

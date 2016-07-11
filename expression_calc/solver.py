@@ -66,6 +66,29 @@ class solver():
           r.conjugate_J1_J2()
           r.create_J()
           self.J_sym = r.J
+
+
+      '''
+      Creates the redundant Jacobian from variables. Stores the result in self.J_sym
+      
+      RETURNS:
+      N/A
+ 
+      INPUTS:
+      N - Number of elements in array.     
+      '''
+      def construct_sym_J_layout(self,N,dim=1,l=20,layout="HEX"):
+          r = H_gen.redundant(N)
+          if layout == "HEX":
+             r.create_hexagonal(hex_dim=dim,l=l)
+          else:
+             r.create_square(side=dim,l=l)
+
+          r.create_J1()
+          r.create_J2()
+          r.conjugate_J1_J2()
+          r.create_J()
+          self.J_sym = r.J
           
       '''
       Substitutes the vector z into the symbolic redundant Jacobian. Stores the result in self.J
@@ -262,6 +285,27 @@ class solver():
                  return q,True
 
           return 0,False
+
+
+      def calculate_R(self,dim=1,l=20,layout="HEX"):
+          if layout == "HEX":
+             ant_x,ant_y = self.hex_grid_ver2(dim,l)
+          elif layout == "LIN":
+             ant_x,ant_y = self.line_grid(dim,l)
+          else:
+             ant_x,ant_y = self.square_grid(dim,l)
+          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
+
+          return amax(phi)
+
+      def calculate_random_y(self,dim=1,l=20,layout="HEX"):
+          R = calculate_R(dim=dim,l=l,layout=layout)
+          y = np.zeros((R,),dtype=complex) 
+
+          for k in xrange(y):
+              y[k] = np.random.randn() + 1j*np.random.randn()
+
+          return y
 
       '''
       INPUTS:
