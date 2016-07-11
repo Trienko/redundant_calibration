@@ -390,6 +390,8 @@ class redundant():
              columns = self.N + (self.N-1)
           elif type_v == "HEX":
              columns = self.N + int(np.amax(self.phi))
+          elif type_v == "SQR":
+             columns = self.N + int(np.amax(self.phi))
           else:
              columns = self.N
  
@@ -431,6 +433,8 @@ class redundant():
           if type_v == "RED":
              columns = self.N + (self.N-1)
           elif type_v == "HEX":
+             columns = self.N + int(np.amax(self.phi))
+          elif type_v == "SQR":
              columns = self.N + int(np.amax(self.phi))
           else:
              columns = self.N
@@ -474,6 +478,8 @@ class redundant():
              columns = 2*(self.N + (self.N-1))
           elif type_v == "HEX":
              columns = 2*(self.N + int(np.amax(self.phi)))
+          elif type_v == "SQR":
+             columns = 2*(self.N + int(np.amax(self.phi))) 
           else:
              columns = 2*(self.N)
           self.J = np.empty((rows,columns),dtype=object)
@@ -890,6 +896,8 @@ class redundant():
              parameters = 2*(self.N + (self.N-1)) 
           elif type_v == "HEX":
              parameters = 2*(self.N + int(np.amax(self.phi)))
+          elif type_v == "SQR":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
           else:
              parameters = 2*(self.N) 
           self.H = np.empty((parameters,parameters),dtype=object)  
@@ -906,6 +914,8 @@ class redundant():
              parameters = 2*(self.N + (self.N-1)) 
           elif type_v == "HEX":
              parameters = 2*(self.N + int(np.amax(self.phi)))
+          elif type_v == "SQR":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
           else:
              parameters = 2*(self.N) 
           H_numerical = np.zeros((parameters,parameters),dtype=complex)  
@@ -921,6 +931,9 @@ class redundant():
              parameters = 2*(self.N + (self.N-1))
              equations = (self.N**2 -self.N) 
           elif type_v == "HEX":
+             parameters = 2*(self.N + int(np.amax(self.phi)))
+             equations = (self.N**2 -self.N)
+          elif type_v == "SQR":
              parameters = 2*(self.N + int(np.amax(self.phi)))
              equations = (self.N**2 -self.N)
           else:

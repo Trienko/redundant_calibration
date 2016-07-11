@@ -88,6 +88,7 @@ class solver():
           r.create_J2(type_v=layout)
           r.conjugate_J1_J2()
           r.create_J(type_v=layout)
+          print "self.J_sym.size = ",r.J.shape
           self.J_sym = r.J
           
       '''
@@ -1057,7 +1058,7 @@ if __name__ == "__main__":
    #print "itr = ",solver_object.itr
    '''
    s = simulator.sim()
-   N = 7
+   N = 9
    g = s.create_antenna_gains(N=N,max_amp=0.1,min_amp=0.05,freq_scale=5,time_steps=600,plot=True)
    #point_sources = s.create_point_sources(num_sources=10,fov=3,a=2)
    #u_m, v_m, w_m, b_m = s.create_uv_regular_line(N=N)
@@ -1067,14 +1068,14 @@ if __name__ == "__main__":
 
    g_0 = g[:,0]
    solver_object = solver()
-   y_0 = solver_object.calculate_random_y(dim=1,l=20,layout="HEX")
+   y_0 = solver_object.calculate_random_y(dim=3,l=20,layout="SQR")
    #y_0 = s.create_y_0_with_M(M,sig=0.01)
    z_0 = np.hstack([g_0,y_0])  
    print "#########################"
    print "len z_0 = ",len(z_0)
    
-   solver_object.construct_sym_J_layout(N,dim=1,l=20,layout="HEX")
-   solver_object.substitute_sym_J(z_0,N,plot=True)
+   solver_object.construct_sym_J_layout(N,dim=3,l=20,layout="SQR")
+   solver_object.substitute_sym_J(z_0,N,plot=True,dim=3,l=20,layout="SQR")
    #solver_object.substitute_sym_H(z_0,N,plot=True)
    #H_temp = np.copy(solver_object.H)
    
@@ -1084,7 +1085,7 @@ if __name__ == "__main__":
    plt.imshow(np.absolute(solver_object.H),interpolation="nearest")
    plt.colorbar()
    plt.show()
-   H_temp = solver_object.generate_H_formula(z_0,N,dim=1,l=20,layout="HEX")
+   H_temp = solver_object.generate_H_formula(z_0,N,dim=3,l=20,layout="SQR")
    plt.imshow(np.absolute(H_temp),interpolation="nearest")
    plt.colorbar()
    plt.show()
