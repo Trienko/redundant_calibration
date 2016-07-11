@@ -306,7 +306,7 @@ class solver():
               for j in xrange(R):
                   psi = psi_func_eval(i,j+1,phi)
                   if psi <> 0:
-                     D[i,j] = g[i]*y[j]*np.absolute(g[psi])**2 
+                     D[i,j] = g[i]*y[j].conj()*np.absolute(g[psi])**2 
 
           DH = D.transpose.conj()  
 
@@ -326,13 +326,40 @@ class solver():
               for j in xrange(R):
                   xi = xi_func_eval(i,j+1,phi)
                   if xi <> 0:
-                     G[i,j] = g[j]*y[i]*np.absolute(g[xi])**2
+                     G[i,j] = g[i]*y[j]*np.absolute(g[xi])**2
 
            GT = G.transpose() 
 
           #CONSTRUCTING Z
           #**************
           Z = np.zeros((R,R))
+
+          #CONSTRUCTING A
+          #**************
+          A = np.zeros((N+R,N+R))
+          A[:N,:N] = C
+          A[:N,N:] = D
+          A[N:,N:] = E
+          A[N:,:N] = DH
+
+          #CONSTRUCTING B
+          #**************
+          B = np.zeros((N+R,N+R))
+          B[:N,:N] = F
+          B[:N,N:] = G
+          B[N:,N:] = Z
+          B[N:,:N] = GT
+
+          #CONSTRUCTING H
+          #**************
+          H = np.zeros((2*(N+R),2*(N+R)))
+          H[:N+R,:N+R] = A
+          H[:N+R,N+R:] = B
+          H[N+R:,:N+R] = B.conj()
+          H[N+R:,N+R:] = A.conj()
+
+          
+          
         
 
       '''
