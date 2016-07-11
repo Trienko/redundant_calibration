@@ -210,11 +210,11 @@ class solver():
 
           for l in xrange(len(red_vec_x)):
               if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
-                 return red_vec_x,red_vec_y,l+1
+                 return red_vec_x,red_vec_y,int(l+1)
 
           red_vec_x = np.append(red_vec_x,np.array([red_x]))
           red_vec_y = np.append(red_vec_y,np.array([red_y]))
-          return red_vec_x,red_vec_y,len(red_vec_x) 
+          return red_vec_x,red_vec_y,int(len(red_vec_x)) 
 
       def calculate_phi(self,ant_x,ant_y,plot=True):
           phi = np.zeros((len(ant_x),len(ant_y)))
@@ -242,16 +242,54 @@ class solver():
           print "phi = ",phi
           return phi,zeta
 
+      def xi_func_eval(self,i,j,phi):
+          column = phi[:,i]
+
+          for p in xrange(len(column)):
+              if column[p] == j:
+                 return p
+
+          return 0
+
+      def psi_func_eval(self,i,j,phi):
+          row = phi[i,:]
+
+          for q in xrange(len(row)):
+              if column[q] == j:
+                 return q
+
+          return 0
+
       '''
       INPUTS:
       z - Input vector.
       N - Number of elements in array.
       plot - Plot the resultant matrices if True.     
       '''
-      def generate_H_formula(self,z,N,plot=False):
+      def generate_H_formula(self,z,N,plot=False,dim=1,l=20,layout="HEX"):
           g = z[:N]
           y = z[N:]
-           
+          R = len(y)
+          if layout == "HEX":
+             ant_x,ant_y = self.hex_grid_ver2(dim,l)
+          elif layout == "LIN":
+             ant_x,ant_y = self.line_grid(dim,l)
+          else:
+             ant_x,ant_y = self.square_grid(dim,l)
+  
+          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
+          
+          #CONSTRUCTING C
+          #***************
+          C = np.zeros((N,N))
+          for i in xrange(N):
+              sum_v = 0
+              for k in xrange(N):
+                  if k != i:
+                     sum_v = np.absolute(g[k])**2*np.absolute(y[zeta[k,i]-1])**2 + sum_v
+              C[i,i] = sum_v
+
+          
 
          
 
