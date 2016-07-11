@@ -280,7 +280,7 @@ class solver():
           phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
           
           #CONSTRUCTING C
-          #***************
+          #**************
           C = np.zeros((N,N))
           for i in xrange(N):
               sum_v = 0
@@ -289,7 +289,29 @@ class solver():
                      sum_v = np.absolute(g[k])**2*np.absolute(y[zeta[k,i]-1])**2 + sum_v
               C[i,i] = sum_v
 
-          
+
+          #CONSTRUCTING E
+          #**************
+          E = np.zeros((R,R))
+          for i in xrange(R):
+              pq = zip(*np.where(phi == (i+1))) #[(0, 0), (0, 1), (1, 2), (1, 3)]
+              sum_v = 0
+              for k in xrange(len(pq)):
+                  sum_v = np.absolute(g[pq[k][0]])^2*np.absolute(g[pq[k][1]])^2 + sum_v
+              E[i,i] = sum_v
+
+          #CONSTRUCTING D
+          #**************
+          D = np.zeros((N,R))
+          for i in xrange(N):
+              for j in xrange(R):
+                  psi = psi_func_eval(i,j+1,phi)
+                  if psi <> 0:
+                     D[i,j] = g[i]*y[j]*np.absolute(g[psi])**2 
+
+          DH = D.transpose.conj()   
+
+
 
          
 
