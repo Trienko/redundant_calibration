@@ -84,10 +84,10 @@ class solver():
           else:
              r.create_square(side=dim,l=l)
 
-          r.create_J1()
-          r.create_J2()
+          r.create_J1(type_v=layout)
+          r.create_J2(type_v=layout)
           r.conjugate_J1_J2()
-          r.create_J()
+          r.create_J(type_v=layout)
           self.J_sym = r.J
           
       '''
@@ -101,12 +101,22 @@ class solver():
       N - Number of elements in array.
       plot - Plot the resultant matrices if True.     
       '''
-      def substitute_sym_J(self,z,N,plot=False):
+      def substitute_sym_J(self,z,N,plot=False,dim=1,l=20,layout="HEX"):
           g = z[:N]
           y = z[N:]
+          
+          if layout == "HEX":
+             ant_x,ant_y = self.hex_grid_ver2(dim,l)
+          elif layout == "LIN":
+             ant_x,ant_y = self.line_grid(dim,l)
+          else:
+             ant_x,ant_y = self.square_grid(dim,l)
+          
+          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
+
           r = H_gen.redundant(N)
           r.J = self.J_sym
-          self.J = r.substitute_J(g,y)
+          self.J = r.substitute_J(g,y,type_v=layout,phi=phi)
           temp_J = np.copy(self.J)
           temp_J[np.absolute(temp_J) > 1e-12] = 1.0
           self.J_int = temp_J.real
@@ -296,13 +306,13 @@ class solver():
              ant_x,ant_y = self.square_grid(dim,l)
           phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
 
-          return amax(phi)
+          return np.amax(phi)
 
       def calculate_random_y(self,dim=1,l=20,layout="HEX"):
-          R = calculate_R(dim=dim,l=l,layout=layout)
+          R = self.calculate_R(dim=dim,l=l,layout=layout)
           y = np.zeros((R,),dtype=complex) 
 
-          for k in xrange(y):
+          for k in xrange(R):
               y[k] = np.random.randn() + 1j*np.random.randn()
 
           return y
@@ -1047,21 +1057,24 @@ if __name__ == "__main__":
    #print "itr = ",solver_object.itr
    '''
    s = simulator.sim()
-   N = 5
+   N = 7
    g = s.create_antenna_gains(N=N,max_amp=0.1,min_amp=0.05,freq_scale=5,time_steps=600,plot=True)
-   point_sources = s.create_point_sources(num_sources=10,fov=3,a=2)
-   u_m, v_m, w_m, b_m = s.create_uv_regular_line(N=N)
-   M = s.create_vis_mat(point_sources=point_sources,u_m=u_m,v_m=v_m,g=None,sig=0,w_m=None)
-   s.plot_baseline(M,[0,1],shw=True)
+   #point_sources = s.create_point_sources(num_sources=10,fov=3,a=2)
+   #u_m, v_m, w_m, b_m = s.create_uv_regular_line(N=N)
+   #M = s.create_vis_mat(point_sources=point_sources,u_m=u_m,v_m=v_m,g=None,sig=0,w_m=None)
+   #s.plot_baseline(M,[0,1],shw=True)
    
 
    g_0 = g[:,0]
-   y_0 = s.create_y_0_with_M(M,sig=0.01)
-   z_0 = np.hstack([g_0,y_0[:,0]])  
    solver_object = solver()
-   solver_object.construct_sym_J(N)
+   y_0 = solver_object.calculate_random_y(dim=1,l=20,layout="HEX")
+   #y_0 = s.create_y_0_with_M(M,sig=0.01)
+   z_0 = np.hstack([g_0,y_0])  
+   print "#########################"
+   print "len z_0 = ",len(z_0)
+   
+   solver_object.construct_sym_J_layout(N,dim=1,l=20,layout="HEX")
    solver_object.substitute_sym_J(z_0,N,plot=True)
-
    #solver_object.substitute_sym_H(z_0,N,plot=True)
    #H_temp = np.copy(solver_object.H)
    
@@ -1071,7 +1084,7 @@ if __name__ == "__main__":
    plt.imshow(np.absolute(solver_object.H),interpolation="nearest")
    plt.colorbar()
    plt.show()
-   H_temp = solver_object.generate_H_formula(z_0,N)
+   H_temp = solver_object.generate_H_formula(z_0,N,dim=1,l=20,layout="HEX")
    plt.imshow(np.absolute(H_temp),interpolation="nearest")
    plt.colorbar()
    plt.show()

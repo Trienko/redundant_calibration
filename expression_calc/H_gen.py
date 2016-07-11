@@ -466,7 +466,9 @@ class redundant():
                    
               #print "###############"
 
-      def create_J(self,type_v="RED"):
+      def create_J(self,type_v="RED",phi=None):
+          if phi <> None:
+             self.phi = phi
           rows = ((self.N*self.N) - self.N)
           if type_v == "RED":
              columns = 2*(self.N + (self.N-1))
@@ -912,7 +914,9 @@ class redundant():
                   H_numerical[r,c] = self.H[r,c].substitute(g,y)   
           return H_numerical        
                   
-      def substitute_J(self,g,y,type_v="RED"):
+      def substitute_J(self,g,y,type_v="RED",phi=None):
+          if phi <> None:
+             self.phi = phi
           if type_v == "RED":
              parameters = 2*(self.N + (self.N-1))
              equations = (self.N**2 -self.N) 
