@@ -217,14 +217,14 @@ class solver():
           return red_vec_x,red_vec_y,int(len(red_vec_x)) 
 
       def calculate_phi(self,ant_x,ant_y,plot=True):
-          phi = np.zeros((len(ant_x),len(ant_y)))
-          zeta = np.zeros((len(ant_x),len(ant_y)))
+          phi = np.zeros((len(ant_x),len(ant_y)),dtype=int)
+          zeta = np.zeros((len(ant_x),len(ant_y)),dtype=int)
           red_vec_x = np.array([])
           red_vec_y = np.array([])
           for k in xrange(len(ant_x)):
               for j in xrange(k+1,len(ant_x)):
                   red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
-                  zeta[k,j] phi[k,j]
+                  zeta[k,j] = phi[k,j]
                   zeta[j,k] = zeta[k,j]
                   #phi[j,k] = phi[k,j]
 
@@ -245,20 +245,23 @@ class solver():
       def xi_func_eval(self,i,j,phi):
           column = phi[:,i]
 
+          #print "column = ",column
+          #print "j = ",j
+
           for p in xrange(len(column)):
               if column[p] == j:
-                 return p
+                 return p,True
 
-          return 0
+          return 0,False
 
       def psi_func_eval(self,i,j,phi):
           row = phi[i,:]
 
           for q in xrange(len(row)):
-              if column[q] == j:
-                 return q
+              if row[q] == j:
+                 return q,True
 
-          return 0
+          return 0,False
 
       '''
       INPUTS:
@@ -266,7 +269,7 @@ class solver():
       N - Number of elements in array.
       plot - Plot the resultant matrices if True.     
       '''
-      def generate_H_formula(self,z,N,plot=False,dim=1,l=20,layout="HEX"):
+      def generate_H_formula(self,z,N,plot=False,dim=5,l=20,layout="LIN"):
           g = z[:N]
           y = z[N:]
           R = len(y)
@@ -281,9 +284,9 @@ class solver():
           
           #CONSTRUCTING C
           #**************
-          C = np.zeros((N,N))
+          C = np.zeros((N,N),dtype=complex)
           for i in xrange(N):
-              sum_v = 0
+              sum_v = 0j
               for k in xrange(N):
                   if k != i:
                      sum_v = np.absolute(g[k])**2*np.absolute(y[zeta[k,i]-1])**2 + sum_v
@@ -291,52 +294,58 @@ class solver():
 
           #CONSTRUCTING E
           #**************
-          E = np.zeros((R,R))
+          E = np.zeros((R,R),dtype=complex)
           for i in xrange(R):
               pq = zip(*np.where(phi == (i+1))) #[(0, 0), (0, 1), (1, 2), (1, 3)]
-              sum_v = 0
+              sum_v = 0j
               for k in xrange(len(pq)):
-                  sum_v = np.absolute(g[pq[k][0]])^2*np.absolute(g[pq[k][1]])^2 + sum_v
+                  sum_v = np.absolute(g[pq[k][0]])**2*np.absolute(g[pq[k][1]])**2 + sum_v
               E[i,i] = sum_v
 
           #CONSTRUCTING D
           #**************
-          D = np.zeros((N,R))
+          D = np.zeros((N,R),dtype=complex)
           for i in xrange(N):
               for j in xrange(R):
-                  psi = psi_func_eval(i,j+1,phi)
-                  if psi <> 0:
+                  psi,found = self.psi_func_eval(i,j+1,phi)
+                  if found:
                      D[i,j] = g[i]*y[j].conj()*np.absolute(g[psi])**2 
 
-          DH = D.transpose.conj()  
+          DH = D.transpose().conj()  
 
           #CONSTRUCTING F
           #**************
-          F = np.zeros((N,N))
+          F = np.zeros((N,N),dtype=complex)
           for i in xrange(N):
               for j in xrange(i,N):
                   if i <> j:
-                     F[i,j] = g[i]*g[j]*y[phi[i,j]-1]
+                     F[i,j] = g[i]*g[j]*np.absolute(y[phi[i,j]-1])**2
                      F[j,i] = F[i,j] 
 
           #CONSTRUCTING G
           #**************
-          G = np.zeros((N,R))
+          G = np.zeros((N,R),dtype=complex)
           for i in xrange(N):
               for j in xrange(R):
-                  xi = xi_func_eval(i,j+1,phi)
-                  if xi <> 0:
+                  xi,found = self.xi_func_eval(i,j+1,phi)
+                  
+                  if found:
+                     #print "i","j","xi",i+1,j+1,xi+1
+                     #print "found",found
                      G[i,j] = g[i]*y[j]*np.absolute(g[xi])**2
+                  #else:
+                  #   print "i","j","xi",i+1,j+1,xi
+                  #   print "found",found  
 
-           GT = G.transpose() 
+          GT = G.transpose() 
 
           #CONSTRUCTING Z
           #**************
-          Z = np.zeros((R,R))
+          Z = np.zeros((R,R),dtype=complex)
 
           #CONSTRUCTING A
           #**************
-          A = np.zeros((N+R,N+R))
+          A = np.zeros((N+R,N+R),dtype=complex)
           A[:N,:N] = C
           A[:N,N:] = D
           A[N:,N:] = E
@@ -344,7 +353,7 @@ class solver():
 
           #CONSTRUCTING B
           #**************
-          B = np.zeros((N+R,N+R))
+          B = np.zeros((N+R,N+R),dtype=complex)
           B[:N,:N] = F
           B[:N,N:] = G
           B[N:,N:] = Z
@@ -352,16 +361,14 @@ class solver():
 
           #CONSTRUCTING H
           #**************
-          H = np.zeros((2*(N+R),2*(N+R)))
+          H = np.zeros((2*(N+R),2*(N+R)),dtype=complex)
           H[:N+R,:N+R] = A
           H[:N+R,N+R:] = B
           H[N+R:,:N+R] = B.conj()
           H[N+R:,N+R:] = A.conj()
 
-          
-          
-        
-
+          return H
+   
       '''
       Creates the redundant Hessian from variables. Stores the result in self.H_sym
       
@@ -953,8 +960,9 @@ if __name__ == "__main__":
    #experiment_as_func_N(N_min=5,N_max=40,step_size=5,max_amp=1.1,min_amp=0.9,time_steps=10,sig1=0.01,sig2=0.01,num_sources=10,type_inverse="CG",pickle_name="CG_HSNR.p")
    #experiment_as_func_N(N_min=5,N_max=60,step_size=5,max_amp=1.1,min_amp=0.9,time_steps=200,sig1=8,sig2=8,num_sources=100,type_inverse="CG",pickle_name="CG_LSNR.p")
    #plot_graph2("PCG_HSNR.p","CG_HSNR.p")
-   
+   '''
    N = 7
+   
    s = simulator.sim()
    g = s.create_antenna_gains(N=N,max_amp=0.1,min_amp=0.05,freq_scale=5,time_steps=600,plot=True)
    point_sources = s.create_point_sources(num_sources=100,fov=3,a=2)
@@ -968,6 +976,7 @@ if __name__ == "__main__":
    y_0 = s.create_y_0_with_M(M,sig=0.01)
    z_0 = np.hstack([g_0,y_0[:,0]])
 
+   
    solver_object = solver()
    
 
@@ -992,15 +1001,40 @@ if __name__ == "__main__":
    #print "dz = ",dz
    #print "len(dz) = ",len(dz)
    #print "itr = ",solver_object.itr
-   """
-   #solver_object.substitute_sym_J(z_0,N,plot=True)
+   '''
+   s = simulator.sim()
+   N = 5
+   g = s.create_antenna_gains(N=N,max_amp=0.1,min_amp=0.05,freq_scale=5,time_steps=600,plot=True)
+   point_sources = s.create_point_sources(num_sources=10,fov=3,a=2)
+   u_m, v_m, w_m, b_m = s.create_uv_regular_line(N=N)
+   M = s.create_vis_mat(point_sources=point_sources,u_m=u_m,v_m=v_m,g=None,sig=0,w_m=None)
+   s.plot_baseline(M,[0,1],shw=True)
+   
+
+   g_0 = g[:,0]
+   y_0 = s.create_y_0_with_M(M,sig=0.01)
+   z_0 = np.hstack([g_0,y_0[:,0]])  
+   solver_object = solver()
+   solver_object.construct_sym_J(N)
+   solver_object.substitute_sym_J(z_0,N,plot=True)
+
    #solver_object.substitute_sym_H(z_0,N,plot=True)
    #H_temp = np.copy(solver_object.H)
-   #solver_object.compute_JH()
-   #solver_object.compute_H()
-   #res_H = H_temp - solver_object.H
-   #plt.imshow(np.absolute(res_H),interpolation="nearest")
-   #plt.show() 
+   
+   solver_object.compute_JH()
+   solver_object.compute_H(sparse_v=False)
+   #print solver_object.H
+   plt.imshow(np.absolute(solver_object.H),interpolation="nearest")
+   plt.colorbar()
+   plt.show()
+   H_temp = solver_object.generate_H_formula(z_0,N)
+   plt.imshow(np.absolute(H_temp),interpolation="nearest")
+   plt.colorbar()
+   plt.show()
+   res_H = H_temp - solver_object.H
+   plt.imshow(np.absolute(res_H),interpolation="nearest")
+   plt.colorbar()
+   plt.show() 
    #print "res_H = ",res_H
 
    #v = solver_object.compute_v(z_0,N)
@@ -1013,7 +1047,7 @@ if __name__ == "__main__":
    #solver_object.compute_r(D[:,:,0],z_0)
    #solver_object.compute_JHr()
    #print "JHr = ",solver_object.JHr
-   """
+   
 
 
     
