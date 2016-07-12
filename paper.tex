@@ -217,15 +217,24 @@ of the gains.
 \end{equation}
 where $\hat{\bg} = \big[\mathcal{R}\{\bg\},\mathcal{I}\{\bg\}\big]^T$, still need to define the other vectors properly....
 
-\citet{Smirnov2015} have recently shown that calibration can be performed using a complex optimization framework. 
+We have to revert to the above formulation as a direct Taylor expansion of v is not possible as v is nonanalytic in its argument.
+
+
+
+\citet{Smirnov2015} have recently shown that calibration can be performed using the following complex framework 
 \begin{equation}
 \min_{\breve{\bg}}\|\breve{\br}\| = \min_{\breve{\bg}}\|\breve{\bd} - \breve{\bv}(\breve{\bg})\|, 
 \end{equation}
 where $\breve{\bg} = \big[\bg,\conj{\bg}]^T$, still need to define the other vectors properly....
 
-The main difference between the traditional approach and the 
-complex optimization framework proposed by \citet{Smirnov2015} is that in their framework they no longer treat the real and imaginary parts of the residual separately which enables them to directly solve for the complex antenna gains themselves (as well as their
-complex conjugates). Recall that most optimization techniques require a gradient operator to enable it to function properly. The main reason why we have traditionally treated 
+The above formulation is based on the fact that v breve is analytic in its argument and its complex conjugate as a whole.
+
+%The main difference between the traditional approach and the 
+%complex optimization framework proposed by \citet{Smirnov2015} is that in their framework they no longer treat the real and imaginary parts of the residual separately which enables them to directly solve for the complex antenna gains themselves (as well as their
+%complex conjugates). 
+
+
+Recall that most optimization techniques require a gradient operator to enable it to function properly. The main reason why we have traditionally treated 
 the real and imaginary parts of the residual separately is due to the fact that $f(z) = \conj{z}$ is not a differentiable complex function where $z\in\mathbb{C}$ and $\conj{(*)}$ denotes conjugation, i.e. $\frac{df(z)}{dz}$
 does not exist, if we apply the standard definition of differentiation:
 \begin{equation}
