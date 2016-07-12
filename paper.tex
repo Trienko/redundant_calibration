@@ -210,12 +210,18 @@ where
  In Eq... $y_{pq}$ denotes the visibility which was created from a skymodel and is associated with antenna $p$ and $q$. [Need to rw this sentence] 
 \end{enumerate}
 
+The simplest why to solve eq. is to use least-squares optimization which if we derive it from first principals would require a Taylor expansion of v.
+
+
+
 The most standard way of tackling the calibration problem is to treat the real and imaginary parts of the residual (difference between observed and predicted visibilities) separately and then to simultaneously solve for the real and imaginary parts
 of the gains. 
 \begin{equation}
 \min_{\hat{\bg}}\|\hat{\br}\| = \min_{\hat{\bg}}\|\hat{\bd} - \hat{\bv}(\hat{\bg})\|, 
 \end{equation}
 where $\hat{\bg} = \big[\mathcal{R}\{\bg\},\mathcal{I}\{\bg\}\big]^T$, still need to define the other vectors properly....
+
+
 
 We have to revert to the above formulation as a direct Taylor expansion of v is not possible as v is nonanalytic in its argument.
 
