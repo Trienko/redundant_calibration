@@ -58,7 +58,7 @@
 % Please keep new commands to a minimum, and use \newcommand not \def to avoid
 % overwriting existing commands. Example:
 %\newcommand{\pcm}{\,cm$^{-2}$}	% per cm-squared
-
+\newcommand{\bz}{\bmath{z}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%% TITLE PAGE %%%%%%%%%%%%%%%%%%%
@@ -185,15 +185,20 @@ Also worth checking: whether using an LM step instead of a GN step improves your
 Briefly review LINCAL here and show that it is equivalent to the GN algorithm.
 
 \section{Complex Optimization}
+The most standard way of tackling the calibration problem is to treat the real and imaginary parts of the residual (difference between observed and predicted visibilities) separately and then to independantly solve for the real and imaginary parts
+of the gains. \citet{Smirnov2015} have recently shown that calibration can be performed using complex optimization framework. The main difference between the traditional approach and the 
+complex optimization framework proposed by \citet{Smirnov2015} is that we no longer treat the real and imaginary parts of the residual separately which enables us to directly solve for the complex antenna gains (and their
+complex conjugate). The main reason why we can  
+
+%A standard way to optimize a complex function $f(\bz)$ of $n$ complex variables $\bz\in\mathbb{Z}^n$ is to recast $f$ as  optimize the real and imaginary parts of  separately.
+
+ 
+
+The main difference between complex optimization and the more traditional
+approach to calibration is that in complex calibration we 
+
+
 Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
-
-
-\section{Conjugate Gradient method}
-brief description and lit review of the method.
-computational complexity of the algorithm.
-sparsity and condition number.
-
-\section{Results: EW regular-layout}
 
 \subsection{Jacobian derivation}
 \subsection{Hessian derivation}
@@ -338,6 +343,11 @@ If there is time
 \section{Results: Hexanol grid}
 NB:: Need to test if it works for this redundant layout.
 
+
+\section{Conjugate Gradient method}
+brief description and lit review of the method.
+computational complexity of the algorithm.
+sparsity and condition number.
 % \section{Methods, Observations, Simulations etc.}
 % 
 % Normally the next section describes the techniques the authors used.
@@ -415,15 +425,16 @@ Try to keep it short.
 %\bibliographystyle{mnras}
 %\bibliography{example} % if your bibtex file is called example.bib
 
-
+\bibliographystyle{mnras}
+\bibliography{paper}
 % Alternatively you could enter them by hand, like this:
 % This method is tedious and prone to error if you have lots of references
-\begin{thebibliography}{99}
-\bibitem[\protect\citeauthoryear{Author}{2012}]{Author2012}
-Author A.~N., 2013, Journal of Improbable Astronomy, 1, 1
-\bibitem[\protect\citeauthoryear{Others}{2013}]{Others2013}
-Others S., 2012, Journal of Interesting Stuff, 17, 198
-\end{thebibliography}
+%\begin{thebibliography}{99}
+%\bibitem[\protect\citeauthoryear{Author}{2012}]{Author2012}
+%Author A.~N., 2013, Journal of Improbable Astronomy, 1, 1
+%\bibitem[\protect\citeauthoryear{Others}{2013}]{Others2013}
+%Others S., 2012, Journal of Interesting Stuff, 17, 198
+%\end{thebibliography}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
