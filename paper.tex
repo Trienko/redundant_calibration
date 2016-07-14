@@ -210,30 +210,28 @@ where
  In Eq... $y_{pq}$ denotes the visibility which was created from a skymodel and is associated with antenna $p$ and $q$. [Need to rw this sentence] 
 \end{enumerate}
 
-The simplest why to solve eq. is to use least-squares optimization which if we derive it from first principals would require a Taylor expansion of v.
+One of the simplests approaches one could use to solve eq. is to use least-squares optimization which we can only employ if we are able to calculate the gradient of $\bv(\bg)$,
+implying that $\bv(\bg)$ needs to be analytic in $\bg$ (the Taylor series expansion of $\bv(\bg)$ exists).
+The problem we face if we try to naivly apply least-squares to eq is that $\bv(\bg)$ is not analytic in its argument, since $\frac{\partial \conj{z}}{\partial z}$ (where 
+$z \in \mathbb{C}$) does not exist.
 
-
-
-The most standard way of tackling the calibration problem is to treat the real and imaginary parts of the residual (difference between observed and predicted visibilities) separately and then to simultaneously solve for the real and imaginary parts
-of the gains. 
+The easiest way to circumvent this problem is to recast our problem in such a way that the predicted visibility vector becomes analytic in its argument.
+The most widely used way to accomplish this is to restate eq as
 \begin{equation}
 \min_{\hat{\bg}}\|\hat{\br}\| = \min_{\hat{\bg}}\|\hat{\bd} - \hat{\bv}(\hat{\bg})\|, 
 \end{equation}
 where $\hat{\bg} = \big[\mathcal{R}\{\bg\},\mathcal{I}\{\bg\}\big]^T$, still need to define the other vectors properly....
+Note that $\hat{\bv}(\hat{\bg})$ is now analytic in its argument and we can proceed and use least squares to estimate $\bg$. 
 
-
-
-We have to revert to the above formulation as a direct Taylor expansion of v is not possible as v is nonanalytic in its argument.
-
-
-
-\citet{Smirnov2015} have recently shown that calibration can be performed using the following complex framework 
+\citet{Smirnov2015} have recently shown that calibration can also be performed using the following complex framework: 
 \begin{equation}
 \min_{\breve{\bg}}\|\breve{\br}\| = \min_{\breve{\bg}}\|\breve{\bd} - \breve{\bv}(\breve{\bg})\|, 
 \end{equation}
 where $\breve{\bg} = \big[\bg,\conj{\bg}]^T$, still need to define the other vectors properly....
+The above formulation is valid and is in fact equivalent to the real/imaginary formulation from above, since v breve is analytic in its argument and its complex conjugate as a whole if we use the Wirtinger derivative
+to define our gradient operator.
 
-The above formulation is based on the fact that v breve is analytic in its argument and its complex conjugate as a whole.
+
 
 %The main difference between the traditional approach and the 
 %complex optimization framework proposed by \citet{Smirnov2015} is that in their framework they no longer treat the real and imaginary parts of the residual separately which enables them to directly solve for the complex antenna gains themselves (as well as their
