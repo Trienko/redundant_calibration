@@ -271,7 +271,10 @@ In eq a sky model is required to generate the predicted visibilities $y_{pq}$ as
 we can reduce the number of unknowns so that we are able to solve for the sky and the gains simultaneously.
 
 \subsubsection{Antenna indices to redundancy index mapping}
-If an array is redundant its redundant baselines sample the exact same visibilites in the $uv$-plane. So even though we label the visibilies belonging to different redundant baselines with
+If an array is redundant its redundant baselines sample the exact same visibilites in the $uv$-plane. We denote the true observed visibility associated with baseline $pq$ and 
+baseline $rs$ with $y_{pq}$ and $y_{rs}$ respectively . However if baseline $pq$ and $rs$ represent the same redundant baselines then $y_{pq} = y_{rs}$. Another
+usefull indexing strategy would therefore be 
+, if they are redundant they are in fact the same value. belonging to different redundant baselines with
 a different composite antenna index they actually represent the same visibilities. Another useful labelling strategy therefore would be to assign redundant indices to each unique
 redundant baseline of the array. Where the numbering can start from one and is incrementet every time a new redundant spacing is added to the existing baselines if we 
 add one antenna after another to our array in numerical order. A usefull mapping would then be the function that maps composite antenna indices to redundancy indices. 
