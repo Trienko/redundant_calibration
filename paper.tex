@@ -190,6 +190,7 @@ Also worth checking: whether using an LM step instead of a GN step improves your
 Briefly review LINCAL here and show that it is equivalent to the GN algorithm.
 
 \section{Complex Optimization}
+\subsection{Scalar Calibration}
 Scalar direction independent calibration is achieved through solving the following minimization problem:
 \begin{equation}
 \min_{\bg}\|\br\| = \min_{\bg}\|\bd - \bv(\bg)\|, 
@@ -228,8 +229,16 @@ Note that $\hat{\bv}(\hat{\bg})$ is now analytic in its argument and we can proc
 \min_{\breve{\bg}}\|\breve{\br}\| = \min_{\breve{\bg}}\|\breve{\bd} - \breve{\bv}(\breve{\bg})\|, 
 \end{equation}
 where $\breve{\bg} = \big[\bg,\conj{\bg}]^T$, still need to define the other vectors properly....
-The above formulation is valid and is in fact equivalent to the real/imaginary formulation from above, since v breve is analytic in its argument and its complex conjugate as a whole if we use the Wirtinger derivative
-to define our gradient operator.
+In the above formulation v breve is analytic in its argument and its complex conjugate as a whole under the assumption that the Wirtinger derivative
+is used to define the gradient operator. As v breve is analytic we will are also able to apply the least squares method to .   
+
+The Wirtinger derivatives are defined as
+\begin{eqnarray}
+\frac{\partial}{\partial z} = \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&~&\frac{\partial}{\partial \conj{z}} = \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ) 
+\end{eqnarray}
+where $z = x + iy$ and $x,y \in \mathbb{R}$. It follows from the above that $\frac{\partial z}{\partial z} = 1,\frac{\partial z}{\partial \conj{z}} = 0,\frac{\partial \conj{z}}{\partial z} = 0$ and $\frac{\partial \conj{z}}{\partial \conj{z}} = 1$.
+
+
 
 
 
@@ -256,6 +265,47 @@ fact
 
 The main difference between complex optimization and the more traditional
 approach to calibration is that in complex calibration we 
+
+\subsection{Redundant Calibration}
+In eq a sky model is required to generate the predicted visibilities $y_{pq}$ as we have too few equations to also solve for them and the gains. If we use a redundant layout
+we can reduce the number of unknowns so that we are able to solve for the sky and the gains simultaneously.
+
+\subsubsection{Antenna indices to redundancy index mapping}
+If an array is redundant its redundant baselines sample the exact same visibilites in the $uv$-plane. So even though we label the visibilies belonging to different redundant baselines with
+a different composite antenna index they actually represent the same visibilities. Another useful labelling strategy therefore would be to assign redundant indices to each unique
+redundant baseline of the array. Where the numbering can start from one and is incrementet every time a new redundant spacing is added to the existing baselines if we 
+add one antenna after another to our array in numerical order. A usefull mapping would then be the function that maps composite antenna indices to redundancy indices. 
+Let $\phi_{pq}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps antenna indices to the redundant spacing indices of the array. Also note that this mapping is not symmetric as 
+$\phi_{pq} = 0$ if $p>q$. Moreover, let
+
+\begin{equation}
+\psi_{ij} = 
+\begin{cases}
+q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation},
+
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
+
+and
+
+\begin{equation}
+\zeta_{ij} = 
+\begin{cases}
+\phi_{ij}~\textrm{if}~i<j\\
+\phi_{ji}~\textrm{if}~i>j\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
+ 
+
 
 
 Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
