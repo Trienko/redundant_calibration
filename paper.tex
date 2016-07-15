@@ -271,45 +271,46 @@ In eq a sky model is required to generate the predicted visibilities $y_{pq}$ as
 we can reduce the number of unknowns so that we are able to solve for the sky and the gains simultaneously.
 
 \subsubsection{Antenna indices to redundancy index mapping}
-If an array is redundant its redundant baselines sample the exact same visibilites in the $uv$-plane. We denote the true observed visibility associated with baseline $pq$ and 
-baseline $rs$ with $y_{pq}$ and $y_{rs}$ respectively . However if baseline $pq$ and $rs$ represent the same redundant baselines then $y_{pq} = y_{rs}$. Another
-usefull indexing strategy would therefore be 
-, if they are redundant they are in fact the same value. belonging to different redundant baselines with
-a different composite antenna index they actually represent the same visibilities. Another useful labelling strategy therefore would be to assign redundant indices to each unique
-redundant baseline of the array. Where the numbering can start from one and is incrementet every time a new redundant spacing is added to the existing baselines if we 
-add one antenna after another to our array in numerical order. A usefull mapping would then be the function that maps composite antenna indices to redundancy indices. 
-Let $\phi_{pq}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps antenna indices to the redundant spacing indices of the array. Also note that this mapping is not symmetric as 
-$\phi_{pq} = 0$ if $p>q$. Moreover, let
+If an array is redundant its redundant baselines sample the exact same visibilites in the $uv$-plane. Recall, that we denote the true observed visibility associated with baseline $pq$ and 
+baseline $rs$ with $y_{pq}$ and $y_{rs}$, respectively . However if baseline $pq$ and $rs$ represent the same redundant baseline then $y_{pq} = y_{rs}$. Another
+usefull indexing strategy would therefore be to use redundant baseline indices instead of antenna pairs to label the true observed visibilities so that we can identify 
+which baselines observe the same visibilities barring instrumental and environmental errors.
 
+Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps antenna indices to the unique redundant baseline indices of the array. This mapping is not symmetric as 
+$\phi_{ij} = 0$ if $i>j$. For an east-west regular array we can construct a simple analytic expression for this mapping:
+\begin{equation}
+\widehat{\phi_{ij}} = 
+\begin{cases}
+j-i&\textrm{if}~i<j\\
+0&\textrm{otherwise}
+\end{cases}.
+\end{equation}
+As will become apparent later the following symmetric variant of $\phi_{ij}$ will turn out to be quite useful later on:
+\begin{equation}
+\zeta_{ij} = 
+\begin{cases}
+\phi_{ij}~\textrm{if}~i\leq j\\
+\phi_{ji}~\textrm{if}~i>j
+\end{cases}.
+\end{equation} 
+It is also crucial to be able to determine the antenna index of the antenna which was used to construct a specific redundant baseline if one is given the other antenna index and the redundant baseline index. This can be calculated via the following two functions:
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+0~\textrm{otherwise}
+\end{cases},
+\end{equation}
+and
 \begin{equation}
 \psi_{ij} = 
 \begin{cases}
 q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 0~\textrm{otherwise}
 \end{cases}
-\end{equation},
-
-\begin{equation}
-\xi_{ij} = 
-\begin{cases}
-p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
-0~\textrm{otherwise}
-\end{cases}
 \end{equation}
-
-and
-
-\begin{equation}
-\zeta_{ij} = 
-\begin{cases}
-\phi_{ij}~\textrm{if}~i<j\\
-\phi_{ji}~\textrm{if}~i>j\\
-0~\textrm{otherwise}
-\end{cases}
-\end{equation}
- 
-
-
+We use $\xi_{ij}$ to retrieve the index of the second antenna if we know the redundant baseline index and the index of the first antenna used to construct the baseline in question, while we use $\psi_{ij}$ to return the index of the first antenna if we know the 
+index of the second antenna instead. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
 Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
 
