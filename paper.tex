@@ -63,6 +63,7 @@
 \newcommand{\bg}{\bmath{g}}
 \newcommand{\bd}{\bmath{d}}
 \newcommand{\bv}{\bmath{v}}
+\newcommand{\by}{\bmath{y}}
 \newcommand{\conj}[1]{\overline{#1}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -313,6 +314,18 @@ We use $\xi_{ij}$ to retrieve the index of the second antenna if we know the red
 index of the second antenna instead. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
 Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
+
+\subsubsection{Redundant calibration}
+In the case of a redundant array we can not only solve for the gains $\bg$ but also the redundant visibilities $\by$ themselves. Where $\by = [y_1,\cdots,y_R]$, $y_i$ denotes 
+a unique redundant visibility and $R$ is the maximum value of the mapping $\phi_{ij}$. The reason we can now also solve for $\by$ is because we have reduced the number of 
+unknowns from $N+B$ to $N+R$, where $N+R$ is now less than $B$ due to the array redundancy. We can now reformulate the calibration problem for an redundant array as follow:
+\begin{equation}
+\min_{\bz}\|\br\| = \min_{\bz}\|\bd - \bv(\bz)\|, 
+\end{equation}
+where $\bz = [\bg,\by]^T$.
+
+
+
 
 \subsection{Jacobian derivation}
 \subsection{Hessian derivation}
