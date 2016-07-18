@@ -64,6 +64,8 @@
 \newcommand{\bd}{\bmath{d}}
 \newcommand{\bv}{\bmath{v}}
 \newcommand{\by}{\bmath{y}}
+\newcommand{\bJ}{\bmath{J}}
+\newcommand{\bD}{\bmath{D}}
 \newcommand{\conj}[1]{\overline{#1}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -316,13 +318,43 @@ index of the second antenna instead. \textbf{NB::} I still need to plot $\zeta_{
 Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
 
 \subsubsection{Redundant calibration}
-In the case of a redundant array we can not only solve for the gains $\bg$ but also the redundant visibilities $\by$ themselves. Where $\by = [y_1,\cdots,y_R]$, $y_i$ denotes 
+In the case of a redundant array we can not only solve for the gains $\bg$ but we can also solve for the redundant unknown visibilities $\by$. Where $\by = [y_1,\cdots,y_R]$, $y_i$ denotes 
 a unique redundant visibility and $R$ is the maximum value of the mapping $\phi_{ij}$. The reason we can now also solve for $\by$ is because we have reduced the number of 
 unknowns from $N+B$ to $N+R$, where $N+R$ is now less than $B$ due to the array redundancy. We can now reformulate the calibration problem for an redundant array as follow:
 \begin{equation}
 \min_{\bz}\|\br\| = \min_{\bz}\|\bd - \bv(\bz)\|, 
 \end{equation}
 where $\bz = [\bg,\by]^T$.
+
+If we now follow the same extension strategy of \citet{Smirnov2015} we can rewrite eq to
+\begin{equation}
+\min_{\breve{\bz}}\|\breve{\br}\| = \min_{\bz}\|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
+\end{equation}
+where $\breve{\bz} = [\bz,\conj{\bz}]^T$ still need to define the remaining variables properly.
+
+We can now solve the above equation by using least-squares, which entails deriving the Gauss-Newton (GN) and Levenberg-Marquerdt (LM) update rules.
+(NEED TO WRITE THIS MUCH BETTER)
+
+\begin{equation}
+\bJ = \frac{\partial\bv}{\partial\bz}~\bJ^* = \frac{\partial \bv}{\partial \breve{\bz}} 
+\end{equation}
+
+\begin{equation}
+\bJ = \begin{bmatrix}
+       \bJ & \bJ^* \\
+       \conj{\bJ^*} & \conj{\bJ}  
+      \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+ \Delta \breve{\bz} = \begin{bmatrix}\Delta \bz\\ \Delta \conj{\bz} \end{bmatrix} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br_k}
+\end{equation}
+
+\begin{equation}
+ \Delta \breve{\bz} = \begin{bmatrix}\Delta \bz\\ \Delta \conj{\bz} \end{bmatrix} = (\bJ^H\bJ + \lambda \bD)^{-1}\bJ^H\breve{\br_k}
+\end{equation}
+
+
 
 
 
@@ -333,7 +365,7 @@ where $\bz = [\bg,\by]^T$.
 \boldsymbol{H} = 
 \begin{bmatrix}
 \boldsymbol{A} & \boldsymbol{B}\\
-\boldsymbol{B}^* & \boldsymbol{A}
+\boldsymbol{B}^* & \boldsymbol{A}^*
 \end{bmatrix}
 \end{equation}
 
@@ -358,7 +390,7 @@ With
 \begin{equation}
 [\boldsymbol{C}]_{ij} = 
 \begin{cases}
- \sum_{k \neq i} \left | g_k \right |^2 \left | y_{|i-k|} \right |^2 & \textrm{if} ~ i=j\\
+ \sum_{k \neq i} \left | g_k \right |^2 \left | y_{\zeta_{ik}} \right |^2 & \textrm{if} ~ i=j\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -366,7 +398,7 @@ With
 \begin{equation}
 [\boldsymbol{D}]_{ij} = 
 \begin{cases}
- g_i y_j^*  \left | g_{i+j} \right |^2  & \textrm{if} ~ i<j\\
+ g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -382,7 +414,7 @@ With
 \begin{equation}
 [\boldsymbol{F}]_{ij} = 
 \begin{cases}
- g_i g_j  \left | y_{|i-j|} \right |^2  & \textrm{if} ~ i \neq j\\
+ g_i g_j  \left | y_{\zeta_{ij}} \right |^2  & \textrm{if} ~ (i \neq j)\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -390,7 +422,7 @@ With
 \begin{equation}
 [\boldsymbol{G}]_{ij} = 
 \begin{cases}
- g_i y_j  \left | g_{i-j} \right |^2  & \textrm{if} ~ i > j\\
+ g_i y_j  \left | g_{\xi_{ij}} \right |^2  & \textrm{if} ~ (\xi_{ij}\neq0)\\
  0 & \textrm{otherwise}
 \end{cases}
 \end{equation}
@@ -398,7 +430,7 @@ With
 Moreover, 
 
 \begin{equation}
-\mathcal{I}_i = \left\{pq|(q - p) = i \right\}
+\mathcal{I}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
 
 The dimensions of the matrices:
