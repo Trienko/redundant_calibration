@@ -129,7 +129,64 @@ class solver():
              plt.imshow(self.J_int,interpolation="nearest")
              plt.show() 
 
+      def LOGCAL_J_amp(self,z,N,dim=1,l=20,layout="HEX"):
+          g = z[:N]
+          y = z[N:]
+          if layout == "HEX":
+             ant_x,ant_y = self.hex_grid_ver2(dim,l)
+          elif layout == "LIN":
+             ant_x,ant_y = self.line_grid(dim,l)
+          else:
+             ant_x,ant_y = self.square_grid(dim,l)
+          
+          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
+          L = np.amax(phi)
 
+          J_logcal = np.zeros(((N**2-N)/2,N+R))
+          p_index = np.zeros(((N,))
+          q_index = np.zeros(((N,))
+
+          counter = 0
+          for p in xrange(len(p_index)):
+              for q in xrange(p+1,len(q_index)):
+                  p_index[counter] = p
+                  q_index[counter] = q
+                  counter = counter + 1
+
+          for eq in J_logcal.shape[0]:
+              J_logcal[eq,p_index[eq]] = 1
+              J_logcal[eq,q_index[eq]] = 1
+              J_logcal[eq,phi[p_index[eq],q_index[eq]]] = 1
+
+      def LOGCAL_J_phase(self,z,N,dim=1,l=20,layout="HEX"):
+          g = z[:N]
+          y = z[N:]
+          if layout == "HEX":
+             ant_x,ant_y = self.hex_grid_ver2(dim,l)
+          elif layout == "LIN":
+             ant_x,ant_y = self.line_grid(dim,l)
+          else:
+             ant_x,ant_y = self.square_grid(dim,l)
+          
+          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
+          L = np.amax(phi)
+
+          J_logcal = np.zeros(((N**2-N)/2,N+R))
+          p_index = np.zeros(((N,))
+          q_index = np.zeros(((N,))
+
+          counter = 0
+          for p in xrange(len(p_index)):
+              for q in xrange(p+1,len(q_index)):
+                  p_index[counter] = p
+                  q_index[counter] = q
+                  counter = counter + 1
+
+          for eq in J_logcal.shape[0]:
+              J_logcal[eq,p_index[eq]] = 1
+              J_logcal[eq,q_index[eq]] = -1
+              J_logcal[eq,phi[p_index[eq],q_index[eq]]] = 1
+  
       def hex_grid_ver2(self,hex_dim,l):
           hex_dim = int(hex_dim)
           side = int(hex_dim + 1)
