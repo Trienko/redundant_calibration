@@ -129,7 +129,7 @@ class solver():
              plt.imshow(self.J_int,interpolation="nearest")
              plt.show() 
 
-      def LOGCAL_J_amp(self,z,N,dim=1,l=20,layout="HEX"):
+      def LOGCAL_J_amp(self,z,N,dim=1,l=20,layout="HEX",constraints=False):
           g = z[:N]
           y = z[N:]
           if layout == "HEX":
@@ -142,7 +142,13 @@ class solver():
           phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
           L = np.amax(phi)
 
-          J_logcal = np.zeros(((N**2-N)/2,N+R))
+          if constraints:
+             J_logcal = np.zeros(((N**2-N)/2+1,N+R))
+             eqs = (N**2-N)/2+1  
+          else:   
+             J_logcal = np.zeros(((N**2-N)/2,N+R))
+             eqs = (N**2-N)/2
+
           p_index = np.zeros(((N,))
           q_index = np.zeros(((N,))
 
@@ -153,14 +159,16 @@ class solver():
                   q_index[counter] = q
                   counter = counter + 1
 
-          for eq in J_logcal.shape[0]:
+          for eq in xrange(eqs):
               J_logcal[eq,p_index[eq]] = 1
               J_logcal[eq,q_index[eq]] = 1
               J_logcal[eq,N-1+phi[p_index[eq],q_index[eq]]] = 1
+          if constraints:
+             J_logcal[-1,:N] = np.ones((N,))  
 
           return J_logcal 
 
-      def LOGCAL_J_phase(self,z,N,dim=1,l=20,layout="HEX"):
+      def LOGCAL_J_phase(self,z,N,dim=1,l=20,layout="HEX",constraints=False):
           g = z[:N]
           y = z[N:]
           if layout == "HEX":
@@ -177,6 +185,13 @@ class solver():
           p_index = np.zeros(((N,))
           q_index = np.zeros(((N,))
 
+         if constraints:
+             J_logcal = np.zeros(((N**2-N)/2+3,N+R))
+             eqs = (N**2-N)/2+3  
+          else:   
+             J_logcal = np.zeros(((N**2-N)/2,N+R))
+             eqs = (N**2-N)/2
+
           counter = 0
           for p in xrange(len(p_index)):
               for q in xrange(p+1,len(q_index)):
@@ -184,10 +199,15 @@ class solver():
                   q_index[counter] = q
                   counter = counter + 1
 
-          for eq in J_logcal.shape[0]:
+          for eq in xrange(eqs):
               J_logcal[eq,p_index[eq]] = 1
               J_logcal[eq,q_index[eq]] = -1
               J_logcal[eq,N-1+phi[p_index[eq],q_index[eq]]] = 1
+          
+          if constraints:
+             J_logcal[-3,:N] = np.ones((N,)) 
+             J_logcal[-2,:N] = ant_x  
+             J_logcal[-1,:N] = ant_y
 
           return J_logcal
 
@@ -215,41 +235,7 @@ class solver():
                   q_index[counter] = q
                   counter = counter + 1
 
-          for eq in J_logcal.shape[0]:
-              v0 = g[p_index[eq]]*g[q_index[eq]].conj()*y[phi[p_index[eq],q_index[eq]]]
-              J_lincal[eq,p_index[eq]] = v0
-              J_lincal[eq,q_index[eq]] = 1j*v0
-              J_lincal[eq,N-1+p_index[eq]] = v0
-              J_lincal[eq,N-1+q_index[eq]] = -1j*v0
-              J_lincal[eq,2*N-1+phi[p_index[eq],q_index[eq]]] = v0
-              J_lincal[eq,2*N-1+phi[p_index[eq],q_index[eq]]] = 1j*v0
-          return J_lincal
-
-      def LINCAL_J(self,z,N,dim=1,l=20,layout="HEX"):
-          g = z[:N]
-          y = z[N:]
-          if layout == "HEX":
-             ant_x,ant_y = self.hex_grid_ver2(dim,l)
-          elif layout == "LIN":
-             ant_x,ant_y = self.line_grid(dim,l)
-          else:
-             ant_x,ant_y = self.square_grid(dim,l)
-          
-          phi,zeta = self.calculate_phi(ant_x,ant_y,plot=False)
-          L = np.amax(phi)
-
-          J_lincal = np.zeros(((N**2-N)/2,N+R))
-          p_index = np.zeros(((N,))
-          q_index = np.zeros(((N,))
-
-          counter = 0
-          for p in xrange(len(p_index)):
-              for q in xrange(p+1,len(q_index)):
-                  p_index[counter] = p
-                  q_index[counter] = q
-                  counter = counter + 1
-
-          for eq in J_logcal.shape[0]:
+          for eq in xrange(J_logcal.shape[0]):
               v0 = g[p_index[eq]]*g[q_index[eq]].conj()*y[phi[p_index[eq],q_index[eq]]]
               J_lincal[eq,p_index[eq]] = v0
               J_lincal[eq,q_index[eq]] = 1j*v0
