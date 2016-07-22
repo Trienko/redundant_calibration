@@ -34,7 +34,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="WSRT.txt",nsteps=300,bas_len=None,order=None):
+      def __init__(self,h_min=-2,h_max=2,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="SQR",nsteps=10,bas_len=50,order=3):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -54,6 +54,187 @@ class sim():
           self.u_m = None #The uvw composite index matrices
           self.v_m = None
           self.w_m = None
+
+      '''
+      Generates an hexagonal layout
+      
+      RETURNS:
+      None
+
+      INPUTS:
+      hex_dim - The amount of rings in the hexagonal layout
+      l - Basic spacing between antennas
+      ''' 
+      def hex_grid(self,hex_dim,l):
+          hex_dim = int(hex_dim)
+          side = int(hex_dim + 1)
+          ant_main_row = int(side + hex_dim)
+        
+          elements = 1
+
+          #SUMMING ANTENNAS IN HEXAGONAL RINGS 
+          for k in xrange(hex_dim):
+              elements = elements + (k+1)*6
+          
+          #CREATING HEXAGONAL LAYOUT STARTING FROM CENTER      
+          ant_x = np.zeros((elements,),dtype=float)
+          ant_y = np.zeros((elements,),dtype=float)
+          #print "len(ant_x) = ",len(ant_x)
+          #print "len(ant_y) = ",len(ant_y)
+          x = 0.0
+          y = 0.0
+
+          counter = 0
+        
+          for k in xrange(side):
+              x_row = x
+              y_row = y
+              for i in xrange(ant_main_row):
+                  if k == 0:
+                     ant_x[counter] = x_row 
+                     ant_y[counter] = y_row
+                     x_row = x_row + l
+                     counter = counter + 1 
+                  else:
+                     ant_x[counter] = x_row
+                     ant_y[counter] = y_row
+                     counter = counter + 1
+                   
+                     ant_x[counter] = x_row
+                     ant_y[counter] = -1*y_row
+                     x_row = x_row + l
+                     counter = counter + 1   
+              x = x + l/2.0
+              y = y + (np.sqrt(3)/2.0)*l                 
+              ant_main_row = ant_main_row - 1
+       
+          #RESORTING ANTENNA INDICES SO THAT LOWER LEFT CORNER BECOMES THE FIRST ANTENNA
+          y_idx = np.argsort(ant_y)
+          ant_y = ant_y[y_idx]
+          ant_x = ant_x[y_idx]
+
+          slice_value = int(side)
+          start_index = 0
+          add = True
+          ant_main_row = int(side + hex_dim)
+
+          for k in xrange(ant_main_row):
+              temp_vec_x = ant_x[start_index:start_index+slice_value]
+              x_idx = np.argsort(temp_vec_x)
+              temp_vec_x = temp_vec_x[x_idx]
+              ant_x[start_index:start_index+slice_value] = temp_vec_x
+              if slice_value == ant_main_row:
+                 add = False
+              start_index = start_index+slice_value 
+            
+              if add:
+                 slice_value = slice_value + 1
+              else:
+                 slice_value = slice_value - 1  
+
+              #print "slice_value = ",slice_value
+              #print "k = ",k
+
+          #SHIFTING CENTER OF ARRAY TO ORIGIN
+          max_x = np.amax(ant_x)
+          #max_y = np.amax(ant_y)
+          
+          ant_x = ant_x - max_x/2.0
+          #ant_y = ant_y - max_y/2.0
+
+          temp_ant = np.zeros((len(ant_x),3),dtype=float)
+          temp_ant[:,0] = ant_x
+          temp_ant[:,1] = ant_y
+          return temp_ant
+
+      '''
+      Generates a square layout
+      
+      RETURNS:
+      None
+
+      INPUTS:
+      side - The amount of antennas in one side
+      l - Basic spacing between antennas
+      '''       
+      def square_grid(self,side,l):
+          elements = side*side
+                
+          ant_x = np.zeros((elements,),dtype=float)
+          ant_y = np.zeros((elements,),dtype=float)
+          print "len(ant_x) = ",len(ant_x)
+          print "len(ant_y) = ",len(ant_y)
+          x = 0.0
+          y = 0.0
+
+          counter = 0
+        
+          for k in xrange(side):
+              x = 0.0
+              for i in xrange(side):
+                  ant_x[counter] = x
+                  ant_y[counter] = y 
+                  x = x + l
+                  counter = counter + 1
+              y = y + l
+ 
+          #SHIFTING CENTER OF ARRAY TO ORIGIN
+          max_x = np.amax(ant_x)
+          max_y = np.amax(ant_y)
+          
+          temp_ant = np.zeros((len(ant_x),3),dtype=float)
+          temp_ant[:,0] = ant_x
+          temp_ant[:,1] = ant_y
+          return temp_ant
+
+      '''
+      Generates a regular EW layout
+      
+      RETURNS:
+      None
+
+      INPUTS:
+      side - The amount of antennas in one side
+      l - Basic spacing between antennas
+      '''              
+      def line_grid(self,elements,l):
+                       
+          ant_x = np.zeros((elements,),dtype=float)
+          ant_y = np.zeros((elements,),dtype=float)
+          print "len(ant_x) = ",len(ant_x)
+          print "len(ant_y) = ",len(ant_y)
+          x = 0.0
+          y = 0.0
+
+          for k in xrange(elements):
+              ant_x[k] = x
+              x = x + l
+
+          temp_ant = np.zeros((len(ant_x),3),dtype=float)
+          temp_ant[:,0] = ant_x
+          temp_ant[:,1] = ant_y
+          return temp_ant
+
+
+      '''
+      Generates an antenna layout either from a file or with a standard grid depending on the value of self.layout
+      
+      RETURNS:
+      None
+
+      INPUTS:
+      None
+      '''
+      def generate_antenna_layout(self):
+          if self.layout == "HEX":
+             self.ant = self.hex_grid(hex_dim=self.order,l=self.bas_len)
+          elif self.layout == "SQR":
+             self.ant = self.square_grid(side=self.order,l=self.bas_len) 
+          elif self.layout == "REG":
+             self.ant = self.line_grid(elements=self.order,l=self.bas_len)
+          else:
+             self.read_antenna_layout()
+          self.N = self.ant.shape[0]
 
       '''
       Reads the antenna layout from a text file
@@ -105,7 +286,7 @@ class sim():
               #plt.annotate(label, xy = (x, y), xytext = (-15, 15), textcoords = 'offset points', fontsize = 12, ha = 'right', va = 'bottom', bbox = dict(boxstyle = 'round,pad=0.5', fc = 'white', alpha = 0.2), arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0')) 
           plt.xlabel("W-E [m]",fontsize=label_size)
           plt.ylabel("S-N [m]",fontsize=label_size)
-          plt.title(title,fontsize=label_size)
+          plt.title(title+"-"+str(self.N),fontsize=label_size)
     
           plt.ylim(-1.1*m,1.1*m)
           plt.xlim(-1.1*m,1.1*m)
@@ -236,14 +417,15 @@ class sim():
           plt.xlim(-1.1*m_x,1.1*m_x)
           plt.xlabel("$u$ [$\lambda$]",fontsize=label_size)
           plt.ylabel("$v$ [$\lambda$]",fontsize=label_size)
-          plt.title(title,fontsize=label_size)
+          plt.title(title+"-"+str(self.N),fontsize=label_size)
           plt.show() 
           
 
 
 if __name__ == "__main__":
    s = sim()
-   s.read_antenna_layout()
-   s.plot_ant(title="WSRT")
+   #s.read_antenna_layout()
+   s.generate_antenna_layout()
+   s.plot_ant(title="HEX")
    s.uv_tracks()
-   s.plot_uv_coverage(title="WSRT")
+   s.plot_uv_coverage(title="HEX")
