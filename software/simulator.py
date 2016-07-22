@@ -38,7 +38,7 @@ class sim():
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
-          self.h = np.linspace(self.h_min,self.h_max,num=nsteps)*np.pi/12
+          self.h = np.linspace(self.h_min,self.h_max,num=nsteps)*np.pi/12 #Hour angle range
           self.dec = dec
           self.lat = lat
           self.freq = freq
@@ -121,7 +121,7 @@ class sim():
       elev - elevation angle of baseline
       lat - latitude of array
       '''
-      def DAE_to_XYZ(d,az,elev,lat):
+      def DAE_to_XYZ(self,d,az,elev,lat):
           XYZ = d * np.array([np.cos(lat)*np.sin(elev) - np.sin(lat)*np.cos(elev)*np.cos(az),
           np.cos(elev)*np.sin(az),
           np.sin(lat)*np.sin(elev) + np.cos(lat)*np.cos(elev)*np.cos(az)])
@@ -130,22 +130,117 @@ class sim():
 
 
       '''
-      Converts XYZ into uvw coordinates
-      
+      Computes the rotation matrix A needed to convert XYZ into uvw at a specific hour angle
+        
+      INPUTS:
+      h - a specific hour angle
+      delta - declination of observation
+
+      RETURNs:
+      A - rotation matrix capable of converting XYZ into uvw
       '''
-      def XYZ_to_uvw(h,delta):
-          A = np.array([[np.sin(h),np.cos(h),0],[-1*np.sin(delta)*np.cos(h),np.sin(delta)*np.sin(h),np.cos(delta)],[np.cos(delta)*np.cos(h),-  np.cos(delta)*np.sin(h),np.sin(delta)]])
+      def XYZ_to_uvw(self,h,delta):
+          A = np.array([[np.sin(h),np.cos(h),0],[-1*np.sin(delta)*np.cos(h),np.sin(delta)*np.sin(h),np.cos(delta)],[np.cos(delta)*np.cos(h),-1*np.cos(delta)*np.sin(h),np.sin(delta)]])
           return A   
 
-def uvTrack(h,d,az,el,lat,dec,wave_length):
-    uvw = np.zeros((len(h),3))
-    for i in xrange(len(h)):
-        A = XYZ_to_uvw(h[i],dec)
-        uvw[i,:] = A.dot(DAE_to_XYZ(d,az,el,lat)/wave_length)
-    return uvw  
+      ''' 
+      Computes the uv-track of a specific baseline
+      
+      RETURNS:
+      uvw - The uv-track of a specific baseline over a certain hour angle range
+      
+      INPUTS:
+      h - hour angle range
+      dec - declination of observation
+      lat - latitude of observation
+      az - azimuth angle of baseline
+      el - elevation angle of baseline
+      d - baseline lenght
+      wave_lenght - wavelenght of observation
+      '''
+      def uv_track(self,h,d,az,el,lat,dec,wave_length):
+          uvw = np.zeros((len(h),3))
+          for i in xrange(len(h)):
+              A = XYZ_to_uvw(h[i],dec)
+              uvw[i,:] = A.dot(DAE_to_XYZ(d,az,el,lat)/wave_length)
+          return uvw 
+      
+
+      ''' 
+      Computes the uv-tracks of an array layout
+      RETURNS:
+      None
+
+      INPUTS:
+      None
+      ''' 
+      def uv_tracks(self):
+          #CALCULATE BASELINE LENGTHS AND AZIMUTH AND ELEVATION ANGLES
+          self.N = self.ant.shape[0]
+          self.B = (self.N**2-self.N)/2
+
+          DAE = np.zeros((self.B,3))#storing baseline length, azimuth angle and elevation
+          
+          p = np.zeros((self.B,),dtype=int) 
+          q = np.zeros((self.B,),dtype=int)  
+
+          k = 0
+          for i in xrange(self.N):
+              for j in xrange(i+1,self.N):
+                  DAE[k,0] = np.sqrt((self.ant[i,0]-self.ant[j,0])**2+(self.ant[i,1]-self.ant[j,1])**2+(self.ant[i,2]-self.ant[j,2])**2)
+                  #WRONG VERSION: DAE[k,1] = np.arctan2(array_l[i,0]-array_l[j,0],array_l[i,1]-array_l[j,1])
+                  #NB MUST USE j - i
+                  DAE[k,1] = np.arctan2(self.ant[j,0]-self.ant[i,0],self.ant[j,1]-self.ant[i,1])
+                  DAE[k,2] = np.arcsin((self.ant[j,2]-self.ant[i,2])/DAE[k,0])
+                  p[k] = i
+                  q[k] = j
+                  k = k + 1 
+   
+          #CONVERT TO XYZ
+          #CONVERT TO UVW
+          self.u_m = np.zeros((self.N,self.N,self.nsteps),dtype=float) 
+          self.v_m = np.zeros((self.N,self.N,self.nsteps),dtype=float)
+          self.w_m = np.zeros((self.N,self.N,self.nsteps),dtype=float)    
+   
+          
+          for i in xrange(num_baselines):
+              X = uv_track(self.h,DAE[i,0],DAE[i,1],DAE[i,2],self.lat,self.dec,self.wave)
+              self.u_m[p[i],q[i],:] = X[:,0]
+              self.u_m[q[i],p[i],:] = -1*X[:,0]
+              self.v_m[p[i],q[i],:] = X[:,1]
+              self.v_m[q[i],p[i],:] = -1*X[:,1] 
+              self.w_m[p[i],q[i],:] = X[:,2]
+              self.w_m[q[i],p[i],:] = -1*X[:,2]
+      
+      ''' 
+      Plots the uv-tracks of an array layout
+      RETURNS:
+      None
+
+      INPUTS:
+      title - title of plot
+      labelsize - font size of labels
+      None
+      ''' 
+      def plot_uv_coverage(self,title,label_size):
+          m_x = np.amax(np.absolute(u_m))
+          m_y = np.amax(np.absolute(v_m)) 
+          for i in xrange(self.N):
+              for j in xrange(i+1,self.N):
+                  plt.plot(self.u_m[i,j,:],self.v_m[i,j,:],"b")  
+                  plt.plot(self.u_m[j,i,:],self.v_m[j,i,:],"r")
+          plt.ylim(-1.1*m_y,1.1*m_y)
+          plt.xlim(-1.1*m_x,1.1*m_x)
+          plt.xlabel("u [$\lambda$]",fontsize=label_size)
+          plt.ylabel("v [$\lambda$]",fontsize=label_size)
+          plt.title(title,fontsize=label_size)
+          plt.show() 
+          
 
 
 if __name__ == "__main__":
    s = sim()
    s.read_antenna_layout()
    s.plot_ant()
+   s.uv_tracks()
+   s.plot_uv_coverage()
