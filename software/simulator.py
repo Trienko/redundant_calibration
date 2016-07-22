@@ -182,6 +182,9 @@ class sim():
           max_x = np.amax(ant_x)
           max_y = np.amax(ant_y)
           
+          ant_x = ant_x - max_x/2.0
+          ant_y = ant_y - max_y/2.0
+          
           temp_ant = np.zeros((len(ant_x),3),dtype=float)
           temp_ant[:,0] = ant_x
           temp_ant[:,1] = ant_y
