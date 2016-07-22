@@ -106,7 +106,43 @@ class sim():
     
           plt.ylim(-1.1*m,1.1*m)
           plt.xlim(-1.1*m,1.1*m)
-          plt.show()  
+          plt.show() 
+
+      '''
+      Converts baseline length, azimuth angle, elevation angle and latitude into XYZ coordinates
+      RETURNS:
+      XYZ - a vector of size 3 containing the XYZ coordinate of a specific baseline 
+            #X - (0,0)
+            #Y - (-6,0)
+            #Z - NCP
+      INPUTS:
+      d - baseline length
+      az - azimuth angle of baseline
+      elev - elevation angle of baseline
+      lat - latitude of array
+      '''
+      def DAE_to_XYZ(d,az,elev,lat):
+          XYZ = d * np.array([np.cos(lat)*np.sin(elev) - np.sin(lat)*np.cos(elev)*np.cos(az),
+          np.cos(elev)*np.sin(az),
+          np.sin(lat)*np.sin(elev) + np.cos(lat)*np.cos(elev)*np.cos(az)])
+          #print "XYZ = ",XYZ
+          return XYZ        
+
+
+      '''
+      Converts XYZ into uvw coordinates
+      
+      '''
+      def XYZ_to_uvw(h,delta):
+          A = np.array([[np.sin(h),np.cos(h),0],[-1*np.sin(delta)*np.cos(h),np.sin(delta)*np.sin(h),np.cos(delta)],[np.cos(delta)*np.cos(h),-  np.cos(delta)*np.sin(h),np.sin(delta)]])
+          return A   
+
+def uvTrack(h,d,az,el,lat,dec,wave_length):
+    uvw = np.zeros((len(h),3))
+    for i in xrange(len(h)):
+        A = XYZ_to_uvw(h[i],dec)
+        uvw[i,:] = A.dot(DAE_to_XYZ(d,az,el,lat)/wave_length)
+    return uvw  
 
 
 if __name__ == "__main__":
