@@ -35,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=3):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=19):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -55,6 +55,8 @@ class sim():
           self.u_m = None #The uvw composite index matrices
           self.v_m = None
           self.w_m = None
+          self.phi = np.array([])
+          self.zeta = np.array([])
 
       '''
       Generates an hexagonal layout
@@ -472,7 +474,9 @@ class sim():
                   red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
                   zeta[k,j] = phi[k,j]
                   zeta[j,k] = zeta[k,j]
-          
+          self.L = np.amax(zeta)
+          self.phi = phi
+          self.zeta = zeta   
           return phi,zeta
 
       '''
@@ -482,7 +486,7 @@ class sim():
       step1 - step size on colorbar
       step2 - step size on axis
       label_size - label size
-      cs - colorbar
+      cs - color scheme
       
       RETURNS:
       None 
@@ -536,11 +540,51 @@ class sim():
 
 
 if __name__ == "__main__":
-   s = sim()
+   #s = sim()
    #s.read_antenna_layout()
-   s.generate_antenna_layout()
-   s.plot_ant(title="HEX")
-   phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-   s.plot_zeta(zeta,5,5,12,"jet")
+   #s.generate_antenna_layout()
+   #s.plot_ant(title="HEX")
+   #phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+   #s.plot_zeta(zeta,5,5,12,"jet")
+   
+   r_v  = np.arange(1,6)
+
+   N = np.zeros((len(r_v),))
+   L = np.zeros((len(r_v),))
+
+   for k in xrange(len(r_v)):
+       print "k = ",k
+       s = sim(order=r_v[k])
+       s.generate_antenna_layout()
+       phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+       N[k] = s.N
+       L[k] = s.L
+ 
+   print "N = ",N
+   print "L = ",L
+
+   r_t = (-3 + np.sqrt(12*N-3))/6
+
+   L_t_2 = 6*((-3 + np.sqrt(12*N-3))/6)**2+3*((-3 + np.sqrt(12*N-3))/6)
+   print "r_t = ",r_t
+   print "r_v = ",r_v 
+
+   z = np.polyfit(r_v, L, 2)
+   print "z = ",z
+
+   #L_t = 2*N-np.sqrt(12*N-3)+4
+   print "L_t = ",2*N-0.5*np.sqrt(12*N-3)-0.5
+   print "L_t_2 = ",L_t_2
+   
+   plt.plot(r_v,L)
+   plt.plot(r_v,6*r_v**2 + 3*r_v,"r")
+   plt.show()
+   plt.plot(N,L)
+   plt.plot(N,2*N-0.5*np.sqrt(12*N-3)-0.5,"r")
+   #print "L2 = ",z[0]*r_v**2 + z[1]*r_v+z[0]
+   #plt.plot(N,z[0]*N+z[1],"g")
+   #print "L2 = ",7./4*N-13./4
+   #print "L3 = ",z[0]*N+z[1]
+   plt.show()
    #s.uv_tracks()
    #s.plot_uv_coverage(title="SQR")
