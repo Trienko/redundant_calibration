@@ -35,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=2):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=3):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -478,90 +478,40 @@ class sim():
       '''
       Plot zeta
       INPUTS:
-      zeta - redundant matrix to plot
-      step - step size on axis
+      data - redundant matrix to plot
+      step1 - step size on colorbar
+      step2 - step size on axis
+      label_size - label size
+      cs - colorbar
       
       RETURNS:
       None 
       '''
-      def plot_zeta(self,zeta,step):
-          k = np.amax(zeta)
-          print "k = ",k
-
-          c = self.cmap_discretize('jet', k+1)
-          #plt.subplot(111)
-          
-          plt.imshow(zeta,interpolation='nearest',cmap=c)
-          plt.colorbar()
-          plt.show()
-
-          plt.imshow(zeta,interpolation='nearest',cmap=c)
-          cb = plt.colorbar()
-          labels = np.arange(0,k,1)
-          loc    = labels + .5
-          cb.set_ticks(loc)
-          cb.set_ticklabels(labels+1)
-
-          plt.show()
-
-          '''
-          plt.imshow(zeta,interpolation="nearest")
-          x = np.arange(len(self.ant[:,0]),step=step,dtype=int)
+      def plot_zeta(self,data,step1,step2,label_size,cs):
+          mpl.rcParams['xtick.labelsize'] = label_size 
+          mpl.rcParams['ytick.labelsize'] = label_size 
+          #get discrete colormap
+          cmap = plt.get_cmap(cs, np.max(data)-np.min(data)+1)
+          # set limits .5 outside true range
+          mat = plt.matshow(data,cmap=cmap,vmin = np.min(data)-.5, vmax = np.max(data)+.5)
+          #tell the colorbar to tick at integers
+          ticks = ticks=np.arange(np.min(data),np.max(data)+1,step1)
+          if ticks[-1] <> np.max(data):
+             ticks = np.append(ticks,np.array([np.max(data)])) 
+          cax = plt.colorbar(mat, ticks=ticks)
+          x = np.arange(len(self.ant[:,0]),step=step2,dtype=int)
+          if x[-1] <> len(self.ant[:,0])-1:
+             x = np.append(x,np.array([len(self.ant[:,0])-1]))
           plt.xticks(x, x+1)
-          y = np.arange(len(self.ant[:,1]),step=step,dtype=int)
+          y = np.arange(len(self.ant[:,1]),step=step2,dtype=int)
+          if y[-1] <> len(self.ant[:,0])-1:
+             y = np.append(y,np.array([len(self.ant[:,0])-1]))
           plt.yticks(y, y+1)
-          plt.colorbar() 
-          plt.yticks(y, y+1)
-           
+          plt.xlabel("$q$",fontsize=label_size+5)
+          plt.ylabel("$p$",fontsize=label_size+5)
+          #plt.title("$\zeta_{pq}$",fontsize=label_size+5)
+          cax.set_label("$R(\zeta_{pq})$", size=label_size+5)
           plt.show()
-          '''
-          #print "phi = ",phi  
-
-      """Return a discrete colormap from the continuous colormap cmap.
-        
-      INPUTS:  
-      cmap: colormap instance, eg. cm.jet. 
-      N: number of colors.
-        
-      RETURN:
-      lin_map - discretized cmap 
-          
-      Example
-      x = resize(arange(100), (5,100))
-      djet = cmap_discretize(cm.jet, 5)
-      imshow(x, cmap=djet)
-      """ 
-      def cmap_discretize(self,cmap, N):
-          if type(cmap) == str:
-             cmap = mpl.cm.get_cmap(cmap)
-          colors_i = np.concatenate((np.linspace(0, 1., N), (0.,0.,0.,0.)))
-          colors_rgba = cmap(colors_i)
-          indices = np.linspace(0, 1., N+1)
-          cdict = {}
-          for ki,key in enumerate(('red','green','blue')):
-              cdict[key] = [ (indices[i], colors_rgba[i-1,ki], colors_rgba[i,ki]) for i in xrange(N+1) ]
-          # Return colormap object.
-          return mpl.colors.LinearSegmentedColormap(cmap.name + "_%d"%N, cdict, 1024)
-
-      '''
-      Returns the p if the redundant index and q are given
-      INPUTS:
-      i - q
-      j - redundant index
-      phi - mapping from pq to redundant index
-      
-      RETURNS:
-      p - p
-      Found - If p was found in phi?
-      '''
-      def xi_func_eval(self,i,j,phi):
-          column = phi[:,i]
-
-          for p in xrange(len(column)):
-              if column[p] == j:
-                 return p,True
-
-          return 0,False
 
       '''
       Returns the q if the redundant index and p are given
@@ -591,6 +541,6 @@ if __name__ == "__main__":
    s.generate_antenna_layout()
    s.plot_ant(title="HEX")
    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-   s.plot_zeta(zeta,5)
+   s.plot_zeta(zeta,5,5,12,"jet")
    #s.uv_tracks()
    #s.plot_uv_coverage(title="SQR")
