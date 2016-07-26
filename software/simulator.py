@@ -1,6 +1,7 @@
 import numpy as np
 import pylab as plt
 import matplotlib as mpl
+#from matplotlib import cm.get_cmap
 
 '''
 Simulator that can create uv-tracks and basic scalar visibilities.
@@ -34,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-2,h_max=2,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="SQR",nsteps=10,bas_len=50,order=3):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=2):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -279,7 +280,7 @@ class sim():
       labelsize - font size of labels
       ms - marker size
       '''
-      def plot_ant(self,title="KAT7",label_size=14,ms=10):
+      def plot_ant(self,title="KAT",label_size=14,ms=10):
           m = np.amax(np.absolute(self.ant))
           mpl.rcParams['xtick.labelsize'] = label_size 
           mpl.rcParams['ytick.labelsize'] = label_size 
@@ -409,7 +410,7 @@ class sim():
       labelsize - font size of labels
       None
       ''' 
-      def plot_uv_coverage(self,title="KAT7",label_size=14):
+      def plot_uv_coverage(self,title="KAT",label_size=14):
           m_x = np.amax(np.absolute(self.u_m))
           m_y = np.amax(np.absolute(self.v_m)) 
           for i in xrange(self.N):
@@ -422,6 +423,165 @@ class sim():
           plt.ylabel("$v$ [$\lambda$]",fontsize=label_size)
           plt.title(title+"-"+str(self.N),fontsize=label_size)
           plt.show() 
+
+      '''
+      Converts the antenna idices pq into a redundant index
+         
+      INPUTS:
+      red_vec_x - the current list of unique redundant baseline vector (x-coordinate)
+      red_vec_y - the current list of unique redundant baseline vector (y-coordinate)
+      ant_x_p - the x coordinate of antenna p
+      ant_x_q - the x coordinate of antenna q
+      ant_y_p - the y coordinate of antenna p
+      ant_y_q - the y coordinate of antenna q
+
+      RETURNS:
+      red_vec_x - the current list of unique redundant baseline vector (x-coordinate)
+      red_vec_y - the current list of unique redundant baseline vector (y-coordinate)
+      l - The redundant index associated with antenna p and q
+      '''
+      def determine_phi_value(self,red_vec_x,red_vec_y,ant_x_p,ant_x_q,ant_y_p,ant_y_q):
+          red_x = ant_x_q - ant_x_p
+          red_y = ant_y_q - ant_y_p
+
+          for l in xrange(len(red_vec_x)):
+              if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
+                 return red_vec_x,red_vec_y,int(l+1)
+
+          red_vec_x = np.append(red_vec_x,np.array([red_x]))
+          red_vec_y = np.append(red_vec_y,np.array([red_y]))
+          return red_vec_x,red_vec_y,int(len(red_vec_x)) 
+
+      '''
+      Returns the mapping phi, from pq indices to redundant indices.
+      INPUTS:
+      ant_x - vector containing the x-positions of all the antennas
+      ant_y - vector containing the y-positions of all the antennas 
+
+      RETURNS:
+      phi - the mapping from pq indices to redundant indices
+      zeta - the symmetrical counterpart  
+      '''
+      def calculate_phi(self,ant_x,ant_y):
+          phi = np.zeros((len(ant_x),len(ant_y)),dtype=int)
+          zeta = np.zeros((len(ant_x),len(ant_y)),dtype=int)
+          red_vec_x = np.array([])
+          red_vec_y = np.array([])
+          for k in xrange(len(ant_x)):
+              for j in xrange(k+1,len(ant_x)):
+                  red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
+                  zeta[k,j] = phi[k,j]
+                  zeta[j,k] = zeta[k,j]
+          
+          return phi,zeta
+
+      '''
+      Plot zeta
+      INPUTS:
+      zeta - redundant matrix to plot
+      step - step size on axis
+      
+      RETURNS:
+      None 
+      '''
+      def plot_zeta(self,zeta,step):
+          k = np.amax(zeta)
+          print "k = ",k
+
+          c = self.cmap_discretize('jet', k+1)
+          #plt.subplot(111)
+          
+          plt.imshow(zeta,interpolation='nearest',cmap=c)
+          plt.colorbar()
+          plt.show()
+
+          plt.imshow(zeta,interpolation='nearest',cmap=c)
+          cb = plt.colorbar()
+          labels = np.arange(0,k,1)
+          loc    = labels + .5
+          cb.set_ticks(loc)
+          cb.set_ticklabels(labels+1)
+
+          plt.show()
+
+          '''
+          plt.imshow(zeta,interpolation="nearest")
+          x = np.arange(len(self.ant[:,0]),step=step,dtype=int)
+          plt.xticks(x, x+1)
+          y = np.arange(len(self.ant[:,1]),step=step,dtype=int)
+          plt.yticks(y, y+1)
+          plt.colorbar() 
+          plt.yticks(y, y+1)
+           
+          plt.show()
+          '''
+          #print "phi = ",phi  
+
+      """Return a discrete colormap from the continuous colormap cmap.
+        
+      INPUTS:  
+      cmap: colormap instance, eg. cm.jet. 
+      N: number of colors.
+        
+      RETURN:
+      lin_map - discretized cmap 
+          
+      Example
+      x = resize(arange(100), (5,100))
+      djet = cmap_discretize(cm.jet, 5)
+      imshow(x, cmap=djet)
+      """ 
+      def cmap_discretize(self,cmap, N):
+          if type(cmap) == str:
+             cmap = mpl.cm.get_cmap(cmap)
+          colors_i = np.concatenate((np.linspace(0, 1., N), (0.,0.,0.,0.)))
+          colors_rgba = cmap(colors_i)
+          indices = np.linspace(0, 1., N+1)
+          cdict = {}
+          for ki,key in enumerate(('red','green','blue')):
+              cdict[key] = [ (indices[i], colors_rgba[i-1,ki], colors_rgba[i,ki]) for i in xrange(N+1) ]
+          # Return colormap object.
+          return mpl.colors.LinearSegmentedColormap(cmap.name + "_%d"%N, cdict, 1024)
+
+      '''
+      Returns the p if the redundant index and q are given
+      INPUTS:
+      i - q
+      j - redundant index
+      phi - mapping from pq to redundant index
+      
+      RETURNS:
+      p - p
+      Found - If p was found in phi?
+      '''
+      def xi_func_eval(self,i,j,phi):
+          column = phi[:,i]
+
+          for p in xrange(len(column)):
+              if column[p] == j:
+                 return p,True
+
+          return 0,False
+
+      '''
+      Returns the q if the redundant index and p are given
+      INPUTS:
+      i - p
+      j - redundant index
+      phi - mapping from pq to redundant index
+      
+      RETURNS:
+      q - q
+      Found - If q was found in phi?
+      '''
+      def psi_func_eval(self,i,j,phi):
+          row = phi[i,:]
+
+          for q in xrange(len(row)):
+              if row[q] == j:
+                 return q,True
+
+          return 0,False
           
 
 
@@ -430,5 +590,7 @@ if __name__ == "__main__":
    #s.read_antenna_layout()
    s.generate_antenna_layout()
    s.plot_ant(title="HEX")
-   s.uv_tracks()
-   s.plot_uv_coverage(title="HEX")
+   phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+   s.plot_zeta(zeta,5)
+   #s.uv_tracks()
+   #s.plot_uv_coverage(title="SQR")
