@@ -537,54 +537,44 @@ class sim():
 
           return 0,False
           
+"""
+Function to verify the analytic expression for calculating the number of redundancies from the number of antennas in an HEXAGONAL 
+layout
 
+INPUTS:
+min_v - the minumum number of rings in the layout
+max_v - the maximum number of rings in the layout
+"""
+def func_N_to_L_hex(min_v=1,max_v=6):
+    r_v  = np.arange(min_v,max_v)
+
+    N = np.zeros((len(r_v),))
+    L = np.zeros((len(r_v),))
+   
+    #GENERATES L NUMERICALLY 
+    for k in xrange(len(r_v)): 
+        s = sim(layout="HEX",order=r_v[k])
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        N[k] = s.N
+        L[k] = s.L
+        
+    #z = np.polyfit(r_v, L, 2) #FITTING A POLYNOMIAL TO DATA    
+    #r_t = (-3 + np.sqrt(12*N-3))/6 #LINK BETWEEN AMOUNT OF RINGS AND NUMBER OF ANTENNAS
+    #L_t = 6*r_v**2 + 3*r_v #ANALYTIC LINK BETWEEN NUMBER OF RINGS AND REDUNDANT BASELINES
+    plt.plot(N,L)
+    plt.plot(N,2*N-0.5*np.sqrt(12*N-3)-0.5,"r")#ANALYTIC LINK BETWEEN NUMBER OF RINGS AND BASELINES
+    plt.xlabel("$N$")
+    plt.ylabel("$L$")
+    plt.show()
 
 if __name__ == "__main__":
+   #func_N_to_L_hex()
    #s = sim()
    #s.read_antenna_layout()
    #s.generate_antenna_layout()
    #s.plot_ant(title="HEX")
    #phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
    #s.plot_zeta(zeta,5,5,12,"jet")
-   
-   r_v  = np.arange(1,6)
-
-   N = np.zeros((len(r_v),))
-   L = np.zeros((len(r_v),))
-
-   for k in xrange(len(r_v)):
-       print "k = ",k
-       s = sim(order=r_v[k])
-       s.generate_antenna_layout()
-       phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-       N[k] = s.N
-       L[k] = s.L
- 
-   print "N = ",N
-   print "L = ",L
-
-   r_t = (-3 + np.sqrt(12*N-3))/6
-
-   L_t_2 = 6*((-3 + np.sqrt(12*N-3))/6)**2+3*((-3 + np.sqrt(12*N-3))/6)
-   print "r_t = ",r_t
-   print "r_v = ",r_v 
-
-   z = np.polyfit(r_v, L, 2)
-   print "z = ",z
-
-   #L_t = 2*N-np.sqrt(12*N-3)+4
-   print "L_t = ",2*N-0.5*np.sqrt(12*N-3)-0.5
-   print "L_t_2 = ",L_t_2
-   
-   plt.plot(r_v,L)
-   plt.plot(r_v,6*r_v**2 + 3*r_v,"r")
-   plt.show()
-   plt.plot(N,L)
-   plt.plot(N,2*N-0.5*np.sqrt(12*N-3)-0.5,"r")
-   #print "L2 = ",z[0]*r_v**2 + z[1]*r_v+z[0]
-   #plt.plot(N,z[0]*N+z[1],"g")
-   #print "L2 = ",7./4*N-13./4
-   #print "L3 = ",z[0]*N+z[1]
-   plt.show()
    #s.uv_tracks()
    #s.plot_uv_coverage(title="SQR")
