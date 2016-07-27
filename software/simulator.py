@@ -444,6 +444,7 @@ class sim():
       
       '''
       Function that generates noise at a certain power level
+      http://dsp.stackexchange.com/questions/16216/adding-white-noise-to-complex-signal-complex-envelope
       INPUTS:
       power - power of the noise to generate
       '''
