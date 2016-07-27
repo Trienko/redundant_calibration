@@ -456,6 +456,15 @@ class sim():
 	          mat[i,j,:] = sig*np.random.randn(self.nsteps)+sig*np.random.randn(self.nsteps)*1j
                   mat[j,i,:] = mat[i,j,:].conj()	  
 	  return mat
+      '''	  
+      How much power in the noise is needed to achieve SNR
+      INPUTS:
+      P_signal - Power in the signal
+      SNR - SNR to achieve
+      P_noise - Power in the noise      
+      '''
+      def power_needed_for_SNR(self,P_signal,SNR)
+          P_noise = P_signal*10**(-1*SNR/10.)
       
       '''
       Generate flux values of sources (power law distribution)
