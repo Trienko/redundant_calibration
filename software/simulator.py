@@ -567,9 +567,44 @@ def func_N_to_L_hex(min_v=1,max_v=6):
     plt.xlabel("$N$")
     plt.ylabel("$L$")
     plt.show()
+    
+"""
+Function to verify the analytic expression for calculating the number of redundancies from the number of antennas in an HEXAGONAL 
+layout
+
+INPUTS:
+min_v - the minumum number of side
+max_v - the maximum number of side
+"""
+def func_N_to_L_SQR(min_v=2,max_v=6):
+    r_v  = np.arange(min_v,max_v)
+
+    N = np.zeros((len(r_v),))
+    L = np.zeros((len(r_v),))
+   
+    #GENERATES L NUMERICALLY 
+    for k in xrange(len(r_v)): 
+        s = sim(layout="SQR",order=r_v[k])
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        N[k] = s.N
+        L[k] = s.L
+        
+    #z = np.polyfit(r_v, L, 2) #FITTING A POLYNOMIAL TO DATA  
+    #r_t = np.sqrt(N) #LINK BETWEEN SIDE AND NUMBER OF ANTENNAS
+    #L_t = 2*r_v**2 - 2*r_v #ANALYTIC LINK BETWEEN SIDE AND REDUNDANT BASELINES
+    #plt.plot(r_v,L)
+    #plt.plot(r_v,2*r_v**2-2*r_v,"r")
+    
+    plt.plot(N,L)
+    plt.plot(N,2*N-2*np.sqrt(N),"r")#ANALYTIC LINK BETWEEN SIDE AND BASELINES
+        
+    plt.xlabel("$N$")
+    plt.ylabel("$L$")
+    plt.show()
 
 if __name__ == "__main__":
-   #func_N_to_L_hex()
+   func_N_to_L_SQR()
    #s = sim()
    #s.read_antenna_layout()
    #s.generate_antenna_layout()
