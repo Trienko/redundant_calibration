@@ -424,7 +424,119 @@ class sim():
           plt.xlabel("$u$ [$\lambda$]",fontsize=label_size)
           plt.ylabel("$v$ [$\lambda$]",fontsize=label_size)
           plt.title(title+"-"+str(self.N),fontsize=label_size)
-          plt.show() 
+          plt.show()
+          
+            '''
+      Generate flux values of sources (power law distribution)
+      RETURNS:
+      y - an array of pareto distributed samples of size num_sources
+      
+      INPUTS:
+      a - pareto distribution (power law) shape parameter. 
+      num_sources - the amount of values to draw from the pareto distribution.
+      plot - if true plot the distribution.
+      '''
+      def generate_flux(self,a = 1.2,num_sources = 10,plot = False):
+          y = np.random.pareto(a, size=num_sources)
+          if plot:
+             count, bins, ignored = plt.hist(y, 100, normed=True)
+             plt.xlabel("$x$")
+             plt.ylabel("$p(x)$")
+             plt.title("Pareto Distribition, $a = $%.2f"%(a))
+             plt.show()
+          return y
+
+      '''
+      Generate flux values of sources (uniform distribution)
+      RETURNS:
+      an array of uniformly distributed samples of size num_sources
+      
+      INPUTS:
+      min_v - the lower boundary of the uniform distribution. 
+      max_v - the upper boundary of the uniform distribution.
+      num_sources - the amount of values to draw from the uniform distribution.
+      '''
+      def generate_flux_unif(self,min_v=0.1,max_v=1,num_sources=10):
+          return np.random.uniform(low=min_v, high=max_v, size = num_sources)
+
+      '''
+      Generate position values of sources (uniform distribution)
+      
+      RETURNS:
+      an array of uniformly distributed samples of size num_sources
+      
+      INPUTS:
+      fov - the fov in which the sources reside (in degrees)
+      num_sources - the amount of values to draw from the uniform distribution.
+      '''
+      def generate_pos(self,fov = 3,num_sources=10):
+          return np.random.uniform(low=-1*np.absolute(fov), high=np.absolute(fov), size = num_sources)*(np.pi/180)
+          
+      '''
+      Creates an observed visibility matrix
+       
+      RETURNS:
+      D - observed visibility matrix, N x N x timeslots
+      
+      INPUTS:
+      point_sources - list of point sources to simulate
+      u_m - N x N x timeslots matrix of u coordinates
+      v_m - N x N x timeslots matrix of v coordinates
+      g - N x t antenna gains to corrupt the visibilities with
+      sig - the noise std
+      w_m - N x N x timeslots matrix of w coordinates. If none just do 2D simulation
+      '''      
+      def create_vis_mat(self,point_sources,u_m,v_m,g,sig,w_m = None):
+          D = np.zeros(u_m.shape)
+          #print "D.shape = ",D.shape
+          #print "G.shape = ",G.shape
+          #Step 1: Create Model Visibility Matrix
+          for k in xrange(len(point_sources)): #for each point source
+              #print "k = ",k
+              l_0 = point_sources[k,1]
+              m_0 = point_sources[k,2]
+              #print "point_sources[k,0] = ",point_sources[k,0]
+              if w_m is None:
+		D = D + point_sources[k,0]*np.exp(-2*np.pi*1j*(u_m*l_0+v_m*m_0))
+	      else:
+		n_0 = np.sqrt(1 - l_0**2 - m_0**2)
+		D = D + point_sources[k,0]*np.exp(-2*np.pi*1j*(u_m*l_0+v_m*m_0+w_m*(n_0-1)))
+    
+          for t in xrange(D.shape[2]): #for each time-step
+              #print "t = ",t
+              if g is not None:
+                 G = np.diag(g[:,t])
+                 #Step 2: Corrupting the Visibilities 
+                 D[:,:,t] = np.dot(G,D[:,:,t])
+                 D[:,:,t] = np.dot(D[:,:,t],G.conj()) 
+                
+              # I NEED TO FIX THE NOISE HERE - MUST ADD THE CONJUGATE HERE
+              # NEED TO BE ABLE TO CALCULATE THE SIG FROM THE SNR PARAMETER
+              #Step 3: Adding Noise
+              D[:,:,t] = D[:,:,t] + sig*np.random.randn(u_m.shape[0],u_m.shape[1]) + sig*np.random.randn(u_m.shape[0],u_m.shape[1])*1j
+    
+          return D
+          
+      '''
+      Creates a point sources array of dimension: num_sources x 3 
+      
+      RETURNS:
+      point_sources - a point sources array with dimension num_sources x 3, with the second dimension denoting flux, l_0 and m_0 (in
+      degrees) respectively.
+      
+      INPUTS:
+      num_sources - number of sources to create
+      a - Pareto parameter
+      fov - fov of sources
+      '''
+      def create_point_sources(self,num_sources,fov,a):
+	  point_sources = np.zeros((num_sources,3),dtype=float)
+	  
+	  point_sources[:,0] = self.generate_flux(a = a,num_sources = num_sources,plot = False)
+	  point_sources[:,1] = self.generate_pos(fov = fov,num_sources=num_sources)
+	  point_sources[:,2] = self.generate_pos(fov = fov,num_sources=num_sources)
+	  
+	  return point_sources    
 
       '''
       Converts the antenna idices pq into a redundant index
