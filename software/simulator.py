@@ -30,12 +30,12 @@ class sim():
              # layout = "HEX" - generate a HEX layout instead of reading from file using bas_len and order (number of rings)
              # layout = "REG" - generate a regular line instead of reading from file using bas_len and order (number of antennas)
              # layout = "SQR" - generate a square layout reading from file using bas_len and order (side length of square)   
-      NSteps - Number of timesteps
+      nsteps - Number of timesteps
       bas_len - Fundamental baseline length used to create HEX, SQR and REG layouts
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=19):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=1):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -425,8 +425,38 @@ class sim():
           plt.ylabel("$v$ [$\lambda$]",fontsize=label_size)
           plt.title(title+"-"+str(self.N),fontsize=label_size)
           plt.show()
-          
-            '''
+      
+      '''
+      Determines the power in signal
+      INPUTS:
+      D - Matrix to calculate the power of
+      RETURNS:
+      D_pow - The power in each baseline
+      d_pow1 - Average power over entire matrix
+      d_pow2 - Average of D_pow over baselines
+      '''
+      def det_power_of_signal(self,D):
+	  bas = (D.shape[0]**2 - D.shape[0])
+	  D_pow = np.mean(np.absolute(D)**2,axis=2)
+	  d_pow1 = np.sum(np.absolute(D)**2)/(bas*D.shape[2])
+	  d_pow2 = np.sum(D_pow)/bas
+	  return D_pow,d_pow1,d_pow2
+      
+      '''
+      Function that generates noise at a certain power level
+      INPUTS:
+      power - power of the noise to generate
+      '''
+      def generate_noise(self,power):
+	  sig = np.sqrt(power/2)
+	  mat = np.zeros((self.N,self.N,self.nsteps),dtype=complex)
+	  for i in xrange(self.N):
+              for j in xrange(i+1,self.N):
+	          mat[i,j,:] = sig*np.random.randn(self.nsteps)+sig*np.random.randn(self.nsteps)*1j
+                  mat[j,i,:] = mat[i,j,:].conj()	  
+	  return mat
+      
+      '''
       Generate flux values of sources (power law distribution)
       RETURNS:
       y - an array of pareto distributed samples of size num_sources
@@ -517,6 +547,7 @@ class sim():
     
           return D
           
+              
       '''
       Creates a point sources array of dimension: num_sources x 3 
       
@@ -716,11 +747,16 @@ def func_N_to_L_SQR(min_v=2,max_v=6):
     plt.show()
 
 if __name__ == "__main__":
-   func_N_to_L_SQR()
-   #s = sim()
+   #func_N_to_L_SQR()
+   s = sim()
    #s.read_antenna_layout()
-   #s.generate_antenna_layout()
-   #s.plot_ant(title="HEX")
+   s.generate_antenna_layout()
+   s.plot_ant(title="HEX")
+   M = s.generate_noise(10)
+   P,p1,p2 = s.det_power_of_signal(M)
+   print "P = ",P
+   print "p1 = ",p1
+   print "p2 = ",p2
    #phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
    #s.plot_zeta(zeta,5,5,12,"jet")
    #s.uv_tracks()
