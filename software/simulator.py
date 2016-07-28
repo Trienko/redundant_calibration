@@ -35,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=100,bas_len=50,order=1):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=600,bas_len=50,order=1):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -436,6 +436,9 @@ class sim():
       d_pow2 - Average of D_pow over baselines
       '''
       def det_power_of_signal(self,D):
+          D = np.copy(D)
+          for t in xrange(D.shape[2]):
+              D[:,:,t] = D[:,:,t]*(np.ones((D.shape[0],D.shape[1]),dtype=float)-np.diag(np.ones((D.shape[0],),dtype=float)))
 	  bas = (D.shape[0]**2 - D.shape[0])
 	  D_pow = np.mean(np.absolute(D)**2,axis=2)
 	  d_pow1 = np.sum(np.absolute(D)**2)/(bas*D.shape[2])
@@ -463,8 +466,9 @@ class sim():
       SNR - SNR to achieve
       P_noise - Power in the noise      
       '''
-      def power_needed_for_SNR(self,P_signal,SNR)
-          P_noise = P_signal*10**(-1*SNR/10.)
+      def power_needed_for_SNR(self,P_signal,SNR):
+          P_noise = P_signal*10**(-1*(SNR/10.))
+          return P_noise
       
       '''
       Generate flux values of sources (power law distribution)
@@ -523,11 +527,11 @@ class sim():
       u_m - N x N x timeslots matrix of u coordinates
       v_m - N x N x timeslots matrix of v coordinates
       g - N x t antenna gains to corrupt the visibilities with
-      sig - the noise std
+      SNR - the signal to noise ratio in dB (gains are assumed to be signal)
       w_m - N x N x timeslots matrix of w coordinates. If none just do 2D simulation
       '''      
-      def create_vis_mat(self,point_sources,u_m,v_m,g,sig,w_m = None):
-          D = np.zeros(u_m.shape)
+      def create_vis_mat(self,point_sources,u_m,v_m,g,SNR,w_m = None):
+          D = np.zeros(u_m.shape,dtype=complex)
           #print "D.shape = ",D.shape
           #print "G.shape = ",G.shape
           #Step 1: Create Model Visibility Matrix
@@ -549,14 +553,39 @@ class sim():
                  #Step 2: Corrupting the Visibilities 
                  D[:,:,t] = np.dot(G,D[:,:,t])
                  D[:,:,t] = np.dot(D[:,:,t],G.conj()) 
-                
-              # I NEED TO FIX THE NOISE HERE - MUST ADD THE CONJUGATE HERE
-              # NEED TO BE ABLE TO CALCULATE THE SIG FROM THE SNR PARAMETER
-              #Step 3: Adding Noise
-              D[:,:,t] = D[:,:,t] + sig*np.random.randn(u_m.shape[0],u_m.shape[1]) + sig*np.random.randn(u_m.shape[0],u_m.shape[1])*1j
-    
+              #OLD NOISE STEP
+              #D[:,:,t] = D[:,:,t] + sig*np.random.randn(u_m.shape[0],u_m.shape[1]) + sig*np.random.randn(u_m.shape[0],u_m.shape[1])*1j
+                       
+          #Step 3: Adding Noise
+          if SNR is not None:
+             D_pow,P_signal,pow2 = self.det_power_of_signal(D)
+             #print "D_pow = ",D_pow
+             #print "P_signal = ",P_signal
+             #print "pow2 = ",pow2
+             P_noise = self.power_needed_for_SNR(P_signal,SNR)
+             #print "P_noise = ",P_noise
+             #print "SNR = ",10*np.log10(P_signal/P_noise)
+             N = self.generate_noise(P_noise)
+             D = D + N 
+
           return D
-          
+
+      '''
+      Plot the real visibilities
+      INPUTS:
+      b - baseline
+      D - visibility matrix
+      c - colout
+      s - show
+      ''' 
+      def plot_visibilities(self,b,D,c,s=False):
+          t = np.ones((D.shape[2],),dtype=float)
+          t = np.cumsum(t)
+          plt.plot(t,D[b[0],b[1],:].real,c)
+          if s:
+             plt.xlabel("Timeslots")
+             plt.ylabel("Jy")
+             plt.show()    
               
       '''
       Creates a point sources array of dimension: num_sources x 3 
@@ -757,16 +786,22 @@ def func_N_to_L_SQR(min_v=2,max_v=6):
     plt.show()
 
 if __name__ == "__main__":
-   #func_N_to_L_SQR()
    s = sim()
    #s.read_antenna_layout()
    s.generate_antenna_layout()
    s.plot_ant(title="HEX")
-   M = s.generate_noise(10)
-   P,p1,p2 = s.det_power_of_signal(M)
-   print "P = ",P
-   print "p1 = ",p1
-   print "p2 = ",p2
+   s.uv_tracks()
+   s.plot_uv_coverage(title="HEX")
+   
+   point_sources = s.create_point_sources(100,fov=3,a=2)
+   D = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=20,w_m=None)
+   s.plot_visibilities([0,1],D,"b",s=True)
+   print "D = ",D[:,:,0]
+   #M = s.generate_noise(10)
+   #P,p1,p2 = s.det_power_of_signal(M)
+   #print "P = ",P
+   #print "p1 = ",p1
+   #print "p2 = ",p2
    #phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
    #s.plot_zeta(zeta,5,5,12,"jet")
    #s.uv_tracks()
