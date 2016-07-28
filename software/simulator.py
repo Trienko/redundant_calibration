@@ -860,19 +860,31 @@ def func_N_to_L_SQR(min_v=2,max_v=6):
     plt.ylabel("$L$")
     plt.show()
 
+'''
+Function that showcases the functionality of this simulator
+
+INPUT:
+None
+
+RETRUNS:
+None
+'''
+def example_usage():
+    s = sim() #INSTANTIATE OBJECT
+    #s.read_antenna_layout()
+    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
+    s.plot_ant(title="HEX") #PLOT THE LAYOUT
+    s.uv_tracks() #GENERATE UV TRACKS
+    s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
+    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
+    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
+    D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None) #CREATE VIS MATRIX
+    M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
+    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
+    s.plot_visibilities([0,1],M,"r",s=True)
+
 if __name__ == "__main__":
+   example_usage()
    
-   s = sim()
-   #s.read_antenna_layout()
-   s.generate_antenna_layout()
-   s.plot_ant(title="HEX")
-   s.uv_tracks()
-   s.plot_uv_coverage(title="HEX")
-   point_sources = s.create_point_sources(100,fov=3,a=2)
-   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True)
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None)
-   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None)
-   s.plot_visibilities([0,1],D,"b",s=False)
-   s.plot_visibilities([0,1],M,"r",s=True)
    
 
