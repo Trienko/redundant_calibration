@@ -534,6 +534,7 @@ class sim():
       w_m - N x N x timeslots matrix of w coordinates. If none just do 2D simulation
       '''      
       def create_vis_mat(self,point_sources,u_m,v_m,g,SNR,w_m = None):
+          sig = 0
           D = np.zeros(u_m.shape,dtype=complex)
           #print "D.shape = ",D.shape
           #print "G.shape = ",G.shape
@@ -570,8 +571,60 @@ class sim():
              #print "SNR = ",10*np.log10(P_signal/P_noise)
              N = self.generate_noise(P_noise)
              D = D + N 
+             sig = (np.sqrt(P_noise/2))
 
-          return D,(np.sqrt(P_noise/2))
+          return D,sig
+
+      '''
+      Generates the antenna gains via sinusoidal model
+      
+      RETURNS:
+      g - N x t antenna gain values
+      
+      INPUTS:
+      N - Number of antennas
+      max_a - Maximum gain amplitude
+      min_a - Minimum gain amplitude
+      max_p - Max phase
+      min_p - Min phase
+      freq_scale - How many complete periods in timesteps
+      time_steps - Number of timesteps to simulate 
+      '''
+      def create_antenna_gains(self,N,max_a,min_a,max_p,min_p,freq_scale,time_steps,plot = False):
+          g = np.zeros((N,time_steps),dtype=complex)
+          
+          period = 1.0/time_steps
+          
+          freq = freq_scale*period
+          
+          t = np.cumsum(np.ones((time_steps,)))
+          
+          amp = np.random.uniform(low=min_a, high=max_a, size = N)
+          amp_phase = np.random.uniform(low=0, high=2*np.pi, size = N)
+                   
+          pha = np.random.uniform(low=(min_p/2.)*(np.pi/180), high=(max_p/2.)*(np.pi/180), size = N) 
+          phase_phase = np.random.uniform(low=0, high=2*np.pi, size = N)
+          print "pha = ",pha*(180/np.pi)
+
+          for t_v in xrange(time_steps):
+	      g[:,t_v] = (amp*np.cos(2*np.pi*freq*t[t_v] + amp_phase)+1)*np.exp(1j*(pha*np.cos(2*np.pi*freq*t[t_v] + phase_phase)+pha))
+          
+          if plot:
+	     for n in xrange(g.shape[0]):
+	         plt.plot(t,np.absolute(g[n,:]))
+	         	                 
+	     plt.xlabel("Time slot")
+	     plt.ylabel("$|g|$")
+	     plt.show()
+
+             for n in xrange(g.shape[0]):
+	         plt.plot(t,np.angle(g[n,:])*(180/np.pi))
+	                 
+	     plt.xlabel("Time slot")
+	     plt.ylabel("ph$(g)$")
+	     plt.show()
+          
+          return g 
 
       '''
       Plot the real visibilities
@@ -798,9 +851,11 @@ if __name__ == "__main__":
    s.plot_uv_coverage(title="HEX")
    
    point_sources = s.create_point_sources(100,fov=3,a=2)
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=20,w_m=None)
+   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True)
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None)
    s.plot_visibilities([0,1],D,"b",s=True)
-   print "sig = ",sig
+   
+   #print "sig = ",sig
    
    #print "D = ",D[:,:,0]
    #M = s.generate_noise(10)
