@@ -61,6 +61,12 @@ class sim():
              np.random.seed(seed)
 
       '''
+      ##############################################################################################################################
+      ANTENNA LAYOUT AND UV-COVERAGE       
+      ##############################################################################################################################
+      '''
+
+      '''
       Generates an hexagonal layout
       
       RETURNS:
@@ -427,7 +433,13 @@ class sim():
           plt.ylabel("$v$ [$\lambda$]",fontsize=label_size)
           plt.title(title+"-"+str(self.N),fontsize=label_size)
           plt.show()
-      
+
+      '''
+      ##############################################################################################################################
+      VISIBILITIES AND NOISE       
+      ##############################################################################################################################
+      '''
+     
       '''
       Determines the power in signal
       INPUTS:
@@ -664,6 +676,13 @@ class sim():
 	  
 	  return point_sources    
 
+
+      '''
+      ##############################################################################################################################
+      PHI       
+      ##############################################################################################################################
+      '''
+
       '''
       Converts the antenna idices pq into a redundant index
          
@@ -853,7 +872,9 @@ if __name__ == "__main__":
    point_sources = s.create_point_sources(100,fov=3,a=2)
    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True)
    D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None)
-   s.plot_visibilities([0,1],D,"b",s=True)
+   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None)
+   s.plot_visibilities([0,1],D,"b",s=False)
+   s.plot_visibilities([0,1],M,"r",s=True)
    
    #print "sig = ",sig
    
