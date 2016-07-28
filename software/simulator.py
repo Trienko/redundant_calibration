@@ -35,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=600,bas_len=50,order=1):
+      def __init__(self,h_min=-6,h_max=6,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=600,bas_len=50,order=1,seed=1):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps
@@ -57,6 +57,8 @@ class sim():
           self.w_m = None
           self.phi = np.array([])
           self.zeta = np.array([])
+          if seed is not None:
+             np.random.seed(seed)
 
       '''
       Generates an hexagonal layout
@@ -521,7 +523,8 @@ class sim():
        
       RETURNS:
       D - observed visibility matrix, N x N x timeslots
-      
+      sig - the sigma added to generate the noise      
+
       INPUTS:
       point_sources - list of point sources to simulate
       u_m - N x N x timeslots matrix of u coordinates
@@ -568,7 +571,7 @@ class sim():
              N = self.generate_noise(P_noise)
              D = D + N 
 
-          return D
+          return D,(np.sqrt(P_noise/2))
 
       '''
       Plot the real visibilities
@@ -786,6 +789,7 @@ def func_N_to_L_SQR(min_v=2,max_v=6):
     plt.show()
 
 if __name__ == "__main__":
+   
    s = sim()
    #s.read_antenna_layout()
    s.generate_antenna_layout()
@@ -794,9 +798,11 @@ if __name__ == "__main__":
    s.plot_uv_coverage(title="HEX")
    
    point_sources = s.create_point_sources(100,fov=3,a=2)
-   D = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=20,w_m=None)
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=20,w_m=None)
    s.plot_visibilities([0,1],D,"b",s=True)
-   print "D = ",D[:,:,0]
+   print "sig = ",sig
+   
+   #print "D = ",D[:,:,0]
    #M = s.generate_noise(10)
    #P,p1,p2 = s.det_power_of_signal(M)
    #print "P = ",P
