@@ -868,7 +868,6 @@ if __name__ == "__main__":
    s.plot_ant(title="HEX")
    s.uv_tracks()
    s.plot_uv_coverage(title="HEX")
-   
    point_sources = s.create_point_sources(100,fov=3,a=2)
    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True)
    D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None)
@@ -876,15 +875,4 @@ if __name__ == "__main__":
    s.plot_visibilities([0,1],D,"b",s=False)
    s.plot_visibilities([0,1],M,"r",s=True)
    
-   #print "sig = ",sig
-   
-   #print "D = ",D[:,:,0]
-   #M = s.generate_noise(10)
-   #P,p1,p2 = s.det_power_of_signal(M)
-   #print "P = ",P
-   #print "p1 = ",p1
-   #print "p2 = ",p2
-   #phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-   #s.plot_zeta(zeta,5,5,12,"jet")
-   #s.uv_tracks()
-   #s.plot_uv_coverage(title="SQR")
+
