@@ -58,11 +58,20 @@ class factor():
                 self.print_f = print_f 
                 self.value = value
              
+    '''
+    Converts factor to a string
+    INPUTS:
+    None
 
+    OUTPUTS:
+    None
+    '''
     def to_string(self):
         if self.print_f:
            if self.type_factor == "y":
               string_out = self.type_factor + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
+           elif self.type_factor == "c":
+              string_out = str(self.value) + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
            else:
               string_out = self.type_factor + "_" + str(self.index)
         else:   
@@ -78,19 +87,36 @@ class factor():
               if self.exponent > 1:
                  string_out = string_out+"^"+str(self.exponent)
         return string_out   
-           
+        
+    '''
+    Takes the conjugate of a factor
+    INPUTS:
+    None
+
+    OUTPUTS:
+    None
+    '''   
     def conjugate(self):
         if self.conjugate_value:
            self.conjugate_value = False
         else:
            self.conjugate_value = True
 
-    def equal(self,factor_in):
+    '''
+    Determines if a factor is equal to factor_in
+    INPUTS:
+    factor_in - The input factor to compare against
+
+    OUTPUTS:
+    true or false depending if factors are equal
+    '''
+    def equal(self,factor_in)
         if self.type_factor == factor_in.type_factor:
            if self.index == factor_in.index:
               if self.exponent == factor_in.exponent:
                  if self.conjugate_value == factor_in.conjugate_value:
-                    return true
+                    if self.value == factor_in.value:
+                       return true
         return false
 
 ###############################################################################
@@ -329,7 +355,7 @@ class term():
           self.const = 1
           if len(self.constant_array) <> 0:
              for factor in self.constant_array:
-                 self.const = self.const*factor.value
+                 self.const = self.const*factor.value**(factor.exponent)
           self.constant_array = np.array([])
 
       '''
@@ -561,7 +587,9 @@ class term():
              return string_out
           if self.const > 1:
               string_out = str(self.const)
-          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) (len(self.b_array) == 0) 
+          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) (len(self.b_array) == 0) and (self.const == 1):
+              string_out = str(self.const)
+              return string_out
           if len(self.g_array) <> 0:
              for factor in self.g_array:
                  string_out = string_out+factor.to_string()
@@ -579,7 +607,18 @@ class term():
                  string_out = string_out+factor.to_string()
           if len(self.ya_array) <> 0:  
              for factor in self.ya_array:
-                 string_out = string_out+factor.to_string() 
+                 string_out = string_out+factor.to_string()
+          if len(self.a_array) <> 0:
+             for factor in self.a_array:
+                 string_out = string_out+factor.to_string()
+          if len(self.b_array) <> 0:
+             for factor in self.b_array:
+                 string_out = string_out+factor.to_string()
+          if self.const == 0:
+             if len(self.const_array) <> 0:
+                for factor in self.const_array:
+                    string_out = string_out+factor.to_string() 
+    
           return string_out 
 
 class expression():
@@ -1462,6 +1501,7 @@ class redundant():
 
                     
 if __name__ == "__main__":
+   '''
    r = redundant(0)
    r.create_hexagonal(1,20)
    #r.create_regular_config2(print_pq=True)
@@ -1516,7 +1556,8 @@ if __name__ == "__main__":
    #plt.imshow(A1,interpolation='nearest')
    #plt.colorbar()
    #plt.show()
-   """
+   '''
+   
    f1 = factor("g",1,1,True)
    f2 = factor("y",1,1,False)
    f3 = factor("g",2,1,False)  
@@ -1539,22 +1580,29 @@ if __name__ == "__main__":
    t2.append_factor(f5)
    t2.append_factor(f6) 
  
+   print "t1 = ",t1.to_string()
+   print "t2 = ",t2.to_string()
+  
    t1.multiply_terms(t2)
+
+   print "t1 = ",t1.to_string()
 
    t3 = term()
    t3.setZero()
 
-   e1 = expression(np.array([t1,t2],dtype=object)) 
-   e2 = expression(np.array([t1,t3],dtype=object)) 
+   print "t3 = ",t3.to_string()
 
-   print "e1 = ",e1.to_string()
-   print "e2 = ",e2.to_string()   
+   #e1 = expression(np.array([t1,t2],dtype=object)) 
+   #e2 = expression(np.array([t1,t3],dtype=object)) 
 
-   e1.dot(e2)   
+   #print "e1 = ",e1.to_string()
+   #print "e2 = ",e2.to_string()   
+
+   #e1.dot(e2)   
  
-   print "e1 = ",e1.to_string()
+   #print "e1 = ",e1.to_string()
  
-   print "t1 = ",t1.to_string()
+   #print "t1 = ",t1.to_string()
 
    #t1.conjugate()
    
