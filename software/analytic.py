@@ -129,6 +129,17 @@ class term():
           self.zero = False # The term is equal to zero
           self.const = 0 #The final constant if we decide to multiply all the constants in the term together
 
+
+      '''
+      Substitutes real values of g and y into term to obtain result
+
+      RETURNS:
+      number - The product of the term after sub
+      
+      INPUTS:
+      g_v - The g vector
+      y_v - The y vector 
+      ''' 
       def substitute(self,g_v,y_v): #STILL NEEDS TO BE FIXED
           if self.zero:
              return 0.0
@@ -227,6 +238,15 @@ class term():
                       indx_array = np.append(indx_array,factor.index)
           return indx_array
  
+      '''
+      Sort the different arrays according to index positions
+
+      RETRUNS:
+      None
+ 
+      INPUTS:
+      array_type - The array to sort (either the antenna gains, the redundant visibilities, the antenna positions or constants)       
+      '''
       def sort_factor(self,array_type):
           indx = self.extract_index_array(array_type)
           if len(indx) <> 0:
@@ -245,7 +265,15 @@ class term():
                self.a_array = self.a_array[s_ind]
              elif array_type == "b":
                self.b_array = self.b_array[s_ind]
-      
+      '''
+      Sort all the factors of all types according to their index postions 
+
+      RETURNS:
+      None
+
+      INPUTS: 
+      None
+      ''' 
       def sort_factors(self):
           self.sort_factor("g")
           self.sort_factor("gc")
@@ -255,6 +283,16 @@ class term():
           self.sort_factor("a")
           self.sort_factor("b")      
 
+     
+      '''
+      Takes the conjugate of all factors in the term
+       
+      Returns:
+      None
+     
+      INPUTS: 
+      None
+      ''' 
       def conjugate(self):
           #print "self.g_array[0].to_string = ",self.g_array[0].to_string()
           g_t = deepcopy(self.g_array)
@@ -278,6 +316,15 @@ class term():
           for k in xrange(len(self.yc_array)):
               self.yc_array[k].conjugate() 
 
+      '''
+      Calculates the total constant factor multiplies all the factors in the term together
+      
+      Returns:
+      None
+     
+      INPUTS: 
+      None
+      ''' 
       def simplify_constant(self):
           self.const = 1
           if len(self.constant_array) <> 0:
@@ -285,6 +332,16 @@ class term():
                  self.const = self.const*factor.value
           self.constant_array = np.array([])
 
+      '''
+      Searches the g and gc arrays to find an index match removes it from both and add to ga. Calculates the amplitudes
+      if a factor and its conjugate is in the term. Only does this for g and gc; y and yc. 
+      
+      Returns:
+      None
+     
+      INPUTS: 
+      None
+      '''       
       def simplify_conjugates(self):
           ind1 = self.extract_index_array("g")
           ind2 = self.extract_index_array("gc")
@@ -320,6 +377,18 @@ class term():
           self.y_array = self.y_array[del1]
           self.yc_array = self.yc_array[del2]
            
+      '''
+      Multiply a1 (can be gains, red vis, x, y or const) and a2 toghether using the indices to do matching
+      
+      RETURNS:
+      product - returns the product of the two arrays
+
+      INPUTS:
+      a1 - first array to multiply
+      ind1 - the indices of the items in a1
+      a2 - second array with which to multiply
+      ind2 - the indices of the items in a2
+      '''
       def multiply_arrays(self,a1,ind1,a2,ind2):
           product = deepcopy(a1)
 
@@ -337,6 +406,15 @@ class term():
 
           return product
 
+      '''
+      Set the term equal to zero
+      
+      INPUT:
+      NONE
+  
+      OUTPUT:
+      NONE
+      '''
       def setZero(self):
           self.zero = True
           self.g_array = np.array([],dtype=object)
@@ -348,6 +426,12 @@ class term():
           self.constant = np.array([],dtype=object)
           self.constant = np.array([],dtype=object) 
 
+      '''
+      Multiply two terms together 
+
+      INPUTS: 
+      in_term - the term with which to multiply
+      ''' 
       def multiply_terms(self,in_term):
           if (self.zero) or (in_term.zero):
              self.zero = True
@@ -383,6 +467,15 @@ class term():
              self.sort_factors() 
           #return self                  
             
+      '''
+      Differentiate with respect to a factor
+      
+      RETURNS:
+      None
+        
+      INPUT:
+      f - differential
+      '''
       def diffirentiate_factor(self,f):#ASSUMING THE EXPONENT IS ALWAYS ONE FOR DIFFERENTIATION
           if self.zero:
              return
@@ -447,13 +540,28 @@ class term():
                   self.y_array = self.y_array[sel_ind]     
                   return
 
-      def to_string(self,simplify=False):
+      '''
+      Converts the term into a printable string
+      
+      INPUTS:
+      simplify - Simplifies the conjugates
+
+      OUTPUTS:
+      string_out - The output string
+      '''
+      def to_string(self,simplify=False,simplify_constant=False):
           if simplify:
              self.simplify_conjugates()
+          if simplify_constant:
+             self.simplify_constant()
+
           string_out = ""
           if self.zero:
              string_out = "0"
              return string_out
+          if self.const > 1:
+              string_out = str(self.const)
+          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) (len(self.b_array) == 0) 
           if len(self.g_array) <> 0:
              for factor in self.g_array:
                  string_out = string_out+factor.to_string()
