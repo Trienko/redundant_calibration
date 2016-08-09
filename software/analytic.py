@@ -71,12 +71,12 @@ class factor():
            if self.type_factor == "y":
               string_out = self.type_factor + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
            elif self.type_factor == "c":
-              string_out = str(self.value) + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
+              string_out = "("+str(self.value)+")" + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
            else:
               string_out = self.type_factor + "_" + str(self.index)
         else:   
            if self.type_factor == "c":
-              string_out = str(self.value) + "_" + str(self.index)
+              string_out = "("+str(self.value) + ")" + "_" + str(self.index)
            else: 
               string_out = self.type_factor + "_" + str(self.index)
         if self.conjugate_value:
@@ -433,7 +433,7 @@ class term():
               else:
                  
                  if product[temp[0]].type_factor == "c":
-                    if product[temp[0]].value == a2[k].value:
+                    if (product[temp[0]].value == a2[k].value) and (product[temp[0]].ant_p == a2[k].ant_p) and (product[temp[0]].ant_q == a2[k].ant_q):
                        product[temp[0]].exponent = product[temp[0]].exponent+a2[k].exponent
                     else:
                        product = np.append(product,a2[k])  
@@ -576,11 +576,28 @@ class term():
                   self.y_array = self.y_array[sel_ind]     
                   return
 
+
+      '''
+      Determines if the term is just a constant
+      
+      INPUTS:
+      None
+
+      RETURNS:
+      is_constant - Returns True if the term is a constant
+      '''
+      def is_constant(self):
+          if (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (len(self.const_array) <> 0):
+             return True
+          else:
+             return False
+
       '''
       Converts the term into a printable string
       
       INPUTS:
       simplify - Simplifies the conjugates
+      simplify_constant - Simplifies the constants
 
       OUTPUTS:
       string_out - The output string
@@ -597,9 +614,13 @@ class term():
              return string_out
           if self.const > 1:
               string_out = str(self.const)
-          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) (len(self.b_array) == 0) and (self.const == 1):
+          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (self.const == 1):
               string_out = str(self.const)
               return string_out
+          if self.const == 0:
+             if len(self.constant_array) <> 0:
+                for factor in self.constant_array:
+                    string_out = string_out+factor.to_string()
           if len(self.g_array) <> 0:
              for factor in self.g_array:
                  string_out = string_out+factor.to_string()
@@ -624,27 +645,59 @@ class term():
           if len(self.b_array) <> 0:
              for factor in self.b_array:
                  string_out = string_out+factor.to_string()
-          if self.const == 0:
-             if len(self.constant_array) <> 0:
-                for factor in self.constant_array:
-                    string_out = string_out+factor.to_string() 
+           
     
           return string_out 
 
+###############################################################################
+
+'''
+Class that represents an algebraic expressions (an algebraic expression consists of terms which inturn consists out of many factors). 
+'''
+
 class expression():
+
+      '''
+      Constructor
+
+      INPUTS:
+      terms - an array of terms 
+
+      RETURNS:
+      None
+      ''' 
       def __init__(self,terms):
           self.terms = deepcopy(terms)
 
+      '''
+      Takes the dot product of two equal length expressions
+
+      INPUTS:
+      exp_in - second expression in the dot product. The first is the current object itself.
+      
+      RETURNS:
+      None
+      ''' 
       def dot(self,exp_in):
 
           for k in xrange(len(exp_in.terms)):
               self.terms[k].multiply_terms(exp_in.terms[k]) 
 
-      def to_string(self,simplify=False):
+      '''
+      Converts an expression into a string
+
+      INPUTS: 
+      Simplify - Simplifies conjugates
+      Simplify_const - Simplify constants
+
+      RETURNS:
+      string_out - The output string
+      '''
+      def to_string(self,simplify=False,simplify_const=False):
           string_out = ""
           for term in self.terms:
               if not term.zero: 
-                 string_out = string_out + " + " + term.to_string(simplify)
+                 string_out = string_out + " + " + term.to_string(simplify=simplify,simplify_const=simplify_const)
 
           if string_out == "":
              string_out = "0" 
@@ -652,6 +705,15 @@ class expression():
              string_out = string_out[3:]
           return string_out
 
+      '''
+      Calculates the number of non-zero terms in an expression
+
+      INPUTS:
+      None
+
+      RETURNS:
+      counter - The number of terms in expression
+      '''
       def number_of_terms(self):
           counter = 0
           for term in self.terms:
@@ -660,7 +722,10 @@ class expression():
 
           return counter 
 
-      def substitute(self,g_v,y_v):
+      '''
+      Substitutes the g and y vector
+      '''
+      def substitute(self,g_v,y_v): #NB STILL NEED TO ADD OTHER VARIABLES AND CONSTANTS
           number = 0j
           for term in self.terms:
               if not term.zero:
@@ -1570,8 +1635,8 @@ if __name__ == "__main__":
    
    f1 = factor("g",1,1,True)
    f2 = factor("y",1,1,False,print_f=False)
-   f3 = factor("g",2,1,False)
-   f4 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=1)  
+   f3 = factor("a",3,1,False)
+   f4 = factor("c",3,1,False,ant_p=3,ant_q=6,print_f=True,value=1)  
    
    print "f1 = ",f1.to_string()
    print "f2 = ",f2.to_string()
@@ -1586,8 +1651,8 @@ if __name__ == "__main__":
 
    f4 = factor("g",1,1,True)
    f5 = factor("y",2,1,False,print_f=False)
-   f6 = factor("g",3,1,False) 
-   f7 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=2)
+   f6 = factor("b",3,1,False) 
+   f7 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=1)
 
    t2 = term()
    t2.append_factor(f4)
@@ -1600,7 +1665,7 @@ if __name__ == "__main__":
   
    t1.multiply_terms(t2)
 
-   print "t1 = ",t1.to_string()
+   print "t1 = ",t1.to_string(simplify_constant=True)
 
    t3 = term()
    t3.setZero()
