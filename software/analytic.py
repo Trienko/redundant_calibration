@@ -75,7 +75,10 @@ class factor():
            else:
               string_out = self.type_factor + "_" + str(self.index)
         else:   
-           string_out = self.type_factor + "_" + str(self.index)
+           if self.type_factor == "c":
+              string_out = str(self.value) + "_" + str(self.index)
+           else: 
+              string_out = self.type_factor + "_" + str(self.index)
         if self.conjugate_value:
            string_out = string_out + "^" + "*"
            if self.exponent > 1:
@@ -110,7 +113,7 @@ class factor():
     OUTPUTS:
     true or false depending if factors are equal
     '''
-    def equal(self,factor_in)
+    def equal(self,factor_in):
         if self.type_factor == factor_in.type_factor:
            if self.index == factor_in.index:
               if self.exponent == factor_in.exponent:
@@ -418,9 +421,9 @@ class term():
       def multiply_arrays(self,a1,ind1,a2,ind2):
           product = deepcopy(a1)
 
-          if len(ind1) == 0:
-             product = deepcopy(a2)
-             return product
+          #if len(ind1) == 0:
+          #   product = deepcopy(a2)
+          #   return product
           
           for k in xrange(len(ind2)):
               i = ind2[k]
@@ -428,7 +431,14 @@ class term():
               if len(temp) == 0:
                  product = np.append(product,a2[k])
               else:
-                 product[temp[0]].exponent = product[temp[0]].exponent+a2[k].exponent
+                 
+                 if product[temp[0]].type_factor == "c":
+                    if product[temp[0]].value == a2[k].value:
+                       product[temp[0]].exponent = product[temp[0]].exponent+a2[k].exponent
+                    else:
+                       product = np.append(product,a2[k])  
+                 else:
+                    product[temp[0]].exponent = product[temp[0]].exponent+a2[k].exponent
 
           return product
 
@@ -450,7 +460,7 @@ class term():
           self.a_array = np.array([],dtype=object)
           self.b_array = np.array([],dtype=object) 
           self.constant = np.array([],dtype=object)
-          self.constant = np.array([],dtype=object) 
+  
 
       '''
       Multiply two terms together 
@@ -615,8 +625,8 @@ class term():
              for factor in self.b_array:
                  string_out = string_out+factor.to_string()
           if self.const == 0:
-             if len(self.const_array) <> 0:
-                for factor in self.const_array:
+             if len(self.constant_array) <> 0:
+                for factor in self.constant_array:
                     string_out = string_out+factor.to_string() 
     
           return string_out 
@@ -1559,26 +1569,31 @@ if __name__ == "__main__":
    '''
    
    f1 = factor("g",1,1,True)
-   f2 = factor("y",1,1,False)
-   f3 = factor("g",2,1,False)  
+   f2 = factor("y",1,1,False,print_f=False)
+   f3 = factor("g",2,1,False)
+   f4 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=1)  
    
    print "f1 = ",f1.to_string()
    print "f2 = ",f2.to_string()
    print "f3 = ",f3.to_string()
+   print "f4 = ",f4.to_string()
 
    t1 = term()
    t1.append_factor(f1)
    t1.append_factor(f2)
    t1.append_factor(f3)
+   t1.append_factor(f4)
 
    f4 = factor("g",1,1,True)
-   f5 = factor("y",2,1,False)
+   f5 = factor("y",2,1,False,print_f=False)
    f6 = factor("g",3,1,False) 
+   f7 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=2)
 
    t2 = term()
    t2.append_factor(f4)
    t2.append_factor(f5)
    t2.append_factor(f6) 
+   t2.append_factor(f7) 
  
    print "t1 = ",t1.to_string()
    print "t2 = ",t2.to_string()
@@ -1608,4 +1623,4 @@ if __name__ == "__main__":
    
    #print "t1 = ",t1.to_string()
    #print "t1 = ",t1.to_string()
-   """
+   
