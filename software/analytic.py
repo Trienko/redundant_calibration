@@ -4,12 +4,13 @@ import pickle
 from scipy import optimize
 import matplotlib as mpl
 from copy import deepcopy
+import simulator
 #import networkx as nx
 #from networkx.utils import reverse_cuthill_mckee_ordering, cuthill_mckee_ordering
 
 '''
 Analytic expression code, with which one can derive the analytic expressions for complex redundant calibration, LOGCAL,
-LINCAL and redundant SteFCal.
+LINCAL and redundant SteFCal (HESSIAN AND JACOBIAN).
 '''
 
 ###############################################################################
@@ -459,8 +460,8 @@ class term():
           self.gc_array = np.array([],dtype=object)
           self.a_array = np.array([],dtype=object)
           self.b_array = np.array([],dtype=object) 
-          self.constant = np.array([],dtype=object)
-  
+          self.const = 0
+          self.constant_array = np.array([],dtype=object)
 
       '''
       Multiply two terms together 
@@ -603,6 +604,9 @@ class term():
       string_out - The output string
       '''
       def to_string(self,simplify=False,simplify_constant=False):
+          #print "HALLO"
+          #print "self.zero = ",self.zero
+          
           if simplify:
              self.simplify_conjugates()
           if simplify_constant:
@@ -697,7 +701,7 @@ class expression():
           string_out = ""
           for term in self.terms:
               if not term.zero: 
-                 string_out = string_out + " + " + term.to_string(simplify=simplify,simplify_const=simplify_const)
+                 string_out = string_out + " + " + term.to_string(simplify=simplify,simplify_constant=simplify_const)
 
           if string_out == "":
              string_out = "0" 
@@ -733,8 +737,11 @@ class expression():
           return number 
            
 class redundant():
-      def __init__(self,N):
-          self.N = N
+      def __init__(self):
+          self.N = 0
+          self.L = 0
+          self.phi = np.array([],dtype=int)
+          self.zeta = np.array([],dtype=int)
           self.regular_array = np.array([],dtype=object)
           self.J1 = np.array([],dtype=object)
           self.Jc1 = np.array([],dtype=object)
@@ -744,7 +751,64 @@ class redundant():
           self.JH = np.array([],dtype=object)
           self.H = np.array([],dtype=object)
           self.phi = np.array([])
-         
+
+      def create_J_LOGCAL(self,layout="REG",order=5,print_f=True):
+          # GENERATES PHI --- NEED TO MAKE IT GLOBAL SO AS TO NOT RECALCULATE IT
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+
+          rows = (self.N**2 - self.N)/2
+          columns = self.N + self.L
+
+          self.J = np.zeros((rows,columns),dtype=object)
+
+          p_v = np.zeros((rows,),dtype=int)
+          q_v = np.zeros((rows,),dtype=int)
+          
+          counter = 0
+          for k in xrange(self.N):
+              for j in xrange(k+1,self.N):
+                  p_v[counter] = k
+                  q_v[counter] = j
+                  counter = counter + 1
+          
+          for r in xrange(rows):
+              p = p_v[r]
+              q = q_v[r]
+              phi_v = self.phi[p,q]
+              for c in xrange(columns):
+                  #print "r = ",r
+                  #print "c = ",c
+                  if c == p:
+                     f = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=False,value=1)
+                     t = term()
+                     t.append_factor(f)
+                     self.J[r,c] = deepcopy(t)
+                  elif c == q:
+                     f = factor("c",q,1,False,ant_p=0,ant_q=0,print_f=False,value=1)
+                     t = term()
+                     t.append_factor(f)
+                     self.J[r,c] = deepcopy(t)
+                  elif (c == (self.N-1 + phi_v)):
+                     f = factor("c",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=1)
+                     t = term()
+                     t.append_factor(f)
+                     
+                     self.J[r,c] = deepcopy(t)
+                  else:
+                     t = term()
+                     t.setZero()
+                     self.J[r,c] = deepcopy(t)
+                     #print "Hallo_zero"
+                     #print "t.zero = ",t.zero
+                  self.J[r,c].to_string()
+                  #print "self.J[r,c] = ",self.J[r,c]
+       
       def create_J1(self,type_v="RED"):
           rows = ((self.N*self.N) - self.N)/2
 
@@ -892,14 +956,14 @@ class redundant():
           string_out = string_out + "]"                  
           return string_out  
 
-      def to_string_J(self):
+      def to_string_J(self,simplify=False,simplify_const=False):
           string_out = " J = ["
           for r in xrange(self.J.shape[0]):
               for c in xrange(self.J.shape[1]):
                   #print "r = ",r
                   #print "c = ",c
                   #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.J[r,c].to_string() + ","
+                  string_out = string_out + self.J[r,c].to_string(simplify,simplify_const) + ","
               string_out = string_out[:-1]
               string_out = string_out+"\n" 
           string_out = string_out[:-1]
@@ -979,8 +1043,8 @@ class redundant():
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]): 
                   J_temp[r,c].conjugate()
-          self.JH = J_temp.transpose()   
-          
+          self.JH = J_temp.transpose()  
+
       def hex_grid(self,hex_dim,l):
           side = hex_dim + 1
           ant_main_row = side + hex_dim
@@ -1252,16 +1316,8 @@ class redundant():
           string_out = string_out+"]"
           return string_out
 
-      def compute_H(self,type_v="RED"):
-          print "ymax = ",np.amax(self.phi)
-          if type_v == "RED":
-             parameters = 2*(self.N + (self.N-1)) 
-          elif type_v == "HEX":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-          elif type_v == "SQR":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-          else:
-             parameters = 2*(self.N) 
+      def compute_H(self):
+          parameters = self.J.shape[1]
           self.H = np.empty((parameters,parameters),dtype=object)  
           for r in xrange(parameters):
               for c in xrange(parameters):
@@ -1308,7 +1364,7 @@ class redundant():
                   J_numerical[r,c] = self.J[r,c].substitute(g,y)   
           return J_numerical  
 
-      def to_string_H(self,simplify=False):
+      def to_string_H(self,simplify=False,simplify_const=False):
           H_temp = deepcopy(self.H)
           string_out = " H = ["
           for r in xrange(H_temp.shape[0]):
@@ -1316,7 +1372,7 @@ class redundant():
                   #print "r = ",r
                   #print "c = ",c
                   #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + H_temp[r,c].to_string(simplify) + ","
+                  string_out = string_out + H_temp[r,c].to_string(simplify=simplify,simplify_const=simplify_const) + ","
               string_out = string_out[:-1]
               string_out = string_out+"\n" 
           string_out = string_out[:-1]
@@ -1576,6 +1632,14 @@ class redundant():
 
                     
 if __name__ == "__main__":
+   r = redundant()
+   r.create_J_LOGCAL()
+   print r.to_string_J()
+   r.JH = r.J.transpose()
+   r.compute_H()
+   print r.to_string_H()
+   H_int = r.to_int_H()
+   print "H_int = ",H_int
    '''
    r = redundant(0)
    r.create_hexagonal(1,20)
@@ -1632,7 +1696,7 @@ if __name__ == "__main__":
    #plt.colorbar()
    #plt.show()
    '''
-   
+   '''
    f1 = factor("g",1,1,True)
    f2 = factor("y",1,1,False,print_f=False)
    f3 = factor("a",3,1,False)
@@ -1688,4 +1752,4 @@ if __name__ == "__main__":
    
    #print "t1 = ",t1.to_string()
    #print "t1 = ",t1.to_string()
-   
+   '''
