@@ -356,7 +356,7 @@ class term():
       None
       ''' 
       def simplify_constant(self):
-          self.const = 1
+          self.const = 1.
           if len(self.constant_array) <> 0:
              for factor in self.constant_array:
                  self.const = self.const*factor.value**(factor.exponent)
@@ -616,11 +616,17 @@ class term():
           if self.zero:
              string_out = "0"
              return string_out
-          if self.const > 1:
+          if not (np.iscomplex([self.const])[0]):
+             self.const = self.const.real
+             if self.const > 1:
+                string_out = str(self.const)
+             elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (np.allclose([self.const],[1])):
+                   string_out = str(self.const)
+                   return string_out
+             elif self.const < 1:
+                  string_out = str(self.const)
+          else:
               string_out = str(self.const)
-          elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (self.const == 1):
-              string_out = str(self.const)
-              return string_out
           if self.const == 0:
              if len(self.constant_array) <> 0:
                 for factor in self.constant_array:
@@ -752,7 +758,7 @@ class redundant():
           self.H = np.array([],dtype=object)
           self.phi = np.array([])
 
-      def create_J_LOGCAL(self,layout="REG",order=5,print_f=True):
+      def create_J_LOGCAL(self,layout="REG",order=5,print_f=False):
           # GENERATES PHI --- NEED TO MAKE IT GLOBAL SO AS TO NOT RECALCULATE IT
           s = simulator.sim(layout=layout,order=order)
           s.generate_antenna_layout()
@@ -808,6 +814,108 @@ class redundant():
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
                   #print "self.J[r,c] = ",self.J[r,c]
+
+      def create_J_LINCAL(self,layout="REG",order=5,print_f=False):
+          # GENERATES PHI --- NEED TO MAKE IT GLOBAL SO AS TO NOT RECALCULATE IT
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+
+          rows = (self.N**2 - self.N)/2
+          columns = 2*self.N + 2*self.L
+
+          self.J = np.zeros((rows,columns),dtype=object)
+
+          p_v = np.zeros((rows,),dtype=int)
+          q_v = np.zeros((rows,),dtype=int)
+          
+          counter = 0
+          for k in xrange(self.N):
+              for j in xrange(k+1,self.N):
+                  p_v[counter] = k
+                  q_v[counter] = j
+                  counter = counter + 1
+          
+          for r in xrange(rows):
+              p = p_v[r]
+              q = q_v[r]
+              phi_v = self.phi[p,q]
+              for c in xrange(columns):
+                  #print "r = ",r
+                  #print "c = ",c
+                  if c == p:
+                     f1 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f2 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     self.J[r,c] = deepcopy(t)
+                  elif c == q:
+                     f1 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f2 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     self.J[r,c] = deepcopy(t)
+                  elif (c == (self.N + p)):
+                     f1 = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=print_f,value=1j)
+                     f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f4 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     t.append_factor(f4)
+                     self.J[r,c] = deepcopy(t) 
+                  elif (c == (self.N + q)):
+                     f1 = factor("c",q,1,False,ant_p=0,ant_q=0,print_f=print_f,value=-1j)
+                     f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f4 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     t.append_factor(f4)
+                     self.J[r,c] = deepcopy(t)
+                  elif (c == (2*(self.N) - 1 + phi_v)):
+                     f1 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f2 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     self.J[r,c] = deepcopy(t)
+                  elif (c == (2*(self.N) + self.L - 1 + phi_v)):
+                     f1 = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=print_f,value=1j) 
+                     f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f3 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
+                     f4 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
+                     t = term()
+                     t.append_factor(f1)
+                     t.append_factor(f2)
+                     t.append_factor(f3) 
+                     t.append_factor(f4)
+                     self.J[r,c] = deepcopy(t)  
+                  else:
+                     t = term()
+                     t.setZero()
+                     self.J[r,c] = deepcopy(t)
+                     #print "Hallo_zero"
+                     #print "t.zero = ",t.zero
+                  self.J[r,c].to_string()
+                  #print "self.J[r,c] = ",self.J[r,c]
+
        
       def create_J1(self,type_v="RED"):
           rows = ((self.N*self.N) - self.N)/2
@@ -1633,12 +1741,15 @@ class redundant():
                     
 if __name__ == "__main__":
    r = redundant()
-   r.create_J_LOGCAL()
+   #r.create_J_LOGCAL()
+   r.create_J_LINCAL(layout="HEX",order=1)
    print r.to_string_J()
    r.JH = r.J.transpose()
    r.compute_H()
-   print r.to_string_H()
+   print r.to_string_H(simplify=True,simplify_const=True)
    H_int = r.to_int_H()
+   plt.imshow(H_int,interpolation="nearest")
+   plt.show()
    print "H_int = ",H_int
    '''
    r = redundant(0)
