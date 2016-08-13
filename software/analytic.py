@@ -593,7 +593,7 @@ class term():
       is_constant - Returns True if the term is a constant
       '''
       def is_constant(self):
-          if (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (len(self.const_array) <> 0):
+          if (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (len(self.constant_array) <> 0) and (len(self.ga_array) == 0) and (len(self.ya_array) == 0):
              return True
           else:
              return False
@@ -611,27 +611,47 @@ class term():
       def to_string(self,simplify=False,simplify_constant=False):
           #print "HALLO"
           #print "self.zero = ",self.zero
-          
+          string_out = ""
+
           if simplify:
              self.simplify_conjugates()
+          
           if simplify_constant:
              self.simplify_constant()
-
-          string_out = ""
+             if not self.is_constant():
+                if not (np.iscomplex([self.const])[0]):
+                   self.const = self.const.real
+                   if not (np.allclose([self.const],[1])):
+                      string_out = "("+str(int(self.const))+")"
+                else:
+                  string_out = "("+str(self.const)+")" 
+             else:
+                string_out = "("+str(self.const)+")"
+ 
+             ''' 
+                OLD BROKEN CODE
+                string_out = str(self.const)          
+                if self.const > 1:
+                   string_out = "("+str(self.const)+")"
+                elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (np.allclose([self.const],[1])):
+                   print "len(self.g_array) = ",len(self.g_array)
+                   print "len(self.gc_array) = ",len(self.gc_array)
+                   print "len(self.yc_array) = ",len(self.yc_array)
+                   print "len(self.y_array) = ",len(self.y_array)
+                   print "len(self.a_array) = ",len(self.a_array)
+                   print "len(self.b_array) = ",len(self.b_array)
+                   string_out = str(int(self.const))
+                   return "#"+string_out+'*'
+                elif (self.const < 1) and (len(self.constant_array)<>0):
+                  string_out = "("+str(self.const)+")"
+             else:
+                 string_out = "("+str(self.const)+")"
+             '''
+          
           if self.zero:
              string_out = "0"
              return string_out
-          if not (np.iscomplex([self.const])[0]):
-             self.const = self.const.real
-             if self.const > 1:
-                string_out = "("+str(self.const)+")"
-             elif (len(self.g_array) == 0) and (len(self.gc_array) == 0) and (len(self.y_array) == 0) and (len(self.yc_array) == 0) and (len(self.a_array) == 0) and (len(self.b_array) == 0) and (np.allclose([self.const],[1])):
-                   string_out = str(self.const)
-                   return string_out
-             elif (self.const < 1) and (len(self.constant_array)<>0):
-                  string_out = "("+str(self.const)+")"
-          else:
-              string_out = "("+str(self.const)+")"
+          
           if self.const == 0:
              if len(self.constant_array) <> 0:
                 for factor in self.constant_array:
@@ -1791,6 +1811,26 @@ class redundant():
           file.write(string_out)
           file.write("\n\\end{bmatrix}\n")
           file.write("\\end{equation}\n")
+
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_8 = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[self.N:2*self.N,2*self.N+self.L:])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  #if r <> c:
+                  string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  #else:
+                  #   string_out = string_out + "d_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
          
                      
           file.write("\\begin{equation}\n")
@@ -2019,15 +2059,25 @@ if __name__ == "__main__":
    r = redundant()
    #r.create_J_LOGCAL()
    r.create_J_LINCAL(layout="REG",order=5)
-   print r.to_string_J()
+   #print r.to_string_J()
    r.hermitian_transpose_J()
    r.compute_H()
+   #r.J[0,0]
+   
    print r.to_string_H(simplify=True,simplify_const=True)
    H_int = r.to_int_H()
    plt.imshow(H_int,interpolation="nearest")
    plt.show()
    print "H_int = ",H_int
    r.to_latex_H2(simplify=True,simplify_const=True)
+
+   e1 = expression(r.J[:,0])
+   #print "e1 = ",e1.to_string()
+
+   e2 = expression(r.JH[0,:])
+   #print "e2 = ",e2.to_string()
+   e2.dot(e1)
+   print "e2 = ",e2.to_string(simplify=True,simplify_const=True)
    '''
    r = redundant(0)
    r.create_hexagonal(1,20)
