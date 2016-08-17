@@ -354,8 +354,51 @@ j \delta_{ij} |g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
 \end{equation}
 
 \begin{equation}
-[\boldsymbol{\mathcal{H}}]_{ij} = \sum_{pq\in\mathcal{I}_{ij}} -\delta_{pq} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
+[\boldsymbol{\mathcal{H}}]_{ij} = j \sum_{pq\in\mathcal{I}_{ij}} \widehat{\delta}_{pqi} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
 \end{equation}
+
+\begin{equation}
+ [\boldsymbol{\mathcal{K}}]_{ij} = 
+\begin{cases}
+0 & i\neq j\\
+\sum_{pq\in\mathcal{I}_{i}} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2 & i=j
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mathcal{I}_{ij} = \{il\in\mathcal{B}|\zeta_{il}=j\}\cup\{li\in\mathcal{B}|\zeta_{li}=j\} 
+\end{equation}
+
+\begin{equation}
+\mathcal{B} = \{st\in\mathbb{N}^2|s<t \wedge s<N \wedge t<N\}
+\end{equation}
+
+\begin{equation}
+\widehat{\delta}_{pqi} = 
+\begin{cases}
+-1 & p = i\\
+1 & q = i\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\mathcal{I}_i = \{pq\in\mathcal{B}|\zeta_{pq}=i\} 
+\end{equation}
+
+\begin{equation}
+\delta_{ij} =
+\begin{cases}
+-1 & i<j\\
+1 & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+
+
+
+
+
 
 
 
