@@ -291,6 +291,80 @@ i-j & (0<i<N)\wedge(0<j<N)\wedge(i>j)\\
 \end{cases}
 \end{equation}
 
+LINCAL
+
+\begin{equation}
+\boldsymbol{H} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{A}} & \boldsymbol{\mathcal{B}}\\
+\boldsymbol{\mathcal{B}}^H & \boldsymbol{\mathcal{C}}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{\mathcal{A}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{D}} & \boldsymbol{\mathcal{E}}\\
+\boldsymbol{\mathcal{E}}^H & \boldsymbol{\mathcal{F}}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{\mathcal{B}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{G}} & j\boldsymbol{\mathcal{G}}\\
+\boldsymbol{\mathcal{H}}^H & j\boldsymbol{\mathcal{H}}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{\mathcal{C}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{I}} & j\boldsymbol{\mathcal{I}}\\
+-j\boldsymbol{\mathcal{I}}^H & \boldsymbol{\mathcal{I}}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{\mathcal{D}}]_{ij} = 
+\begin{cases}
+|g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
+\sum_{k \neq i} |g_k|^2|g_i|^2|y_{\zeta_{ij}}|^2 & i = j
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{\mathcal{E}}]_{ij} =
+\begin{cases}
+j \delta_{ij} |g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
+-j \sum_{k \neq i} \delta_{ik} |g_k|^2|g_i|^2|y_{\zeta_{ij}}|^2 & i = j
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{\mathcal{F}}]_{ij} =
+\begin{cases}
+ -|g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
+ \sum_{k \neq i} \delta_{ik} |g_k|^2|g_i|^2|y_{\zeta_{ij}}|^2 & i = j
+\end{cases}
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{\mathcal{G}}]_{ij} = \sum_{pq\in\mathcal{I}_{ij}} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
+\end{equation}
+
+\begin{equation}
+[\boldsymbol{\mathcal{H}}]_{ij} = \sum_{pq\in\mathcal{I}_{ij}} -\delta_{pq} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
+\end{equation}
+
+
+
+
+
+
+
+
+
 
 
 \end{section}
