@@ -728,11 +728,17 @@ class expression():
       RETURNS:
       string_out - The output string
       '''
-      def to_string(self,simplify=False,simplify_const=False):
+      def to_string(self,simplify=False,simplify_const=False,write_out_zeros=False):
           string_out = ""
           for term in self.terms:
-              if not term.zero: 
-                 string_out = string_out + " + " + term.to_string(simplify=simplify,simplify_constant=simplify_const)
+              if not write_out_zeros:
+                 if not term.zero: 
+                    string_out = string_out + " + " + term.to_string(simplify=simplify,simplify_constant=simplify_const)
+              else:
+                 if term.zero:
+                    string_out = string_out + "," + "0"
+                 else:
+                    string_out = string_out + " , " + term.to_string(simplify=simplify,simplify_constant=simplify_const)
 
           if string_out == "":
              string_out = "0" 
@@ -1744,14 +1750,6 @@ class redundant():
           file.write(string_out)
           file.write("\n\\end{eqnarray}\n") 
 
-          string_out = ""
-          file.write("\\begin{eqnarray}\n")
-          for r in xrange(H_temp.shape[0]):
-              string_out = string_out + "d_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
-          string_out = string_out[:-3]
-          file.write(string_out)
-          file.write("\n\\end{eqnarray}\n") 
-
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_5 = \n\\begin{bmatrix}\n")
           string_out = ""
@@ -1831,12 +1829,11 @@ class redundant():
           file.write(string_out)
           file.write("\n\\end{bmatrix}\n")
           file.write("\\end{equation}\n")
-         
-                     
+
           file.write("\\begin{equation}\n")
-          file.write("\\boldsymbol{H}_2 = \n\\begin{bmatrix}\n")
+          file.write("\\boldsymbol{H}_9 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[:2*self.N-1,2*self.N-1:])
+          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,:self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -1845,7 +1842,7 @@ class redundant():
                   #if r <> c:
                   string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
                   #else:
-                  #string_out = string_out + "b_{"+str(r)+"}" + "&"  
+                  #   string_out = string_out + "d_{"+str(r)+"}" + "&"  
               string_out = string_out[:-1]
               string_out = string_out+"\\\\\n" 
           string_out = string_out[:-3]
@@ -1853,18 +1850,70 @@ class redundant():
           file.write("\n\\end{bmatrix}\n")
           file.write("\\end{equation}\n")
 
-          #string_out = ""
-          #file.write("\\begin{eqnarray}\n")
-          #for r in xrange(H_temp.shape[0]):
-          #    string_out = string_out + "b_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify)+"\\\\\n"
-          #string_out = string_out[:-3]
-          #file.write(string_out)
-          #file.write("\n\\end{eqnarray}\n")
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_{10} = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,self.N:2*self.N])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  #if r <> c:
+                  string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  #else:
+                  #   string_out = string_out + "d_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
 
           file.write("\\begin{equation}\n")
-          file.write("\\boldsymbol{H}_3 = \n\\begin{bmatrix}\n")
+          file.write("\\boldsymbol{H}_{11} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N-1:,2*self.N-1:])
+          H_temp = deepcopy(self.H[2*self.N+self.L:,:self.N])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  #if r <> c:
+                  string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  #else:
+                  #   string_out = string_out + "d_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
+
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_{12} = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[2*self.N+self.L:,self.N:2*self.N])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  #if r <> c:
+                  string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  #else:
+                  #   string_out = string_out + "d_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
+
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_{13} = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,2*self.N:2*self.N+self.L])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -1873,50 +1922,105 @@ class redundant():
                   if r <> c:
                      string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
                   else:
-                     string_out = string_out + "b_{"+str(r)+"}" + "&"  
+                     string_out = string_out + "e_{"+str(r)+"}" + "&"  
               string_out = string_out[:-1]
               string_out = string_out+"\\\\\n" 
           string_out = string_out[:-3]
           file.write(string_out)
           file.write("\n\\end{bmatrix}\n")
           file.write("\\end{equation}\n")
-
+                              
           string_out = ""
           file.write("\\begin{eqnarray}\n")
           for r in xrange(H_temp.shape[0]):
-              string_out = string_out + "b_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
+              string_out = string_out + "e_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
           string_out = string_out[:-3]
           file.write(string_out)
-          file.write("\n\\end{eqnarray}\n")
+          file.write("\n\\end{eqnarray}\n") 
 
           file.write("\\begin{equation}\n")
-          file.write("\\boldsymbol{H}_4 = \n\\begin{bmatrix}\n")
+          file.write("\\boldsymbol{H}_{14} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N-1:,:2*self.N-1])
+          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,2*self.N+self.L:])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
                   #print "c = ",c
                   #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  #if r <> c:
-                  string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
-                  #else:
-                  #string_out = string_out + "d_{"+str(r)+"}" + "&"  
+                  if r <> c:
+                     string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  else:
+                     string_out = string_out + "f_{"+str(r)+"}" + "&"  
               string_out = string_out[:-1]
               string_out = string_out+"\\\\\n" 
           string_out = string_out[:-3]
           file.write(string_out)
           file.write("\n\\end{bmatrix}\n")
           file.write("\\end{equation}\n")
+                              
+          string_out = ""
+          file.write("\\begin{eqnarray}\n")
+          for r in xrange(H_temp.shape[0]):
+              string_out = string_out + "f_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{eqnarray}\n")
 
-          #string_out = ""
-          #file.write("\\begin{eqnarray}\n")
-          #for r in xrange(H_temp.shape[0]):
-          #    string_out = string_out + "d_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify)+"\\\\\n"
-          #string_out = string_out[:-3]
-          #file.write(string_out)
-          #file.write("\n\\end{eqnarray}\n")
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_{15} = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[2*self.N+self.L:,2*self.N:2*self.N+self.L])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  if r <> c:
+                     string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  else:
+                     string_out = string_out + "g_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
+                              
+          string_out = ""
+          file.write("\\begin{eqnarray}\n")
+          for r in xrange(H_temp.shape[0]):
+              string_out = string_out + "g_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{eqnarray}\n")
 
+          file.write("\\begin{equation}\n")
+          file.write("\\boldsymbol{H}_{16} = \n\\begin{bmatrix}\n")
+          string_out = ""
+          H_temp = deepcopy(self.H[2*self.N+self.L:,2*self.N+self.L:])
+          for r in xrange(H_temp.shape[0]):
+              for c in xrange(H_temp.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  if r <> c:
+                     string_out = string_out + H_temp[r,c].to_string(simplify,simplify_const) + "&"
+                  else:
+                     string_out = string_out + "h_{"+str(r)+"}" + "&"  
+              string_out = string_out[:-1]
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{bmatrix}\n")
+          file.write("\\end{equation}\n")
+                              
+          string_out = ""
+          file.write("\\begin{eqnarray}\n")
+          for r in xrange(H_temp.shape[0]):
+              string_out = string_out + "h_{"+str(r)+"} &=& " + H_temp[r,r].to_string(simplify,simplify_const)+"\\\\\n"
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{eqnarray}\n")
           file.close()
 
       def to_latex_JH(self,simplify=False):
@@ -2071,13 +2175,13 @@ if __name__ == "__main__":
    print "H_int = ",H_int
    r.to_latex_H2(simplify=True,simplify_const=True)
 
-   e1 = expression(r.J[:,0])
-   #print "e1 = ",e1.to_string()
+   #e1 = expression(r.J[:,0])
+   #print "e1 = ",e1.to_string(simplify=True,simplify_const=True,write_out_zeros=True)
 
-   e2 = expression(r.JH[0,:])
-   #print "e2 = ",e2.to_string()
-   e2.dot(e1)
-   print "e2 = ",e2.to_string(simplify=True,simplify_const=True)
+   #e2 = expression(r.JH[6,:])
+   #print "e2 = ",e2.to_string(simplify=True,simplify_const=False,write_out_zeros=True)
+   #e2.dot(e1)
+   #print "e2 = ",e2.to_string(simplify=False,simplify_const=False,write_out_zeros=True)
    '''
    r = redundant(0)
    r.create_hexagonal(1,20)
