@@ -394,21 +394,88 @@ j \delta_{ij} |g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
 \end{cases}
 \end{equation}
 
+LINCAL NEW (CORRECT VERSION)
 
+\begin{equation}
+\boldsymbol{H} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{A}} & \boldsymbol{\mathcal{B}}\\
+\boldsymbol{\mathcal{B}}^T & \boldsymbol{\mathcal{C}}
+\end{bmatrix}
+\end{equation}
 
+\begin{equation}
+\boldsymbol{\mathcal{A}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{D}} & \boldsymbol{0}\\
+\boldsymbol{0} & \boldsymbol{\mathcal{T}}\odot\boldsymbol{\mathcal{D}}
+\end{bmatrix}
+\end{equation}
 
+\begin{equation}
+[\boldsymbol{\mathcal{D}}]_{ij} = 
+\begin{cases}
+2|g_i|^2|y_{\zeta_{ij}}|^2|g_j|^2 & i\neq j\\
+2\sum_{k \neq i} |g_k|^2|g_i|^2|y_{\zeta_{ij}}|^2 & i = j
+\end{cases}
+\end{equation}
 
+\begin{equation}
+\boldsymbol{\mathcal{T}} = 2\boldsymbol{I}-\boldsymbol{1}
+\end{equation}
 
+\begin{equation}
+\boldsymbol{\mathcal{B}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{E}} & \boldsymbol{0}\\
+\boldsymbol{0} & \boldsymbol{\mathcal{F}}
+\end{bmatrix}
+\end{equation}
 
+\begin{equation}
+[\boldsymbol{\mathcal{E}}]_{ij} = 2\sum_{pq\in\mathcal{I}_{ij}} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
+\end{equation}
 
+\begin{equation}
+[\boldsymbol{\mathcal{F}}]_{ij} = 2\sum_{pq\in\mathcal{I}_{ij}} \delta_{pq}^i |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2
+\end{equation}
 
+\begin{equation}
+\mathcal{I}_{ij} = \{il\in\mathcal{B}|\zeta_{il}=j\}\cup\{li\in\mathcal{B}|\zeta_{li}=j\} 
+\end{equation}
 
+\begin{equation}
+\mathcal{B} = \{st\in\mathbb{N}^2|s<t \wedge s<N \wedge t<N\}
+\end{equation}
 
+\begin{equation}
+\delta_{pq}^i = 
+\begin{cases}
+1 & p = i\\
+-1 & q = i\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
 
+\begin{equation}
+\boldsymbol{\mathcal{C}} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{G}} & \boldsymbol{0}\\
+\boldsymbol{0} & \boldsymbol{\mathcal{G}}
+\end{bmatrix}
+\end{equation}
 
+\begin{equation}
+ [\boldsymbol{\mathcal{G}}]_{ij} = 
+\begin{cases}
+0 & i\neq j\\
+2\sum_{pq\in\mathcal{I}_{i}} |g_p|^2|g_q|^2|y_{\zeta_{pq}}|^2 & i=j
+\end{cases}
+\end{equation}
 
-
-
+\begin{equation}
+\mathcal{I}_i = \{pq\in\mathcal{B}|\zeta_{pq}=i\} 
+\end{equation}
 
 \end{section}
 \end{document}
