@@ -945,7 +945,16 @@ class redundant():
                      #print "Hallo_zero"
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
-                  #print "self.J[r,c] = ",self.J[r,c]
+          
+          J_temp = deepcopy(self.J)
+          
+          for r in xrange(J_temp.shape[0]):
+              for c in xrange(J_temp.shape[1]): 
+                  J_temp[r,c].conjugate()
+          
+          self.J = np.vstack([deepcopy(self.J),J_temp])  
+          #print "self.J[r,c] = ",self.J[r,c]
+
 
        
       def create_J1(self,type_v="RED"):
