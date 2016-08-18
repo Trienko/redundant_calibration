@@ -2182,6 +2182,9 @@ if __name__ == "__main__":
    plt.imshow(H_int,interpolation="nearest")
    plt.show()
    print "H_int = ",H_int
+   #J_int = r.to_int_J()
+   #plt.imshow(J_int,interpolation="nearest")
+   #plt.show()
    r.to_latex_H2(simplify=True,simplify_const=True)
 
    #e1 = expression(r.J[:,0])
