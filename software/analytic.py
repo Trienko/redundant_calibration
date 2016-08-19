@@ -772,23 +772,142 @@ class expression():
               if not term.zero:
                  number = number + term.substitute(g_v,y_v)
           return number 
-           
-class redundant():
-      def __init__(self):
-          self.N = 0
-          self.L = 0
-          self.phi = np.array([],dtype=int)
-          self.zeta = np.array([],dtype=int)
-          self.regular_array = np.array([],dtype=object)
-          self.J1 = np.array([],dtype=object)
-          self.Jc1 = np.array([],dtype=object)
-          self.J2 = np.array([],dtype=object)
-          self.Jc2 = np.array([],dtype=object)
-          self.J = np.array([],dtype=object)
-          self.JH = np.array([],dtype=object)
-          self.H = np.array([],dtype=object)
-          self.phi = np.array([])
 
+###############################################################################
+
+'''
+Class that constructs the Jacobian and Hessian for a redundant layout analyticaly
+'''
+class redundant():
+      
+      '''
+      Consructer
+
+      INPUTS:
+      None
+
+      RETURNS:
+      None  
+      '''
+      def __init__(self):
+          
+          self.N = 0 #Number of antennas in the array
+          self.L = 0 #Number of unique redundant baselines 
+          self.phi = np.array([],dtype=int) #Mapping between antennas and redundant index
+          self.zeta = np.array([],dtype=int) #Symmetrical version of phi
+          self.regular_array = np.array([],dtype=object) #The array containing the model  
+          self.J1 = np.array([],dtype=object) #Upper right corner of complex Jacobian
+          self.Jc1 = np.array([],dtype=object) #Lower left corner of complex Jacobian
+          self.J2 = np.array([],dtype=object) #Uppper left corner of complex Jacobian
+          self.Jc2 = np.array([],dtype=object) #Lower right corner of complex Jacobian
+          self.J = np.array([],dtype=object) #Jacobian matrix
+          self.JH = np.array([],dtype=object) #Jacobian hermitian transpose
+          self.H = np.array([],dtype=object) #Hessian matrix
+
+#################################################################################
+# CREATING MODEL
+#################################################################################
+
+
+      '''
+      Creates the array and the assoiciated analytic expression for the model
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
+      def create_redundant(self,layout="REG",order=5,print_f=False)
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+          
+          for p in xrange(1,self.N):
+              for q in xrange(p+1,self.N+1):
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.regular_array = np.append(self.regular_array,t_temp)
+      
+      '''
+      Old code which creates the model for an EW regular array in the following way g_1g_2y_1, g2g3y_1 ...
+
+      NB - ONLY WORKS FOR EW ARRAY
+
+      INPUTS:
+      print_pq = False
+      
+
+      OUTPUTS:
+      None
+      '''    
+      def create_regular(self,print_pq=False):
+          spacing_vector = np.arange(self.N)[1:]  
+          redundant_baselines = spacing_vector[::-1]          
+          
+          self.regular_array=np.array([],dtype=object)
+          
+          for k in xrange(len(redundant_baselines)):
+              ant1 = 1
+              for j in xrange(redundant_baselines[k]):
+                  ant2 = ant1 + spacing_vector[k]
+                  g_fact = factor("g",ant1,1,False,False,0,0,False)
+                  y_fact = factor("y",spacing_vector[k],1,False,False,ant1,ant1,print_pq)
+                  gc_fact = factor("g",ant2,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.regular_array = np.append(self.regular_array,t_temp)
+                  ant1 = ant1 + 1
+      '''
+      Old code which creates the model for an EW regular array in the following way g_1g_2y_1, g1g3y_2 ...
+
+      NB - ONLY WORKS FOR EW ARRAY
+
+      INPUTS:
+      print_pq = False
+      
+
+      OUTPUTS:
+      None
+      '''    
+      def create_normal(self,print_pq=False):
+          self.regular_array=np.array([],dtype=object)
+          
+          for p in xrange(1,self.N):
+              y_counter = 1
+              for q in xrange(p+1,self.N+1):
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",y_counter,1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.regular_array = np.append(self.regular_array,t_temp)
+                  y_counter = y_counter+1
+
+      '''
+      Constructs the LOGCAL Jacobian - NB (ONLY AMPLITUDE FUNCTIONING)
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
       def create_J_LOGCAL(self,layout="REG",order=5,print_f=False):
           # GENERATES PHI --- NEED TO MAKE IT GLOBAL SO AS TO NOT RECALCULATE IT
           s = simulator.sim(layout=layout,order=order)
@@ -845,7 +964,17 @@ class redundant():
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
                   #print "self.J[r,c] = ",self.J[r,c]
+      '''
+      Constructs the LINCAL Jacobian
 
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
       def create_J_LINCAL(self,layout="REG",order=5,print_f=False):
           # GENERATES PHI --- NEED TO MAKE IT GLOBAL SO AS TO NOT RECALCULATE IT
           s = simulator.sim(layout=layout,order=order)
@@ -932,7 +1061,7 @@ class redundant():
                      f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
                      f3 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
                      f4 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
-                     t = term()
+                     t = term() OR 
                      t.append_factor(f1)
                      t.append_factor(f2)
                      t.append_factor(f3) 
@@ -946,6 +1075,11 @@ class redundant():
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
           
+          '''
+          NB CODE BELOW CALCULATES THE LOWER PART OF JACOBIAN; DO NOT KNOW IF THIS IS THE CORRECT STRATEGY
+          OR IF IT IS EVEN DOING WHAT I THINK. WANTED TO JUST REPEAT THE CONJUGATE OF THE MODEL AND DIFFERENTIATE TOWARDS 
+          EACH VARIABLE. THIS IS A SIMPLE SHORTCUT WHICH I HOPE ACCOMPLISHES THIS
+          '''
           J_temp = deepcopy(self.J)
           
           for r in xrange(J_temp.shape[0]):
@@ -955,20 +1089,22 @@ class redundant():
           self.J = np.vstack([deepcopy(self.J),J_temp])  
           #print "self.J[r,c] = ",self.J[r,c]
 
+      '''
+      Creates the left upper corner of the complex Jacobian
 
-       
-      def create_J1(self,type_v="RED"):
+      NB - CAN ONLY DO THE COMPLEX JACOBIAN NOT LINCAL OR LOGCAL
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def create_J1(self):
           rows = ((self.N*self.N) - self.N)/2
 
-          if type_v == "RED":
-             columns = self.N + (self.N-1)
-          elif type_v == "HEX":
-             columns = self.N + int(np.amax(self.phi))
-          elif type_v == "SQR":
-             columns = self.N + int(np.amax(self.phi))
-          else:
-             columns = self.N
- 
+          columns = self.N+self.L
+           
           self.J1 = np.empty((rows,columns),dtype=object)
 
           column_vector = np.array([],dtype=object)
@@ -1193,268 +1329,7 @@ class redundant():
                   J_temp[r,c].conjugate()
           self.JH = J_temp.transpose()  
 
-      def hex_grid(self,hex_dim,l):
-          side = hex_dim + 1
-          ant_main_row = side + hex_dim
-        
-          elements = 1
 
-          #summing the antennas in hexactoganal rings 
-          for k in xrange(hex_dim):
-              elements = elements + (k+1)*6
-                
-          ant_x = np.zeros((elements,),dtype=float)
-          ant_y = np.zeros((elements,),dtype=float)
-          print "len(ant_x) = ",len(ant_x)
-          print "len(ant_y) = ",len(ant_y)
-          x = 0.0
-          y = 0.0
-
-          counter = 0
-        
-          for k in xrange(side):
-              x_row = x
-              y_row = y
-              for i in xrange(ant_main_row):
-                  if k == 0:
-                     ant_x[counter] = x_row 
-                     ant_y[counter] = y_row
-                     x_row = x_row + l
-                     counter = counter + 1 
-                  else:
-                     ant_x[counter] = x_row
-                     ant_y[counter] = y_row
-                     counter = counter + 1
-                   
-                     ant_x[counter] = x_row
-                     ant_y[counter] = -1*y_row
-                     x_row = x_row + l
-                     counter = counter + 1   
-              x = x + l/2.0
-              y = y + (np.sqrt(3)/2.0)*l                 
-              ant_main_row = ant_main_row - 1
-    
-          return ant_x,ant_y
-
-      def hex_grid_ver2(self,hex_dim,l):
-          hex_dim = int(hex_dim)
-          side = int(hex_dim + 1)
-          ant_main_row = int(side + hex_dim)
-        
-          elements = 1
-
-          #summing the antennas in hexactoganal rings 
-          for k in xrange(hex_dim):
-              elements = elements + (k+1)*6
-                 
-          ant_x = np.zeros((elements,),dtype=float)
-          ant_y = np.zeros((elements,),dtype=float)
-          print "len(ant_x) = ",len(ant_x)
-          print "len(ant_y) = ",len(ant_y)
-          x = 0.0
-          y = 0.0
-
-          counter = 0
-        
-          for k in xrange(side):
-              x_row = x
-              y_row = y
-              for i in xrange(ant_main_row):
-                  if k == 0:
-                     ant_x[counter] = x_row 
-                     ant_y[counter] = y_row
-                     x_row = x_row + l
-                     counter = counter + 1 
-                  else:
-                     ant_x[counter] = x_row
-                     ant_y[counter] = y_row
-                     counter = counter + 1
-                   
-                     ant_x[counter] = x_row
-                     ant_y[counter] = -1*y_row
-                     x_row = x_row + l
-                     counter = counter + 1   
-              x = x + l/2.0
-              y = y + (np.sqrt(3)/2.0)*l                 
-              ant_main_row = ant_main_row - 1
-       
-          y_idx = np.argsort(ant_y)
-          ant_y = ant_y[y_idx]
-          ant_x = ant_x[y_idx]
-
-          slice_value = int(side)
-          start_index = 0
-          add = True
-          ant_main_row = int(side + hex_dim)
-
-          for k in xrange(ant_main_row):
-              temp_vec_x = ant_x[start_index:start_index+slice_value]
-              x_idx = np.argsort(temp_vec_x)
-              temp_vec_x = temp_vec_x[x_idx]
-              ant_x[start_index:start_index+slice_value] = temp_vec_x
-              if slice_value == ant_main_row:
-                 add = False
-              start_index = start_index+slice_value 
-            
-              if add:
-                 slice_value = slice_value + 1
-              else:
-                 slice_value = slice_value - 1  
-
-              print "slice_value = ",slice_value
-              print "k = ",k  
-
-          return ant_x,ant_y
-
-      def determine_phi_value(self,red_vec_x,red_vec_y,ant_x_p,ant_x_q,ant_y_p,ant_y_q):
-          red_x = ant_x_q - ant_x_p
-          red_y = ant_y_q - ant_y_p
-
-          for l in xrange(len(red_vec_x)):
-              if (np.allclose(red_x,red_vec_x[l]) and np.allclose(red_y,red_vec_y[l])):
-                 return red_vec_x,red_vec_y,l+1
-
-          red_vec_x = np.append(red_vec_x,np.array([red_x]))
-          red_vec_y = np.append(red_vec_y,np.array([red_y]))
-          return red_vec_x,red_vec_y,len(red_vec_x) 
-
-      def calculate_phi(self,ant_x,ant_y,plot=False):
-          phi = np.zeros((len(ant_x),len(ant_y)))
-          red_vec_x = np.array([])
-          red_vec_y = np.array([])
-          for k in xrange(len(ant_x)):
-              for j in xrange(k+1,len(ant_x)):
-                  red_vec_x,red_vec_y,phi[k,j]  = self.determine_phi_value(red_vec_x,red_vec_y,ant_x[k],ant_x[j],ant_y[k],ant_y[j])           
-                  phi[j,k] = phi[k,j]
-
-          if plot:
-             plt.imshow(phi,interpolation="nearest")
-             x = np.arange(len(ant_x))
-             plt.xticks(x, x+1)
-             y = np.arange(len(ant_x))
-             plt.yticks(y, y+1)
-             plt.colorbar() 
-             #plt.yticks(y, y+1)
-           
-             plt.show()
-
-          print "phi = ",phi
-          return phi
-
-      def create_hexagonal(self,hex_dim,l,print_pq=False):
-          self.regular_array=np.array([],dtype=object)
-
-          ant_x,ant_y = self.hex_grid_ver2(hex_dim,l)
-          self.N = len(ant_x)
-          #plt.plot(ant_x,ant_y,"ro")
-          #plt.show()
-          self.phi = self.calculate_phi(ant_x,ant_y)
-          
-          for p in xrange(1,self.N):
-              for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False,False,0,0,False) 
-                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
-                  gc_fact = factor("g",q,1,True,False,0,0,False)
-                  t_temp = term()
-                  t_temp.append_factor(g_fact)
-                  t_temp.append_factor(y_fact)
-                  t_temp.append_factor(gc_fact)
-                  self.regular_array = np.append(self.regular_array,t_temp)
-
-      def square_grid(self,side,l):
-          elements = side*side
-                
-          ant_x = np.zeros((elements,),dtype=float)
-          ant_y = np.zeros((elements,),dtype=float)
-          print "len(ant_x) = ",len(ant_x)
-          print "len(ant_y) = ",len(ant_y)
-          x = 0.0
-          y = 0.0
-
-          counter = 0
-        
-          for k in xrange(side):
-              x = 0.0
-              for i in xrange(side):
-                  ant_x[counter] = x
-                  ant_y[counter] = y 
-                  x = x + l
-                  counter = counter + 1
-              y = y + l 
- 
-          return ant_x,ant_y
-                  
-      def create_square(self,side,l,print_pq=False):
-          self.regular_array=np.array([],dtype=object)
-
-          ant_x,ant_y = self.square_grid(side,l)
-          self.N = len(ant_x)
-          #plt.plot(ant_x,ant_y,"ro")
-          #plt.show()
-          self.phi = self.calculate_phi(ant_x,ant_y)
-          
-          for p in xrange(1,self.N):
-              for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False,False,0,0,False) 
-                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
-                  gc_fact = factor("g",q,1,True,False,0,0,False)
-                  t_temp = term()
-                  t_temp.append_factor(g_fact)
-                  t_temp.append_factor(y_fact)
-                  t_temp.append_factor(gc_fact)
-                  self.regular_array = np.append(self.regular_array,t_temp)
-
-      def create_regular(self,print_pq=False):
-          spacing_vector = np.arange(self.N)[1:]  
-          redundant_baselines = spacing_vector[::-1]          
-          
-          self.regular_array=np.array([],dtype=object)
-          
-          for k in xrange(len(redundant_baselines)):
-              ant1 = 1
-              for j in xrange(redundant_baselines[k]):
-                  ant2 = ant1 + spacing_vector[k]
-                  g_fact = factor("g",ant1,1,False,False,0,0,False)
-                  y_fact = factor("y",spacing_vector[k],1,False,False,ant1,ant1,print_pq)
-                  gc_fact = factor("g",ant2,1,True,False,0,0,False)
-                  t_temp = term()
-                  t_temp.append_factor(g_fact)
-                  t_temp.append_factor(y_fact)
-                  t_temp.append_factor(gc_fact)
-                  self.regular_array = np.append(self.regular_array,t_temp)
-                  ant1 = ant1 + 1
-
-      def create_normal(self,print_pq=False):
-          self.regular_array=np.array([],dtype=object)
-          
-          for p in xrange(1,self.N):
-              y_counter = 1
-              for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False,False,0,0,False) 
-                  y_fact = factor("y",y_counter,1,False,False,p,q,print_pq)          
-                  gc_fact = factor("g",q,1,True,False,0,0,False)
-                  t_temp = term()
-                  t_temp.append_factor(g_fact)
-                  t_temp.append_factor(y_fact)
-                  t_temp.append_factor(gc_fact)
-                  self.regular_array = np.append(self.regular_array,t_temp)
-                  y_counter = y_counter+1
-
-      def create_regular_config2(self,print_pq=False):
-          self.regular_array=np.array([],dtype=object)
-          
-          for p in xrange(1,self.N):
-              y_counter = 1
-              for q in xrange(p+1,self.N+1):
-                  g_fact = factor("g",p,1,False,False,0,0,False) 
-                  y_fact = factor("y",y_counter,1,False,False,p,q,print_pq)          
-                  gc_fact = factor("g",q,1,True,False,0,0,False)
-                  t_temp = term()
-                  t_temp.append_factor(g_fact)
-                  t_temp.append_factor(y_fact)
-                  t_temp.append_factor(gc_fact)
-                  self.regular_array = np.append(self.regular_array,t_temp)
-                  y_counter = y_counter+1
      
       def to_string_regular(self):
           string_out = "regular_array = ["
@@ -2171,7 +2046,7 @@ class redundant():
 if __name__ == "__main__":
    r = redundant()
    #r.create_J_LOGCAL()
-   r.create_J_LINCAL(layout="REG",order=5)
+   r.create_J_LINCAL(layout="HEX",order=1)
    #print r.to_string_J()
    r.hermitian_transpose_J()
    r.compute_H()
