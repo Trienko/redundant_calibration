@@ -805,9 +805,8 @@ class redundant():
           self.H = np.array([],dtype=object) #Hessian matrix
 
 #################################################################################
-# CREATING MODEL
+# CREATING MODEL, JOCOBIAN AND HESSIAN
 #################################################################################
-
 
       '''
       Creates the array and the assoiciated analytic expression for the model
@@ -1136,18 +1135,23 @@ class redundant():
                   #print "*********************"   
                    
               #print "###############"
+      '''
+      Creates the right upper corner of the complex Jacobian
 
-      def create_J2(self,type_v="RED"):
+      NB - CAN ONLY DO THE COMPLEX JACOBIAN NOT LINCAL OR LOGCAL
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def create_J2(self):
           
           rows = ((self.N*self.N) - self.N)/2
-          if type_v == "RED":
-             columns = self.N + (self.N-1)
-          elif type_v == "HEX":
-             columns = self.N + int(np.amax(self.phi))
-          elif type_v == "SQR":
-             columns = self.N + int(np.amax(self.phi))
-          else:
-             columns = self.N
+
+          columns = self.N+self.L
+
           self.J2 = np.empty((rows,columns),dtype=object)
 
           column_vector = np.array([],dtype=object)
@@ -1179,19 +1183,23 @@ class redundant():
                   #print "*********************"   
                    
               #print "###############"
+      '''
+      Creates the complex Jacobian
 
-      def create_J(self,type_v="RED",phi=None):
-          if phi <> None:
-             self.phi = phi
+      NB - CAN ONLY DO THE COMPLEX JACOBIAN NOT LINCAL OR LOGCAL
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def create_J(self):
+          
           rows = ((self.N*self.N) - self.N)
-          if type_v == "RED":
-             columns = 2*(self.N + (self.N-1))
-          elif type_v == "HEX":
-             columns = 2*(self.N + int(np.amax(self.phi)))
-          elif type_v == "SQR":
-             columns = 2*(self.N + int(np.amax(self.phi))) 
-          else:
-             columns = 2*(self.N)
+          
+          columns = self.N+self.L 
+           
           self.J = np.empty((rows,columns),dtype=object)
           self.J[:rows/2,:columns/2] = self.J1
           self.J[:rows/2,columns/2:] = self.J2
@@ -1226,90 +1234,15 @@ class redundant():
       #    self.J[rows/2:,:columns/2] = self.Jc2
       #    self.J[rows/2:,columns/2:] = self.Jc1 
      
-      def to_string_J1(self):
-          string_out = " J1 = ["
-          for r in xrange(self.J1.shape[0]):
-              for c in xrange(self.J1.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.J1[r,c].to_string() + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out  
-
-      def to_string_J(self,simplify=False,simplify_const=False):
-          string_out = " J = ["
-          for r in xrange(self.J.shape[0]):
-              for c in xrange(self.J.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.J[r,c].to_string(simplify,simplify_const) + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out  
-
-      def to_string_JH(self):
-          string_out = " J^H = ["
-          for r in xrange(self.JH.shape[0]):
-              for c in xrange(self.JH.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.JH[r,c].to_string() + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out  
-
-      def to_string_J2(self):
-          string_out = " J2 = ["
-          for r in xrange(self.J2.shape[0]):
-              for c in xrange(self.J2.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.J2[r,c].to_string() + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out  
-
-      def to_string_Jc2(self):
-          string_out = " Jc2 = ["
-          for r in xrange(self.Jc2.shape[0]):
-              for c in xrange(self.Jc2.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.Jc2[r,c].to_string() + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out 
-
-      def to_string_Jc1(self):
-          string_out = " Jc1 = ["
-          for r in xrange(self.Jc1.shape[0]):
-              for c in xrange(self.Jc1.shape[1]):
-                  #print "r = ",r
-                  #print "c = ",c
-                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
-                  string_out = string_out + self.Jc1[r,c].to_string() + ","
-              string_out = string_out[:-1]
-              string_out = string_out+"\n" 
-          string_out = string_out[:-1]
-          string_out = string_out + "]"                  
-          return string_out           
-
+      '''
+      Calculates the conjugate of J1 and J2
+     
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
       def conjugate_J1_J2(self):
           self.Jc1 = deepcopy(self.J1)
           self.Jc2 = deepcopy(self.J2)
@@ -1321,24 +1254,32 @@ class redundant():
               for c in xrange(self.Jc2.shape[1]): 
                   self.Jc2[r,c].conjugate()
 
+      '''
+      Calculates the hermitian transpose of J
+     
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
       def hermitian_transpose_J(self):
           J_temp = deepcopy(self.J)
           
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]): 
                   J_temp[r,c].conjugate()
-          self.JH = J_temp.transpose()  
+          self.JH = J_temp.transpose()
 
+      '''
+      Computes the analytic HESSIAN
 
-     
-      def to_string_regular(self):
-          string_out = "regular_array = ["
-          for entry in self.regular_array:
-              string_out = string_out + entry.to_string()+","
-          string_out = string_out[:-1]
-          string_out = string_out+"]"
-          return string_out
-
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None       
+      ''' 
       def compute_H(self):
           parameters = self.J.shape[1]
           self.H = np.empty((parameters,parameters),dtype=object)  
@@ -1350,21 +1291,40 @@ class redundant():
                   row_temp.dot(column)
                   self.H[r,c] = row_temp
 
-      def substitute_H(self,g,y,type_v="RED"):
-          if type_v == "RED":
-             parameters = 2*(self.N + (self.N-1)) 
-          elif type_v == "HEX":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-          elif type_v == "SQR":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-          else:
-             parameters = 2*(self.N) 
+      '''
+      Substitute values into the HESSIAN
+
+      NB - CONSTANT NOT YET ADDED HERE
+
+      INPUTS:
+      g - g vector
+      y - y vector
+      
+      OUTPUTS:
+      None       
+      ''' 
+      def substitute_H(self,g,y):
+
+          parameters = 2*(self.N + (self.L))           
+
           H_numerical = np.zeros((parameters,parameters),dtype=complex)  
           for r in xrange(parameters):
               for c in xrange(parameters):
                   H_numerical[r,c] = self.H[r,c].substitute(g,y)   
           return H_numerical        
-                  
+      
+      '''
+      Substitute values into the JACOBIAN
+
+      NB - CONSTANT NOT YET ADDED HERE
+
+      INPUTS:
+      g - g vector
+      y - y vector
+      
+      OUTPUTS:
+      None       
+      '''                   
       def substitute_J(self,g,y,type_v="RED",phi=None):
           if phi <> None:
              self.phi = phi
@@ -1387,6 +1347,195 @@ class redundant():
                   J_numerical[r,c] = self.J[r,c].substitute(g,y)   
           return J_numerical  
 
+
+#################################################################################
+# OUTPUT 
+#################################################################################
+
+      '''
+      Prints the upper left corner of Jacobian
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def to_string_J1(self):
+          string_out = " J1 = ["
+          for r in xrange(self.J1.shape[0]):
+              for c in xrange(self.J1.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.J1[r,c].to_string() + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out  
+
+      '''
+      Prints the entire Jacobian
+
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      '''
+      def to_string_J(self,simplify=False,simplify_const=False):
+          string_out = " J = ["
+          for r in xrange(self.J.shape[0]):
+              for c in xrange(self.J.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.J[r,c].to_string(simplify,simplify_const) + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out  
+
+
+      '''
+      Prints the Hermitian transpose of Jacobian
+
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      '''
+      def to_string_JH(self):
+          string_out = " J^H = ["
+          for r in xrange(self.JH.shape[0]):
+              for c in xrange(self.JH.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.JH[r,c].to_string() + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out  
+
+      '''
+      Prints the upper right corner of Jacobian
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def to_string_J2(self):
+          string_out = " J2 = ["
+          for r in xrange(self.J2.shape[0]):
+              for c in xrange(self.J2.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.J2[r,c].to_string() + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out  
+
+      '''
+      Prints the lower left corner of Jacobian
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def to_string_Jc2(self):
+          string_out = " Jc2 = ["
+          for r in xrange(self.Jc2.shape[0]):
+              for c in xrange(self.Jc2.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.Jc2[r,c].to_string() + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out 
+
+      '''
+      Prints the lower right corner of Jacobian
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      ''' 
+      def to_string_Jc1(self):
+          string_out = " Jc1 = ["
+          for r in xrange(self.Jc1.shape[0]):
+              for c in xrange(self.Jc1.shape[1]):
+                  #print "r = ",r
+                  #print "c = ",c
+                  #print "self.J1[r,c] = ", self.J1[r,c].to_string()
+                  string_out = string_out + self.Jc1[r,c].to_string() + ","
+              string_out = string_out[:-1]
+              string_out = string_out+"\n" 
+          string_out = string_out[:-1]
+          string_out = string_out + "]"                  
+          return string_out           
+
+  
+
+      '''
+      Prints the model
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      '''      
+      def to_string_regular(self):
+          string_out = "regular_array = ["
+          for entry in self.regular_array:
+              string_out = string_out + entry.to_string()+","
+          string_out = string_out[:-1]
+          string_out = string_out+"]"
+          return string_out
+
+      '''
+      Prints the HESSIAN
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+      simplify_const - simplify the constant by multiplying it out 
+      
+      OUTPUTS:
+      None 
+      '''      
       def to_string_H(self,simplify=False,simplify_const=False):
           H_temp = deepcopy(self.H)
           string_out = " H = ["
@@ -1402,6 +1551,9 @@ class redundant():
           string_out = string_out + "]"                  
           return string_out  
 
+      
+      '''
+      OLD LATEX WRITE OUT (4 major sub-blocks
       def to_latex_H(self,simplify=False,simplify_const=True):
           file = open("H_"+str(self.N)+".txt", "w")
           file.write("\\begin{equation}\n")
@@ -1517,9 +1669,21 @@ class redundant():
           #file.write("\n\\end{eqnarray}\n")
 
           file.close()
+      '''
 
+      '''
+      Writes the HESSIAN to a latex txt file
+     
+      Writes out each of the 16 sublocks (old version wrote out only the 4 major sub-blocks)
 
-      def to_latex_H2(self,simplify=False,simplify_const=True):
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+      simplify_const - simplify the constant by multiplying it out 
+      
+      OUTPUTS:
+      None 
+      '''    
+      def to_latex_H(self,simplify=False,simplify_const=True):
           file = open("H_"+str(self.N)+".txt", "w")
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_1 = \n\\begin{bmatrix}\n")
@@ -1907,6 +2071,19 @@ class redundant():
           file.write("\n\\end{eqnarray}\n")
           file.close()
 
+      '''
+      Writes the hermitian transpose of the JACOBIAN to a latex txt file
+     
+      Writes out each of the 16 sublocks (old version wrote out only the 4 major sub-blocks)
+
+      NB - MIGHT NOT BE COMPATABLE WITH NEW FACTOR PRINT INPUTS
+
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+           
+      OUTPUTS:
+      None 
+      '''    
       def to_latex_JH(self,simplify=False):
           file = open("JH_"+str(self.N)+".txt", "w")
           file.write("\\begin{equation}\n")
@@ -1974,7 +2151,19 @@ class redundant():
           file.write("\\end{equation}\n")
 
           file.close()
+      '''
+      Writes the JACOBIAN to a latex txt file
+     
+      Writes out each of the 16 sublocks (old version wrote out only the 4 major sub-blocks)
 
+      NB - MIGHT NOT BE COMPATABLE WITH NEW FACTOR PRINT INPUTS
+
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+           
+      OUTPUTS:
+      None 
+      '''    
       def to_latex_J(self):
           file = open("J_"+str(self.N)+".txt", "w")
           file.write("\\begin{equation}\n")
@@ -2035,6 +2224,11 @@ class redundant():
 
           file.close()
 
+      '''
+      Converts the HESSIAN to a number of terms plot
+
+      NB - Will fail for LINCAL as LINCAL has terms that cancel which have not been coded yet
+      ''' 
       def to_int_H(self):
           H_int = np.zeros(self.H.shape,dtype=int)
           for r in xrange(self.H.shape[0]):
@@ -2060,7 +2254,7 @@ if __name__ == "__main__":
    #J_int = r.to_int_J()
    #plt.imshow(J_int,interpolation="nearest")
    #plt.show()
-   r.to_latex_H2(simplify=True,simplify_const=True)
+   r.to_latex_H(simplify=True,simplify_const=True)
 
    #e1 = expression(r.J[:,0])
    #print "e1 = ",e1.to_string(simplify=True,simplify_const=True,write_out_zeros=True)
