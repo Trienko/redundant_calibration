@@ -2272,150 +2272,77 @@ def Complex_example():
     print "H_int = ",H_int
     r.to_latex_H(simplify=True,simplify_const=True)    
 
+    #REORDERING OF HESSIAN OLD CODE
+    #H_int_old = np.copy(H_int)
+    #H_int[H_int <= 1] = 0
+    #G = nx.Graph(H_int)
+    #rcm = list(reverse_cuthill_mckee_ordering(G))
+    #rcm = list(reverse_cuthill_mckee_ordering(G))
+    #print "rcm = ",rcm
+    #A1 = H_int_old[rcm, :][:, rcm]
+    #plt.imshow(A1,interpolation='nearest')
+    #plt.colorbar()
+    #plt.show()
+
+
+'''
+SIMPLE EXAMPLE
+'''
+def Simple_example():
+    f1 = factor("g",1,1,True)
+    f2 = factor("y",1,1,False,print_f=False)
+    f3 = factor("a",3,1,False)
+    f4 = factor("c",3,1,False,ant_p=3,ant_q=6,print_f=True,value=1)  
+   
+    print "f1 = ",f1.to_string()
+    print "f2 = ",f2.to_string()
+    print "f3 = ",f3.to_string()
+    print "f4 = ",f4.to_string()
+
+    t1 = term()
+    t1.append_factor(f1)
+    t1.append_factor(f2)
+    t1.append_factor(f3)
+    t1.append_factor(f4)
+
+    f4 = factor("g",1,1,True)
+    f5 = factor("y",2,1,False,print_f=False)
+    f6 = factor("b",3,1,False) 
+    f7 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=1)
+
+    t2 = term()
+    t2.append_factor(f4)
+    t2.append_factor(f5)
+    t2.append_factor(f6) 
+    t2.append_factor(f7) 
+ 
+    print "t1 = ",t1.to_string()
+    print "t2 = ",t2.to_string()
+  
+    t1.multiply_terms(t2)
+
+    print "t1 = ",t1.to_string()
+
+    t3 = term()
+    t3.setZero()
+
+    print "t3 = ",t3.to_string()
+
+    e1 = expression(np.array([t1,t2],dtype=object)) 
+    e2 = expression(np.array([t1,t3],dtype=object)) 
+
+    print "e1 = ",e1.to_string()
+    print "e2 = ",e2.to_string()   
+
+    e1.dot(e2)   
+ 
+    print "e1 = ",e1.to_string(simplify_const=True)
 
 
              
 if __name__ == "__main__":
-   LINCAL_example()
+   #LINCAL_example()
    Complex_example()
+   #Simple_example()
 
-   '''
-   r = redundant()
-   #r.create_J_LOGCAL()
-   r.create_J_LINCAL(layout="HEX",order=1)
-   #print r.to_string_J()
-   r.hermitian_transpose_J()
-   r.compute_H()
-   #r.J[0,0]
-   
-   print r.to_string_H(simplify=True,simplify_const=True)
-   H_int = r.to_int_H()
-   plt.imshow(H_int,interpolation="nearest")
-   plt.show()
-   print "H_int = ",H_int
-   #J_int = r.to_int_J()
-   #plt.imshow(J_int,interpolation="nearest")
-   #plt.show()
-   r.to_latex_H(simplify=True,simplify_const=True)
-   
-   #e1 = expression(r.J[:,0])
-   #print "e1 = ",e1.to_string(simplify=True,simplify_const=True,write_out_zeros=True)
 
-   #e2 = expression(r.JH[6,:])
-   #print "e2 = ",e2.to_string(simplify=True,simplify_const=False,write_out_zeros=True)
-   #e2.dot(e1)
-   #print "e2 = ",e2.to_string(simplify=False,simplify_const=False,write_out_zeros=True)
-   '''
-   '''
-   r = redundant(0)
-   r.create_hexagonal(1,20)
-   #r.create_regular_config2(print_pq=True)
-   #r.create_regular()
-   #r.create_normal()
-   print r.to_string_regular()
-   r.create_J1(type_v="HEX")
-   r.create_J2(type_v="HEX")
-   print r.to_string_J1()
-   print r.to_string_J2()
-   r.conjugate_J1_J2()
-   r.create_J(type_v="HEX")
-   r.hermitian_transpose_J()
-   r.compute_H(type_v="HEX")
-   H_int = r.to_int_H()
-   
-   #print r.to_string_J1()
-   #print r.to_string_J2()
-   #print r.to_string_Jc1()
-   #print r.to_string_Jc2()
-   print r.to_string_J()
-   #print r.to_string_JH()
-   print r.to_string_H()
-   print r.to_string_H(simplify=True)
-   r.to_latex_H(simplify=True)
-   #r.to_latex_J()
-   #r.to_latex_JH()
-   
-   plt.imshow(H_int,interpolation="nearest")
-   plt.colorbar()
-   plt.show()
-
-   H_int[H_int <> 0] = 1
-   plt.imshow(H_int,interpolation="nearest")
-   plt.colorbar()
-   plt.show()
-   x = np.sum(H_int)
-   print "nonzero = ",x
-   y = H_int.shape[0]
-   y = y*y
-   print "y = ",y
-   z = y - x
-   print "z = ",z
-   print (1.*x)/y 
-   #H_int_old = np.copy(H_int)
-   #H_int[H_int <= 1] = 0
-   #G = nx.Graph(H_int)
-   #rcm = list(reverse_cuthill_mckee_ordering(G))
-   #rcm = list(reverse_cuthill_mckee_ordering(G))
-   #print "rcm = ",rcm
-   #A1 = H_int_old[rcm, :][:, rcm]
-   #plt.imshow(A1,interpolation='nearest')
-   #plt.colorbar()
-   #plt.show()
-   '''
-   '''
-   f1 = factor("g",1,1,True)
-   f2 = factor("y",1,1,False,print_f=False)
-   f3 = factor("a",3,1,False)
-   f4 = factor("c",3,1,False,ant_p=3,ant_q=6,print_f=True,value=1)  
-   
-   print "f1 = ",f1.to_string()
-   print "f2 = ",f2.to_string()
-   print "f3 = ",f3.to_string()
-   print "f4 = ",f4.to_string()
-
-   t1 = term()
-   t1.append_factor(f1)
-   t1.append_factor(f2)
-   t1.append_factor(f3)
-   t1.append_factor(f4)
-
-   f4 = factor("g",1,1,True)
-   f5 = factor("y",2,1,False,print_f=False)
-   f6 = factor("b",3,1,False) 
-   f7 = factor("c",3,1,False,ant_p=3,ant_q=5,print_f=True,value=1)
-
-   t2 = term()
-   t2.append_factor(f4)
-   t2.append_factor(f5)
-   t2.append_factor(f6) 
-   t2.append_factor(f7) 
- 
-   print "t1 = ",t1.to_string()
-   print "t2 = ",t2.to_string()
-  
-   t1.multiply_terms(t2)
-
-   print "t1 = ",t1.to_string(simplify_constant=True)
-
-   t3 = term()
-   t3.setZero()
-
-   print "t3 = ",t3.to_string()
-
-   #e1 = expression(np.array([t1,t2],dtype=object)) 
-   #e2 = expression(np.array([t1,t3],dtype=object)) 
-
-   #print "e1 = ",e1.to_string()
-   #print "e2 = ",e2.to_string()   
-
-   #e1.dot(e2)   
- 
-   #print "e1 = ",e1.to_string()
- 
-   #print "t1 = ",t1.to_string()
-
-   #t1.conjugate()
-   
-   #print "t1 = ",t1.to_string()
-   #print "t1 = ",t1.to_string()
-   '''
