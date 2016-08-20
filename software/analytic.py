@@ -818,7 +818,7 @@ class redundant():
       OUTPUTS:
       None 
       '''
-      def create_redundant(self,layout="REG",order=5,print_f=False)
+      def create_redundant(self,layout="REG",order=5,print_pq=False):
           s = simulator.sim(layout=layout,order=order)
           s.generate_antenna_layout()
           phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
@@ -1060,7 +1060,7 @@ class redundant():
                      f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
                      f3 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
                      f4 = factor("y",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=0)     
-                     t = term() OR 
+                     t = term() 
                      t.append_factor(f1)
                      t.append_factor(f2)
                      t.append_factor(f3) 
@@ -1074,13 +1074,13 @@ class redundant():
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
           
+          
+          J_temp = deepcopy(self.J)
           '''
           NB CODE BELOW CALCULATES THE LOWER PART OF JACOBIAN; DO NOT KNOW IF THIS IS THE CORRECT STRATEGY
           OR IF IT IS EVEN DOING WHAT I THINK. WANTED TO JUST REPEAT THE CONJUGATE OF THE MODEL AND DIFFERENTIATE TOWARDS 
           EACH VARIABLE. THIS IS A SIMPLE SHORTCUT WHICH I HOPE ACCOMPLISHES THIS
           '''
-          J_temp = deepcopy(self.J)
-          
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]): 
                   J_temp[r,c].conjugate()
@@ -1198,7 +1198,7 @@ class redundant():
           
           rows = ((self.N*self.N) - self.N)
           
-          columns = self.N+self.L 
+          columns = 2*(self.N+self.L) 
            
           self.J = np.empty((rows,columns),dtype=object)
           self.J[:rows/2,:columns/2] = self.J1
@@ -2236,8 +2236,50 @@ class redundant():
                   H_int[r,c] = self.H[r,c].number_of_terms()
           return H_int   
 
-                    
+'''
+EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF LINCAL HESSIAN
+'''
+def LINCAL_example():
+    r = redundant()
+    #r.create_J_LOGCAL()
+    r.create_J_LINCAL(layout="HEX",order=1)
+    r.hermitian_transpose_J()
+    r.compute_H()
+    H_int = r.to_int_H()
+    plt.imshow(H_int,interpolation="nearest")
+    plt.show()
+    print "H = ",r.to_string_H(simplify=True,simplify_const=True)
+    print "H_int = ",H_int
+    r.to_latex_H(simplify=True,simplify_const=True)
+
+'''
+EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF COMPLEX HESSIAN
+'''
+def Complex_example():
+    r = redundant()
+    r.create_regular()
+    r.create_redundant(layout="HEX",order=1,print_pq=False) 
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    r.hermitian_transpose_J()
+    r.compute_H()          
+    H_int = r.to_int_H()
+    plt.imshow(H_int,interpolation="nearest")
+    plt.show()
+    print "H = ",r.to_string_H(simplify=True,simplify_const=True)
+    print "H_int = ",H_int
+    r.to_latex_H(simplify=True,simplify_const=True)    
+
+
+
+             
 if __name__ == "__main__":
+   LINCAL_example()
+   Complex_example()
+
+   '''
    r = redundant()
    #r.create_J_LOGCAL()
    r.create_J_LINCAL(layout="HEX",order=1)
@@ -2255,7 +2297,7 @@ if __name__ == "__main__":
    #plt.imshow(J_int,interpolation="nearest")
    #plt.show()
    r.to_latex_H(simplify=True,simplify_const=True)
-
+   
    #e1 = expression(r.J[:,0])
    #print "e1 = ",e1.to_string(simplify=True,simplify_const=True,write_out_zeros=True)
 
@@ -2263,6 +2305,7 @@ if __name__ == "__main__":
    #print "e2 = ",e2.to_string(simplify=True,simplify_const=False,write_out_zeros=True)
    #e2.dot(e1)
    #print "e2 = ",e2.to_string(simplify=False,simplify_const=False,write_out_zeros=True)
+   '''
    '''
    r = redundant(0)
    r.create_hexagonal(1,20)
