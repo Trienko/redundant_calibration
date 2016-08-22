@@ -803,6 +803,8 @@ class redundant():
           self.J = np.array([],dtype=object) #Jacobian matrix
           self.JH = np.array([],dtype=object) #Jacobian hermitian transpose
           self.H = np.array([],dtype=object) #Hessian matrix
+          self.v = np.array([],dtype=object) #Model array - going to use it to calculate J^Hv - trying to derive redundant SteFCal.
+          self.JHv = np.array([],dtype=object) #J^H times v
 
 #################################################################################
 # CREATING MODEL, JOCOBIAN AND HESSIAN
@@ -837,7 +839,44 @@ class redundant():
                   t_temp.append_factor(y_fact)
                   t_temp.append_factor(gc_fact)
                   self.regular_array = np.append(self.regular_array,t_temp)
-      
+
+      '''
+      Creates the model vector v - will use it to compute J^Hv
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
+      def create_v(self,layout="REG",order=5,print_pq=False):
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+          
+          for p in xrange(1,self.N):
+              for q in xrange(p+1,self.N+1):
+                  g_fact = factor("g",p,1,False,False,0,0,False) 
+                  y_fact = factor("y",int(self.phi[p-1,q-1]),1,False,False,p,q,print_pq)          
+                  gc_fact = factor("g",q,1,True,False,0,0,False)
+                  t_temp = term()
+                  t_temp.append_factor(g_fact)
+                  t_temp.append_factor(y_fact)
+                  t_temp.append_factor(gc_fact)
+                  self.v = np.append(self.regular_array,t_temp)
+          v_copy = deepcopy(self.v)
+
+          for k in xrange(len(v_copy)):
+              v_copy[k].conjugate()      
+
+          self.v = np.vstack([deepcopy(self.v),v_copy])
+
+
       '''
       Old code which creates the model for an EW regular array in the following way g_1g_2y_1, g2g3y_1 ...
 
@@ -1292,6 +1331,27 @@ class redundant():
                   self.H[r,c] = row_temp
 
       '''
+      Computes J^H times v
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None       
+      ''' 
+      def compute_JHv(self):
+          parameters = self.JH.shape[1]
+          
+        
+          self.JHv = np.empty((parameters,),dtype=object)  
+          for r in xrange(parameters):
+                row = expression(self.JH[r,:])
+                row_temp = deepcopy(row)
+                column = expression(self.JHv)
+                  row_temp.dot(column)
+                  self.JHv[r] = row_temp
+
+      '''
       Substitute values into the HESSIAN
 
       NB - CONSTANT NOT YET ADDED HERE
@@ -1525,6 +1585,24 @@ class redundant():
           return string_out
 
       '''
+      Prints JHv
+     
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+      simplify_const - simplify the constant by multiplying it out 
+      
+      OUTPUTS:
+      output_string - output string
+      '''      
+      def to_string_JHv(self,simplify=False,simplify_const=False):
+          string_out = "JHv = ["
+          for entry in self.JHv:
+              string_out = string_out + entry.to_string()+","
+          string_out = string_out[:-1]
+          string_out = string_out+"]"
+          return string_out
+
+      '''
       Prints the HESSIAN
      
       NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
@@ -1534,7 +1612,7 @@ class redundant():
       simplify_const - simplify the constant by multiplying it out 
       
       OUTPUTS:
-      None 
+      string_out - output string 
       '''      
       def to_string_H(self,simplify=False,simplify_const=False):
           H_temp = deepcopy(self.H)
@@ -2074,8 +2152,6 @@ class redundant():
       '''
       Writes the hermitian transpose of the JACOBIAN to a latex txt file
      
-      Writes out each of the 16 sublocks (old version wrote out only the 4 major sub-blocks)
-
       NB - MIGHT NOT BE COMPATABLE WITH NEW FACTOR PRINT INPUTS
 
       INPUTS:
@@ -2154,8 +2230,6 @@ class redundant():
       '''
       Writes the JACOBIAN to a latex txt file
      
-      Writes out each of the 16 sublocks (old version wrote out only the 4 major sub-blocks)
-
       NB - MIGHT NOT BE COMPATABLE WITH NEW FACTOR PRINT INPUTS
 
       INPUTS:
@@ -2253,11 +2327,33 @@ def LINCAL_example():
     r.to_latex_H(simplify=True,simplify_const=True)
 
 '''
+EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF JHv
+'''
+def JHv_example():
+    r = redundant()
+    r.create_redundant(layout="HEX",order=1,print_pq=False) 
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    r.hermitian_transpose_J()
+    r.compute_JHv()
+    r.to_string_JHv()
+    #r.compute_H()          
+    #H_int = r.to_int_H()
+    plt.imshow(H_int,interpolation="nearest")
+    plt.show()
+    print "H = ",r.to_string_H(simplify=True,simplify_const=True)
+    print "H_int = ",H_int
+    r.to_latex_H(simplify=True,simplify_const=True)
+
+
+'''
 EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF COMPLEX HESSIAN
 '''
 def Complex_example():
     r = redundant()
-    r.create_regular()
+    #r.create_regular()
     r.create_redundant(layout="HEX",order=1,print_pq=False) 
     r.create_J1()
     r.create_J2()
@@ -2343,6 +2439,7 @@ def Simple_example():
 if __name__ == "__main__":
    #LINCAL_example()
    Complex_example()
+   JHv_example()
    #Simple_example()
 
 
