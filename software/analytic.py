@@ -1340,16 +1340,15 @@ class redundant():
       None       
       ''' 
       def compute_JHv(self):
-          parameters = self.JH.shape[1]
-          
-        
+          parameters = self.JH.shape[0]
+                  
           self.JHv = np.empty((parameters,),dtype=object)  
           for r in xrange(parameters):
                 row = expression(self.JH[r,:])
                 row_temp = deepcopy(row)
-                column = expression(self.JHv)
-                  row_temp.dot(column)
-                  self.JHv[r] = row_temp
+                column = expression(self.v)
+                row_temp.dot(column)
+                self.JHv[r] = row_temp
 
       '''
       Substitute values into the HESSIAN
@@ -2160,6 +2159,30 @@ class redundant():
       OUTPUTS:
       None 
       '''    
+      def to_latex_JHv(self,simplify=False,simplify_const=True):
+          file = open("JHv_"+str(self.N)+".txt", "w")
+          file.write("\\boldsymbol{J}^Hv = \n\\begin{eqnarray}\n")
+          string_out = ""
+          JHv_temp = deepcopy(self.JHv)
+          for r in xrange(len(JHv_temp)):
+              string_out = string_out + JHv_temp[r].to_string(simplify,simplify_const)
+              string_out = string_out+"\\\\\n" 
+          string_out = string_out[:-3]
+          file.write(string_out)
+          file.write("\n\\end{eqnarray}\n")
+          file.close()
+
+      '''
+      Writes the hermitian transpose of the JACOBIAN to a latex txt file
+     
+      NB - MIGHT NOT BE COMPATABLE WITH NEW FACTOR PRINT INPUTS
+
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+           
+      OUTPUTS:
+      None 
+      '''    
       def to_latex_JH(self,simplify=False):
           file = open("JH_"+str(self.N)+".txt", "w")
           file.write("\\begin{equation}\n")
@@ -2331,23 +2354,15 @@ EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF JHv
 '''
 def JHv_example():
     r = redundant()
-    r.create_redundant(layout="HEX",order=1,print_pq=False) 
+    r.create_redundant(layout="REG",order=5,print_pq=True) 
     r.create_J1()
     r.create_J2()
     r.conjugate_J1_J2()
     r.create_J()
     r.hermitian_transpose_J()
     r.compute_JHv()
-    r.to_string_JHv()
-    #r.compute_H()          
-    #H_int = r.to_int_H()
-    plt.imshow(H_int,interpolation="nearest")
-    plt.show()
-    print "H = ",r.to_string_H(simplify=True,simplify_const=True)
-    print "H_int = ",H_int
-    r.to_latex_H(simplify=True,simplify_const=True)
-
-
+    print r.to_string_JHv()
+    r.to_latex_JHv()
 '''
 EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF COMPLEX HESSIAN
 '''
@@ -2438,7 +2453,7 @@ def Simple_example():
              
 if __name__ == "__main__":
    #LINCAL_example()
-   Complex_example()
+   #Complex_example()
    JHv_example()
    #Simple_example()
 
