@@ -73,6 +73,8 @@ class factor():
               string_out = self.type_factor + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
            elif self.type_factor == "c":
               string_out = "("+str(self.value)+")" + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
+           elif self.type_factor == "b":
+              string_out = self.type_factor + "_{" + str(self.ant_p)+str(self.ant_q)+"}"
            else:
               string_out = self.type_factor + "_" + str(self.index)
         else:   
@@ -350,6 +352,9 @@ class term():
 
           for k in xrange(len(self.constant_array)):
               self.constant_array[k].conjugate() 
+
+          for k in xrange(len(self.b_array)):
+              self.b_array[k].conjugate()
 
       '''
       Calculates the total constant factor multiplies all the factors in the term together
@@ -805,6 +810,10 @@ class redundant():
           self.H = np.array([],dtype=object) #Hessian matrix
           self.v = np.array([],dtype=object) #Model array - going to use it to calculate J^Hv - trying to derive redundant SteFCal.
           self.JHv = np.array([],dtype=object) #J^H times v
+          self.z = np.array([],dtype=object) #The parameter vector
+          self.d = np.array([],dtype=object) #The parameter vector
+          self.JHd = np.array([],dtype=object) #The parameter vector
+          self.Jz = np.array([],dtype=object) #The Jacobian times the parameter vector
 
 #################################################################################
 # CREATING MODEL, JOCOBIAN AND HESSIAN
@@ -868,15 +877,96 @@ class redundant():
                   t_temp.append_factor(g_fact)
                   t_temp.append_factor(y_fact)
                   t_temp.append_factor(gc_fact)
-                  self.v = np.append(self.regular_array,t_temp)
+                  self.v = np.append(self.v,t_temp)
           v_copy = deepcopy(self.v)
 
           for k in xrange(len(v_copy)):
-              v_copy[k].conjugate()      
+              v_copy[k].conjugate() 
+              self.v = np.append(self.v,v_copy[k]) #USING ALTERNATIVE APPROACH     
 
-          self.v = np.vstack([deepcopy(self.v),v_copy])
+          #self.v = np.vstack([deepcopy(self.v),v_copy]) - NOT WORKING NOT SURE WHY?
 
+          #for k in xrange(len(self.v)):
+          #    print "k = ",k
+          #    print "v[k] = ",self.v[k].to_string()
 
+      '''
+      Creates the observed visibility vector d - will use it to compute J^Hd
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
+      def create_d(self,layout="REG",order=5,print_pq=False):
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+          
+          for p in xrange(1,self.N):
+              for q in xrange(p+1,self.N+1):
+                  b_fact = factor("b",p,1,False,False,p,q,False) 
+                  t_temp = term()
+                  t_temp.append_factor(b_fact)
+                  self.d = np.append(self.v,t_temp)
+          d_copy = deepcopy(self.d)
+
+          for k in xrange(len(v_copy)):
+              d_copy[k].conjugate() 
+              self.d = np.append(self.d,d_copy[k]) #USING ALTERNATIVE APPROACH     
+
+          #self.v = np.vstack([deepcopy(self.v),v_copy]) - NOT WORKING NOT SURE WHY?
+
+          #for k in xrange(len(self.v)):
+          #    print "k = ",k
+          #    print "v[k] = ",self.v[k].to_string()
+              
+      '''
+      Creates the parameter vector z 
+
+      INPUTS:
+      layout - Which layout to use (HEX, REG or SQR).
+      order - What layout order to use.
+      print_f - If true print the redundant index of factor; if false print the composite antenna index
+
+      OUTPUTS:
+      None 
+      '''
+      
+      def create_z(self,layout="REG",order=5):
+          s = simulator.sim(layout=layout,order=order)
+          s.generate_antenna_layout()
+          phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+          self.N = s.N
+          self.L = s.L 
+          self.phi = phi
+          self.zeta = zeta
+          
+          for p in xrange(1,self.N+1):
+              g_fact = factor("g",p,1,False,False,0,0,False)
+              t_temp = term()
+              t_temp.append_factor(g_fact)
+              self.z = np.append(self.z,t_temp)
+
+          for q in xrange(1,self.L+1):
+              y_fact = factor("y",q,1,False,False,0,0,False) 
+              t_temp = term()
+              t_temp.append_factor(y_fact)
+              self.z = np.append(self.z,t_temp)               
+
+          z_copy = deepcopy(self.z)
+
+          for k in xrange(len(z_copy)):
+              z_copy[k].conjugate() 
+              self.z = np.append(self.z,z_copy[k]) #USING ALTERNATIVE APPROACH 
+         
+      
       '''
       Old code which creates the model for an EW regular array in the following way g_1g_2y_1, g2g3y_1 ...
 
@@ -1341,14 +1431,54 @@ class redundant():
       ''' 
       def compute_JHv(self):
           parameters = self.JH.shape[0]
-                  
+          column = expression(self.v)
+          #print "column = ",column.to_string()        
           self.JHv = np.empty((parameters,),dtype=object)  
           for r in xrange(parameters):
                 row = expression(self.JH[r,:])
                 row_temp = deepcopy(row)
-                column = expression(self.v)
                 row_temp.dot(column)
                 self.JHv[r] = row_temp
+
+      '''
+      Computes J^H times d
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None       
+      ''' 
+      def compute_JHd(self):
+          parameters = self.JH.shape[0]
+          column = expression(self.d)
+          #print "column = ",column.to_string()        
+          self.JHv = np.empty((parameters,),dtype=object)  
+          for r in xrange(parameters):
+                row = expression(self.JH[r,:])
+                row_temp = deepcopy(row)
+                row_temp.dot(column)
+                self.JHd[r] = row_temp
+
+      '''
+      Computes J times z
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None       
+      ''' 
+      def compute_Jz(self):
+          eqns = self.J.shape[0]
+          column = expression(self.z)
+          #print "column = ",column.to_string()        
+          self.Jz = np.empty((eqns,),dtype=object)  
+          for r in xrange(eqns):
+                row = expression(self.J[r,:])
+                row_temp = deepcopy(row)
+                row_temp.dot(column)
+                self.Jz[r] = row_temp
 
       '''
       Substitute values into the HESSIAN
@@ -1384,21 +1514,9 @@ class redundant():
       OUTPUTS:
       None       
       '''                   
-      def substitute_J(self,g,y,type_v="RED",phi=None):
-          if phi <> None:
-             self.phi = phi
-          if type_v == "RED":
-             parameters = 2*(self.N + (self.N-1))
-             equations = (self.N**2 -self.N) 
-          elif type_v == "HEX":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-             equations = (self.N**2 -self.N)
-          elif type_v == "SQR":
-             parameters = 2*(self.N + int(np.amax(self.phi)))
-             equations = (self.N**2 -self.N)
-          else:
-             parameters = 2*(self.N) 
-             equations = (self.N**2 -self.N)
+      def substitute_J(self,g,y):
+          parameters = 2*(self.N + self.L)
+          equations = (self.N**2 -self.N) 
           J_numerical = np.zeros((equations,parameters),dtype=complex)  
           for r in xrange(equations):
               #print "r = ",r
@@ -1584,6 +1702,44 @@ class redundant():
           return string_out
 
       '''
+      Prints the parameter vector z
+     
+      NB - NOT SURE IF INCOMPATABLE WITH NEW INPUTS TO to_string()
+
+      INPUTS:
+      None
+      
+      OUTPUTS:
+      None 
+      '''      
+      def to_string_z(self,simplify,simplify_const):
+          string_out = "z = ["
+          for entry in self.z:
+              string_out = string_out + entry.to_string(simplify)+","
+          string_out = string_out[:-1]
+          string_out = string_out+"]"
+          return string_out
+
+      '''
+      Prints JHv
+     
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+      simplify_const - simplify the constant by multiplying it out 
+      
+      OUTPUTS:
+      output_string - output string
+      '''      
+      def to_string_JHd(self,simplify=False,simplify_const=False):
+          string_out = "JHv = ["
+          for entry in self.JHd:
+              string_out = string_out + entry.to_string(simplify)+","
+          string_out = string_out[:-1]
+          string_out = string_out+"]"
+          return string_out
+
+
+      '''
       Prints JHv
      
       INPUTS:
@@ -1596,7 +1752,25 @@ class redundant():
       def to_string_JHv(self,simplify=False,simplify_const=False):
           string_out = "JHv = ["
           for entry in self.JHv:
-              string_out = string_out + entry.to_string()+","
+              string_out = string_out + entry.to_string(simplify)+","
+          string_out = string_out[:-1]
+          string_out = string_out+"]"
+          return string_out 
+
+      '''
+      Prints Jz
+     
+      INPUTS:
+      simplify - simplify the product of a variable and its conjugate
+      simplify_const - simplify the constant by multiplying it out 
+      
+      OUTPUTS:
+      output_string - output string
+      '''      
+      def to_string_Jz(self,simplify=False,simplify_const=False):
+          string_out = "Jz = ["
+          for entry in self.Jz:
+              string_out = string_out + entry.to_string(simplify)+","
           string_out = string_out[:-1]
           string_out = string_out+"]"
           return string_out
@@ -2352,17 +2526,51 @@ def LINCAL_example():
 '''
 EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF JHv
 '''
+def JHd_example():
+    r = redundant()
+    r.create_redundant(layout="REG",order=5,print_pq=True)
+    r.create_d(layout="REG",order=5,print_pq=True) 
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    r.hermitian_transpose_J()
+    r.compute_JHd()
+    print r.to_string_JHd(simplify=True,simplify_const=False)
+    #r.to_latex_JHv(simplify=True,simplify_const=False)
+
+'''
+EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF JHv
+'''
 def JHv_example():
     r = redundant()
-    r.create_redundant(layout="REG",order=5,print_pq=True) 
+    r.create_redundant(layout="REG",order=5,print_pq=True)
+    r.create_v(layout="REG",order=5,print_pq=True) 
     r.create_J1()
     r.create_J2()
     r.conjugate_J1_J2()
     r.create_J()
     r.hermitian_transpose_J()
     r.compute_JHv()
-    print r.to_string_JHv()
-    r.to_latex_JHv()
+    print r.to_string_JHv(simplify=True,simplify_const=False)
+    r.to_latex_JHv(simplify=True,simplify_const=False)
+
+'''
+EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF Jz
+'''
+def Jz_example():
+    r = redundant()
+    r.create_redundant(layout="REG",order=5,print_pq=True)
+    r.create_z(layout="REG",order=5)
+    print r.to_string_z(simplify=True,simplify_const=False) 
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    #r.hermitian_transpose_J()
+    r.compute_Jz()
+    print r.to_string_Jz(simplify=True,simplify_const=False)
+
 '''
 EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF COMPLEX HESSIAN
 '''
@@ -2454,7 +2662,9 @@ def Simple_example():
 if __name__ == "__main__":
    #LINCAL_example()
    #Complex_example()
-   JHv_example()
+   #JHv_example()
+   JHd_example()
+   #Jz_example()
    #Simple_example()
 
 

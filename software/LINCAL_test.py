@@ -2,6 +2,10 @@ import numpy as np
 import scipy as sp
 import pylab as plt
 import simulator
+import analytic
+
+
+
 
 def LINCAL_J(z,N,L,phi):
     g = z[:N]
@@ -43,6 +47,23 @@ def LINCAL_J(z,N,L,phi):
     J = np.vstack([J,np.conj(J)])     
 
     return J
+
+def compute_v(z,N,phi):
+    g = z[:N]
+    y = z[N:]
+
+    rows = (N**2 - N)
+              
+    v = np.zeros((rows,),dtype=complex)
+
+    counter = 0
+    for k in xrange(N):
+        for j in xrange(k+1,N):
+              phi_v = phi[k,j]
+              v[counter] = g[k]*np.conjugate(g[j])*y[phi_v-1]
+              counter = counter + 1
+    v[counter:] = np.conjugate(v[:counter]) 
+    return v
 
 def LINCAL_H_analytic(z,N,L,zeta):
     g = z[:N]
@@ -188,8 +209,84 @@ def create_index_ij(zeta,N,i,j):
 
     return p,q 
   
+'''
+Creates the redundant complex Jacobian analytically. Returns the result
+      
+RETURNS:
+J - analytic Jacobian 
+ 
+INPUTS:
+dim - dimesnion of array
+layout - which layout ot choose     
+'''
+def construct_sym_J_layout(dim=5,layout="REG"):
+    r = analytic.redundant()
+    r.create_redundant(layout=layout,order=dim,print_pq=False)
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    #print "self.J_sym.size = ",r.J.shape
+    return r.J,r.N,r.L
+          
+'''
+Substitutes the vector z into the symbolic redundant Jacobian. Stores the result in self.J
+      
+RETURNS:
+J - the numerical Jacobian
+ 
+INPUTS:
+z - Input vector.
+N - Number of elements in array.
+plot - Plot the resultant matrices if True.     
+'''
+def substitute_sym_J(z,J_sym,dim=5,layout="REG",plot=True):
+    r = analytic.redundant()
+    r.create_redundant(layout=layout,order=dim,print_pq=False)
+    g = z[:r.N]
+    y = z[r.N:]
+    r.J = J_sym
+    J_num = r.substitute_J(g,y)
+    if plot:
+       plt.imshow(np.absolute(J_num),interpolation="nearest")
+       plt.show()
+    return J_num
 
+
+   
 if __name__ == "__main__":
+   s = simulator.sim(layout="REG",order=5)
+   s.generate_antenna_layout()
+   phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+ 
+   J_sym,N,L = construct_sym_J_layout()
+   g = np.random.randn(N)+1j*np.random.randn(N)
+   y = np.random.randn(L)+1j*np.random.randn(L)
+   #g = np.ones((N,))
+   #y = np.ones((L,))
+   z = np.hstack([g,y])
+   
+   J_num = substitute_sym_J(z,J_sym)
+
+   JH_num = J_num.transpose().conjugate()
+   v_num = compute_v(z,N,phi)
+
+   H_num = np.dot(JH_num,J_num)*np.eye(JH_num.shape[0])
+   
+   z2 = np.hstack([z,np.conjugate(z)])
+
+   Hz_num = np.dot(H_num,z2)
+
+   JHv_num = np.dot(JH_num,v_num)
+
+   print "v_num = ",v_num 
+   print "JHv_num = ",JHv_num
+   print "Hz_num = ",Hz_num
+   print "d = ",JHv_num - Hz_num
+   
+
+   
+   '''
    s = simulator.sim(layout="SQR",order=5)
    s.generate_antenna_layout()
    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
@@ -223,3 +320,4 @@ if __name__ == "__main__":
    plt.show() 
 
    print "H2 - H.real = ",H2-H.real
+   '''
