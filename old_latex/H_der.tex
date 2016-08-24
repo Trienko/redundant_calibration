@@ -589,7 +589,52 @@ g_{i}^{k+1} = \alpha \frac{\sum_{k\neq i } g_k x_{\zeta_{ki}}d_{ki}}{|g_k|^2|y_{
 y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{I}_j} \conj{g}_p g_q d_{pq}}{\sum_{pq \in \mathcal{I}_j}|g_p|^2|g_q|^2} + (1-\alpha) y_i^k 
 \end{equation}
 
+\begin{equation}
+\boldsymbol{J} =
+\begin{bmatrix}
+\boldsymbol{\mathcal{M}} & \boldsymbol{\mathcal{N}}\\
+\boldsymbol{\mathcal{N}}^* & \boldsymbol{\mathcal{M}}^*
+\end{bmatrix}
+\end{equation}
 
+\begin{equation}
+\boldsymbol{\mathcal{M}} = 
+%\vphantom{% phantom stuff for correct box dimensions
+%    \begin{matrix}
+%    \overbrace{XYZ}^{\mbox{$y_{\zeta_{pq}} \conj{g}_q \delta_p^j$}} 
+%    \end{matrix}}
+\begin{bmatrix}
+\coolover{{\scriptstyle j=1,\ldots,N}}{y_{\zeta_{pq}} \conj{g}_q \delta_p^j} & \coolover{{\scriptstyle k=1,\ldots,L}}{g_p\conj{g}_q\delta_{\zeta_{pq}}^k}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{g_p\conj{g}_q\delta_{\zeta_{pq}}^k}{{\scriptstyle[pq] = 1,\ldots,B~(p<q)}}
+\end{matrix}
+\end{equation}
+
+\begin{equation}
+\boldsymbol{\mathcal{N}} = 
+%\vphantom{% phantom stuff for correct box dimensions
+%    \begin{matrix}
+%    \overbrace{XYZ}^{\mbox{$y_{\zeta_{pq}} \conj{g}_q \delta_p^j$}} 
+%    \end{matrix}}
+\begin{bmatrix}
+\coolover{{\scriptstyle j=1,\ldots,N}}{g_p y_{\zeta_{pq}} \delta_q^j} & \boldsymbol{0}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{g_p\conj{g}_q\delta_{\zeta_{pq}}^k}{{\scriptstyle[pq] = 1,\ldots,B~(p<q)}}
+\end{matrix}
+\end{equation}
+
+
+
+
+\begin{equation}
+\delta_x^y=
+\begin{cases}
+1 & \textrm{if}~x=y\\
+0 & \textrm{otherwise}
+\end{cases}
+\end{equation}
 
 
 
