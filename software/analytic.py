@@ -900,7 +900,7 @@ class redundant():
       OUTPUTS:
       None 
       '''
-      def create_d(self,layout="REG",order=5,print_pq=False):
+      def create_d(self,layout="REG",order=5,print_pq=True):
           s = simulator.sim(layout=layout,order=order)
           s.generate_antenna_layout()
           phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
@@ -911,13 +911,13 @@ class redundant():
           
           for p in xrange(1,self.N):
               for q in xrange(p+1,self.N+1):
-                  b_fact = factor("b",p,1,False,False,p,q,False) 
+                  b_fact = factor("b",p,1,False,False,p,q,print_f=print_pq) 
                   t_temp = term()
                   t_temp.append_factor(b_fact)
-                  self.d = np.append(self.v,t_temp)
+                  self.d = np.append(self.d,t_temp)
           d_copy = deepcopy(self.d)
 
-          for k in xrange(len(v_copy)):
+          for k in xrange(len(d_copy)):
               d_copy[k].conjugate() 
               self.d = np.append(self.d,d_copy[k]) #USING ALTERNATIVE APPROACH     
 
@@ -1453,7 +1453,7 @@ class redundant():
           parameters = self.JH.shape[0]
           column = expression(self.d)
           #print "column = ",column.to_string()        
-          self.JHv = np.empty((parameters,),dtype=object)  
+          self.JHd = np.empty((parameters,),dtype=object)  
           for r in xrange(parameters):
                 row = expression(self.JH[r,:])
                 row_temp = deepcopy(row)
@@ -1731,7 +1731,7 @@ class redundant():
       output_string - output string
       '''      
       def to_string_JHd(self,simplify=False,simplify_const=False):
-          string_out = "JHv = ["
+          string_out = "JHd = ["
           for entry in self.JHd:
               string_out = string_out + entry.to_string(simplify)+","
           string_out = string_out[:-1]
