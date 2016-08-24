@@ -1,9 +1,27 @@
 \documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath,amsfonts,amssymb,graphicx,subfigure}
+\usepackage{amsmath,amsfonts,amssymb,graphicx,subfigure,mathtools}
 \usepackage{amsmath}
 \usepackage{rotating}
 \usepackage{lscape}
+
+\newcommand{\conj}[1]{\overline{#1}}
+
+%MATRIX HELPER FUNCTIONS
+\newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}^{\mbox{$#1$}}}}#2} 
+
+\newcommand\coolunder[2]{\mathrlap{\smash{\underbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}_{\mbox{$#1$}}}}#2}
+
+\newcommand\coolleftbrace[2]{%
+#1\left\{\vphantom{\begin{matrix} #2 \end{matrix}}\right.}
+
+\newcommand\coolrightbrace[2]{%
+\left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
+
+
+
 %opening
 \title{SPARC: SpArse Redundant Calibration}
 \author{T.L. Grobler}
@@ -179,10 +197,6 @@ and
 0~\textrm{otherwise}
 \end{cases}
 \end{equation}
-
-
-
-
 
 \begin{equation}
 \boldsymbol{H} = 
@@ -493,5 +507,108 @@ REDUNDANT STEFCAL DERIVATION
 \widetilde{\boldsymbol{H}} = \boldsymbol{I}\odot\boldsymbol{H} 
 \end{equation}
 
+\begin{eqnarray}
+\begin{bmatrix} \Delta \boldsymbol{z}\\ \Delta \conj{\boldsymbol{z}} \end{bmatrix} &=& (\boldsymbol{J}^H\boldsymbol{J})^{-1} \boldsymbol{J}^H(\breve{\boldsymbol{d}}-\breve{\boldsymbol{v}})\\
+&=& (\boldsymbol{J}^H\boldsymbol{J})^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} - \frac{1}{3}(\boldsymbol{J}^H\boldsymbol{J})^{-1}(\boldsymbol{J}^H\boldsymbol{J})\breve{\boldsymbol{z}}\\
+\breve{\boldsymbol{z}}_{k+1} &=& (\boldsymbol{J}^H\boldsymbol{J})^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} + \frac{2}{3}\breve{\boldsymbol{z}}_k  
+\end{eqnarray}
+
+Gauss-Newton:
+
+\begin{eqnarray}
+\begin{bmatrix} \Delta \boldsymbol{z}\\ \Delta \conj{\boldsymbol{z}} \end{bmatrix} &\approx& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H(\breve{\boldsymbol{d}}-\breve{\boldsymbol{v}})\\ 
+&=& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} -  \widetilde{\boldsymbol{H}}^{-1}\widetilde{\boldsymbol{H}}\breve{\boldsymbol{z}}\\
+\breve{\boldsymbol{z}}_{k+1} &\approx& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}}
+\end{eqnarray}
+
+Levenberg-Marquardt:
+
+\begin{eqnarray}
+\breve{\boldsymbol{z}}_{k+1} &\approx& \frac{1}{1+\lambda}\widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} + \frac{\lambda}{1+\lambda} \breve{\boldsymbol{z}}_k\\
+ &=& \alpha \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} + (1-\alpha)\breve{\boldsymbol{z}}_k 
+\end{eqnarray}
+
+with $\alpha = \frac{1}{1+\lambda}$. Moreover $\lambda = \frac{1-\alpha}{\alpha}$. So in Marthi and Chengular (2014) they use an $\alpha$ of 0.3, which corresponds to an LM damping factor $\lambda$
+of $2\frac{1}{3}$.
+
+
+
+%\[  \vphantom{% phantom stuff for correct box dimensions
+%    \begin{matrix}
+%    \overbrace{XYZ}^{\mbox{$R$}}\\ \\ \\ \\ \\ \\ 
+%    \underbrace{pqr}_{\mbox{$S$}}
+%    \end{matrix}}%
+%\begin{matrix}% matrix for left braces
+%\vphantom{a}\\ 
+%\coolleftbrace{A}{e \\ y\\ y}\\
+%\coolleftbrace{B}{y \\i \\ m}
+%\end{matrix}%
+%\begin{bmatrix}
+%a & \coolover{R}{b & c & d} & x & \coolover{Z}{x & x}\\
+%e & f & g & h & x & x & x \\
+%y & y & y & y & y & y & y \\
+%y & y & y & y & y & y & y \\
+%y & y & y & y & y & y & y \\
+%i & j & k & l & x & x & x \\
+%m &  \coolunder{S}{n & o}  & \coolunder{W}{p & x & x} & x
+%\end{bmatrix}%
+%\begin{matrix}% matrix for right braces 
+%\coolrightbrace{x \\ x \\ y\\ y}{T}\\
+%\coolrightbrace{y \\ y \\ x }{U}
+%\end{matrix}\]
+
+\begin{equation}
+\boldsymbol{J}^H\breve{\boldsymbol{d}} = 
+\begin{bmatrix}
+\sum_{k\neq i } g_k x_{\zeta_{ki}}d_{ki}\\
+\sum_{pq \in \mathcal{I}_j} \conj{g}_p g_q d_{pq}\\
+\downarrow^{*}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\sum g_k x_{\zeta_{ki}}d_{ki}}{i = 1\cdots N}\\
+\coolrightbrace{\sum \conj{g}_p g_q d_{pq}}{j = 1\cdots L}\\
+\vphantom{\downarrow^{*}}
+\end{matrix}
+\end{equation}
+
+\begin{equation}
+x_{\zeta_{ki}} = 
+\begin{cases}
+\conj{y}_{\zeta_{ki}} & \textrm{if}~k < i\\
+y_{\zeta_{ki}} & \textrm{otherwise}
+\end{cases}
+\end{equation}
+
+Which implies that 
+
+\begin{equation}
+g_{i}^{k+1} = \alpha \frac{\sum_{k\neq i } g_k x_{\zeta_{ki}}d_{ki}}{|g_k|^2|y_{\zeta_{ki}}|^2} + (1-\alpha) g_i^k 
+\end{equation}
+
+\begin{equation}
+y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{I}_j} \conj{g}_p g_q d_{pq}}{\sum_{pq \in \mathcal{I}_j}|g_p|^2|g_q|^2} + (1-\alpha) y_i^k 
+\end{equation}
+
+
+
+
+
+
+
+
+
+%\begin{equation}
+%\begin{matrix}% matrix for right braces 
+%\coolrightbrace{x \\ x \\ y\\ y}{T}\\
+%\coolrightbrace{y \\ y \\ x }{U}
+%\end{matrix}
+%\end{equation}
+
+
+
+
+
+
 \end{section}
 \end{document}
+ 
