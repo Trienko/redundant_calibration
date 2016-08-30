@@ -793,6 +793,48 @@ class sim():
                  return q,True
 
           return 0,False
+
+      '''
+      Returns the p if the redundant index and q are given
+      INPUTS:
+      i - q
+      j - redundant index
+      phi - mapping from pq to redundant index
+      
+      RETURNS:
+      p - p
+      Found - If p was found in phi?
+      '''
+      def xi_func_eval(self,i,j,phi):
+          column = phi[:,i]
+
+          #print "column = ",column
+          #print "j = ",j
+
+          for p in xrange(len(column)):
+              if column[p] == j:
+                 return p,True
+
+          return 0,False
+
+
+      '''
+      Returns the the dictionary PQ containing all the pq index sets associated with each redundant spacing
+      INPUTS:
+      phi - mapping from pq to redundant index
+      L - maximum entry in phi
+
+      RETURNS:
+      PQ - dictionary of pq index sets associated with each redundant spacing      
+     '''
+      def create_PQ(self,phi,L):
+          PQ = {}
+          for i in xrange(L):
+              pq = zip(*np.where(phi == (i+1)))
+              #print "pq2 = ",pq        
+              PQ[str(i)]=pq
+              #print "PQ = ",PQ    
+          return PQ
           
 """
 Function to verify the analytic expression for calculating the number of redundancies from the number of antennas in an HEXAGONAL 
