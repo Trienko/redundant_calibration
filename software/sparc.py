@@ -114,7 +114,7 @@ class SPARC():
       def compute_JHr(self,J,r):
           return np.dot(J.transpose().conjugate(),r)
 
-      def compute_JHr_formula(self,z,D):
+      def compute_JHr_formula(self,z,R):
           
           g = z[:self.N]
           y = z[self.N:]
@@ -128,7 +128,7 @@ class SPARC():
                         x_ki = np.conjugate(y[self.zeta[i,k]-1])  
                      else:
                         x_ki = y[self.zeta[i,k]-1]
-                     sum_v = sum_v + g[k]*x_ki*D[i,k]
+                     sum_v = sum_v + g[k]*x_ki*R[i,k]
               vec1[i] = sum_v
 
           vec2 = np.zeros((self.L,),dtype=complex)
@@ -140,7 +140,7 @@ class SPARC():
                   p = pq[k][0]
                   q = pq[k][1]
                   
-                  sum_v = sum_v + np.conjugate(g[p])*g[q]*D[p,q]
+                  sum_v = sum_v + np.conjugate(g[p])*g[q]*R[p,q]
               vec2[i] = sum_v
 
           return np.hstack([vec1,vec2,np.conjugate(vec1),np.conjugate(vec2)]) 
