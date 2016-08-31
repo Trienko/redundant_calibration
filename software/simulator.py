@@ -835,6 +835,33 @@ class sim():
               PQ[str(i)]=pq
               #print "PQ = ",PQ    
           return PQ
+
+      '''
+      Takes the y-vector and constructs an NxN matrix M
+
+      INPUTS:
+      PQ - dictionary of pq index sets associated with each redundant spacing 
+      y - vector from which M is constructed
+      N - number of antennas
+
+      OUTPUTS:
+      M - NxN matrix from y
+      '''
+      def convert_y_to_M(self,PQ,y,N):
+    
+          M = np.zeros((N,N),dtype=complex)
+          for i in xrange(len(y)):
+              pq = PQ[str(i)]
+              #print "pq = ",pq
+                          
+          for k in xrange(len(pq)):
+              p = pq[k][0]
+              q = pq[k][1]
+             
+              M[p,q] = y[i]
+              M[q,p] = np.conjugate(y[i])  
+              #from IPython import embed; embed() 
+          return M
           
 """
 Function to verify the analytic expression for calculating the number of redundancies from the number of antennas in an HEXAGONAL 

@@ -560,29 +560,29 @@ of $2\frac{1}{3}$.
 \begin{equation}
 \boldsymbol{J}^H\breve{\boldsymbol{d}} = 
 \begin{bmatrix}
-\sum_{k\neq i } g_k x_{\zeta_{ki}}d_{ki}\\
+\sum_{k\neq i } g_k x_{\zeta_{ik}}d_{ik}\\
 \sum_{pq \in \mathcal{I}_j} \conj{g}_p g_q d_{pq}\\
 \downarrow^{*}
 \end{bmatrix}
 \begin{matrix}% matrix for right braces 
-\coolrightbrace{\sum g_k x_{\zeta_{ki}}d_{ki}}{i = 1\cdots N}\\
+\coolrightbrace{\sum g_k x_{\zeta_{ik}}d_{ik}}{i = 1\cdots N}\\
 \coolrightbrace{\sum \conj{g}_p g_q d_{pq}}{j = 1\cdots L}\\
 \vphantom{\downarrow^{*}}
 \end{matrix}
 \end{equation}
 
 \begin{equation}
-x_{\zeta_{ki}} = 
+x_{\zeta_{ik}} = 
 \begin{cases}
-\conj{y}_{\zeta_{ki}} & \textrm{if}~k < i\\
-y_{\zeta_{ki}} & \textrm{otherwise}
+\conj{y}_{\zeta_{ik}} & \textrm{if}~k > i\\
+y_{\zeta_{ik}} & \textrm{otherwise}
 \end{cases}
 \end{equation}
 
 Which implies that 
 
 \begin{equation}
-g_{i}^{k+1} = \alpha \frac{\sum_{k\neq i } g_k x_{\zeta_{ki}}d_{ki}}{|g_k|^2|y_{\zeta_{ki}}|^2} + (1-\alpha) g_i^k 
+g_{i}^{k+1} = \alpha \frac{\sum_{k\neq i } g_k x_{\zeta_{ik}}d_{ik}}{|g_k|^2|y_{\zeta_{ik}}|^2} + (1-\alpha) g_i^k 
 \end{equation}
 
 \begin{equation}

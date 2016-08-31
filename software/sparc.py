@@ -3,15 +3,17 @@ import scipy as sp
 import pylab as plt
 import simulator
 import analytic
+from scipy.sparse import csr_matrix
 
 class SPARC():
 
-      def __init__(self,N,L,phi,PQ):
+      def __init__(self,N,L,phi,zeta,PQ):
 
           self.N = N
           self.L = L
           self.B = (N**2-N)/2
           self.phi = phi
+          self.zeta = zeta
           self.PQ = PQ
  
           self.v = np.array([])
@@ -48,6 +50,17 @@ class SPARC():
       def compute_r(self,d,v):
           r = d-v
           return r
+
+      def construct_R(self,r):
+          r_new = r[:self.B]
+          counter = 0
+          R = np.zeros((self.N,self.N),dtype=complex)
+          for k in xrange(self.N):
+              for j in xrange(k+1,self.N):
+                  R[k,j] = r_new[counter]
+                  R[j,k] = np.conjugate(r_new[counter])
+                  counter = counter + 1
+          return R 
 
       def compute_J(self,z):
           g = z[:self.N]
@@ -98,6 +111,41 @@ class SPARC():
       def compute_JHJ(self,J):
           return np.dot(J.transpose().conjugate(),J)
 
+      def compute_JHr(self,J,r):
+          return np.dot(J.transpose().conjugate(),r)
+
+      def compute_JHr_formula(self,z,D):
+          
+          g = z[:self.N]
+          y = z[self.N:]
+          
+          vec1 = np.zeros((self.N,),dtype=complex)
+          for i in xrange(len(vec1)):
+              sum_v = 0j
+              for k in xrange(len(vec1)):
+                  if k <> i:
+                     if k > i:
+                        x_ki = np.conjugate(y[self.zeta[i,k]-1])  
+                     else:
+                        x_ki = y[self.zeta[i,k]-1]
+                     sum_v = sum_v + g[k]*x_ki*D[i,k]
+              vec1[i] = sum_v
+
+          vec2 = np.zeros((self.L,),dtype=complex)
+          
+          for i in xrange(len(vec2)):
+              sum_v = 0j
+              pq = PQ[str(i)]
+              for k in xrange(len(pq)):
+                  p = pq[k][0]
+                  q = pq[k][1]
+                  
+                  sum_v = sum_v + np.conjugate(g[p])*g[q]*D[p,q]
+              vec2[i] = sum_v
+
+          return np.hstack([vec1,vec2,np.conjugate(vec1),np.conjugate(vec2)]) 
+
+             
 
       '''
       INPUTS:
@@ -193,20 +241,25 @@ class SPARC():
           H[self.N+self.L:,:self.N+self.L] = B.conj()
           H[self.N+self.L:,self.N+self.L:] = A.conj()
 
-          return H
+          H_sparse = csr_matrix(H,dtype=complex) #THIS MIGHT NOT BE THE FASTEST WHY - MAY NEED TO TWEAK THIS 
+
+          return H,H_sparse
+
+
+
            
 if __name__ == "__main__":
-   s = simulator.sim() #INSTANTIATE OBJECT
+   s = simulator.sim(layout="REG",order=5) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
    PQ = s.create_PQ(phi,s.L)
-   #s.uv_tracks() #GENERATE UV TRACKS
+   s.uv_tracks() #GENERATE UV TRACKS
    #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
-   #point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-   #g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   #D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=10,w_m=None) #CREATE VIS MATRIX
+   point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
+   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=10,w_m=None) #CREATE VIS MATRIX
    #M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
    #s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    #s.plot_visibilities([0,1],M,"r",s=True)    
@@ -218,13 +271,24 @@ if __name__ == "__main__":
 
    print "z = ",z
 
-   sparc_object = SPARC(s.N,s.L,phi,PQ)
+   sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
    v = sparc_object.compute_v(z)
    J = sparc_object.compute_J(z)
    H_comp = sparc_object.compute_JHJ(J)
-   H = sparc_object.generate_H_formula(z,s.psi_func_eval,s.xi_func_eval)
+   H,H_sparse = sparc_object.generate_H_formula(z,s.psi_func_eval,s.xi_func_eval)
+   d = sparc_object.vectorize_D(D[:,:,0])
+   r = sparc_object.compute_r(d,v)
+   JHr_com = sparc_object.compute_JHr(J,r)
+  
+   R = sparc_object.construct_R(r)
+   
+   JHr_fun = sparc_object.compute_JHr_formula(z,R)
 
-      
+   print "JHr_com = ",JHr_com
+   print "len(JHr_com) = ", len(JHr_com)
+   print "JHr_fun = ",JHr_fun
+   print "len(JHr_fun) = ", len(JHr_fun)
+         
    print "v = ",v
    plt.imshow(np.absolute(J),interpolation="nearest")
    plt.show()   
