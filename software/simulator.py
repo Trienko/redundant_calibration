@@ -854,13 +854,13 @@ class sim():
               pq = PQ[str(i)]
               #print "pq = ",pq
                           
-          for k in xrange(len(pq)):
-              p = pq[k][0]
-              q = pq[k][1]
+              for k in xrange(len(pq)):
+                  p = pq[k][0]
+                  q = pq[k][1]
              
-              M[p,q] = y[i]
-              M[q,p] = np.conjugate(y[i])  
-              #from IPython import embed; embed() 
+                  M[p,q] = y[i]
+                  M[q,p] = np.conjugate(y[i])  
+                  #from IPython import embed; embed() 
           return M
           
 """
@@ -946,7 +946,7 @@ def example_usage():
     s.uv_tracks() #GENERATE UV TRACKS
     s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
     point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
+    g=s.create_antenna_gains(s.N,0.99,0.95,2,1,5,s.nsteps,plot = True) #GENERATE GAINS
     D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=20,w_m=None) #CREATE VIS MATRIX
     M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
     s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS

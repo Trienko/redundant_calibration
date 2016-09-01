@@ -4,6 +4,9 @@ import pylab as plt
 import simulator
 import analytic
 from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import cg
+from scipy.linalg import pinv
+from scipy.sparse import dia_matrix
 
 class SPARC():
 
@@ -15,9 +18,8 @@ class SPARC():
           self.phi = phi
           self.zeta = zeta
           self.PQ = PQ
- 
-          self.v = np.array([])
-          self.r = np.array([])
+          self.itr = 0
+          self.itr_vec = np.array([],dtype=int)
 
       def compute_v(self,z):
           g = z[:self.N] 
@@ -145,13 +147,109 @@ class SPARC():
 
           return np.hstack([vec1,vec2,np.conjugate(vec1),np.conjugate(vec2)]) 
 
-             
+      def compute_inverse_cg(self,A,b,M=None,tol=1e-6):
+          self.itr = 0
+          x,info = cg(A=A,b=b,tol=tol,M=M,callback=self.report)
+          self.itr_vec = np.append(self.itr_vec,np.array([self.itr]))
+          return x,info
 
+      def report(self,xk):
+          self.itr = self.itr + 1
+
+      def compute_update_step_cg(self,d,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6):
+          R = sparc_object.construct_R(r)
+
+          H,H_sparse,D_l,D_sparse = self.generate_H_formula(z,psi_func_eval,xi_func_eval,lam=lam)
+          JHr_fun = self.compute_JHr_formula(z,R) #CAN STILL INCREASE THE SPEED BY DIRECTLY COMPUTING R form D and V
+          
+          if method == "PCG":
+             dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=tol)
+          else:
+             dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=None,tol=tol)
+          return dz[:len(dz)/2],info
+
+
+      def levenberg_marquardt(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
+
+          K=10
+
+          temp = np.ones((D.shape[0],D.shape[1]) ,dtype=complex)
+          z = np.ones((self.N+self.L,),dtype=complex)
+          d = sparc_object.vectorize_D(D)
+  
+          counter = 0
+
+          converged = False
+
+          v = sparc_object.compute_v(z)
+          r = sparc_object.compute_r(d,v)      
+          old_chi = np.linalg.norm(r)                       
+          olam = lam           
+    
+          while (True):
+                #print "lam = ",lam
+                
+
+                dz,info = self.compute_update_step_cg(d,r,z,psi_func_eval,xi_func_eval,lam=lam,method=method,tol=tol3)
+                
+                z = z + dz
+
+                v = sparc_object.compute_v(z)
+                r = sparc_object.compute_r(d,v) 
+                new_chi = np.linalg.norm(r)
+                
+                #print "new_chi = ",new_chi
+                if new_chi < tol1:
+                   converged = True 
+                   break
+
+                #if new_chi > old_chi:
+                #   z -= dz
+                #   lam = lam*K
+                #else:
+                #   old_chi = new_chi
+                #   lam = olam
+
+                #print "chi 2 = ",np.linalg.norm(dz)/np.linalg.norm(z)  
+                #print "z = ",z             
+
+                #if np.linalg.norm(dz)/np.linalg.norm(z) < tol2:
+                #   #lam = lam*K
+                #   converged = True
+                #   break 
+                
+                if counter > max_itr:
+                   break
+          
+                counter = counter + 1
+
+          print "chi = ",new_chi 
+          print "chi 2 = ",np.linalg.norm(dz)/np.linalg.norm(z)  
+          print "counter = ",counter
+          G = np.dot(np.diag(z[:self.N]),temp)
+          G = np.dot(G,np.diag(z[:self.N].conj()))  
+          #print "self.PQ = ",self.PQ
+          #print "y = ",z[self.N:]
+          M = convert_y_to_M(self.PQ,z[self.N:],self.N)  
+          #print "M = ",M    
+          return z,converged,G,M
+
+      def levenberg_marquardt_time(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
+          z_temp = np.zeros((self.N+self.L,D.shape[2]),dtype=complex)
+          M = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
+          G = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
+          c_temp = np.zeros((D.shape[2],),dtype=bool)
+          for t in xrange(D.shape[2]):
+              print "t= ",t
+              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method)
+              print "c_temp = ",c_temp[t]  
+          return z_temp,c_temp,G,M    
+           
       '''
       INPUTS:
       z - Input vector.
       '''
-      def generate_H_formula(self,z,psi_func_eval,xi_func_eval):
+      def generate_H_formula(self,z,psi_func_eval,xi_func_eval,lam=0):
           g = z[:self.N]
           y = z[self.N:]
                     
@@ -241,15 +339,20 @@ class SPARC():
           H[self.N+self.L:,:self.N+self.L] = B.conj()
           H[self.N+self.L:,self.N+self.L:] = A.conj()
 
-          H_sparse = csr_matrix(H,dtype=complex) #THIS MIGHT NOT BE THE FASTEST WHY - MAY NEED TO TWEAK THIS 
+          H_lam = H + lam*np.diag(np.diag(H))
 
-          return H,H_sparse
+          H_D = np.diag(np.diag(H_lam)**(-1))
 
+          H_sparse = csr_matrix(H_lam,dtype=complex) #THIS MIGHT NOT BE THE FASTEST WAY - MAY NEED TO TWEAK THIS 
+          H_D_sparse = dia_matrix(H_D,dtype=complex)
 
-
+          return H_lam,H_sparse,H_D,H_D_sparse
            
+
+
+
 if __name__ == "__main__":
-   s = simulator.sim(layout="REG",order=5) #INSTANTIATE OBJECT
+   s = simulator.sim(nsteps=50,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
@@ -258,12 +361,20 @@ if __name__ == "__main__":
    s.uv_tracks() #GENERATE UV TRACKS
    #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=10,w_m=None) #CREATE VIS MATRIX
-   #M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
-   #s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
-   #s.plot_visibilities([0,1],M,"r",s=True)    
+   g=s.create_antenna_gains(s.N,0.01,0.005,2,1,5,s.nsteps,plot = True) #GENERATE GAINS
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
+   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
+   s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
+   s.plot_visibilities([0,1],M,"r",s=True)    
    
+   sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+   z_cal,c_cal,G_cal,M_cal=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method="PCG")
+   s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
+   s.plot_visibilities([0,1],M,"r",s=False)    
+   s.plot_visibilities([0,1],G_cal*M_cal,"g",s=False)
+   s.plot_visibilities([0,1],M_cal,"c",s=True)
+   
+   '''
    g = np.random.randn(s.N)+1j*np.random.randn(s.N)
    y = np.random.randn(s.L)+1j*np.random.randn(s.L)
 
@@ -275,19 +386,33 @@ if __name__ == "__main__":
    v = sparc_object.compute_v(z)
    J = sparc_object.compute_J(z)
    H_comp = sparc_object.compute_JHJ(J)
-   H,H_sparse = sparc_object.generate_H_formula(z,s.psi_func_eval,s.xi_func_eval)
+   H,H_sparse,D_l,D_sparse = sparc_object.generate_H_formula(z,s.psi_func_eval,s.xi_func_eval,lam=0)
+   
    d = sparc_object.vectorize_D(D[:,:,0])
+   
    r = sparc_object.compute_r(d,v)
+   
    JHr_com = sparc_object.compute_JHr(J,r)
   
    R = sparc_object.construct_R(r)
    
-   JHr_fun = sparc_object.compute_JHr_formula(z,R)
+   JHr_fun = sparc_object.compute_JHr_formula(z,R) #CAN STILL INCREASE THE SPEED BY DIRECTLY COMPUTING R form D and V
+
+   dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=1e-6)
+   H_inv = pinv(H)
+   dz_p = np.dot(H_inv,JHr_fun)
+
+   
+
+   p1 = np.dot(H,dz)
+   p2 = np.dot(H,dz_p)
+   
 
    print "JHr_com = ",JHr_com
    print "len(JHr_com) = ", len(JHr_com)
    print "JHr_fun = ",JHr_fun
    print "len(JHr_fun) = ", len(JHr_fun)
+   
          
    print "v = ",v
    plt.imshow(np.absolute(J),interpolation="nearest")
@@ -303,6 +428,17 @@ if __name__ == "__main__":
    plt.colorbar()
    plt.show()
 
-    
-   
+   print "dz = ",dz
+   print "info = ",info
+   print "dz_p = ",dz_p
+
+   print "itr = ",sparc_object.itr_vec   
+
+   print "p1 = ",p1
+   print "p2 = ",p2
+
+   print "p1 - p2 = ",p1-p2
+
+   print "dz - dz_p = ",dz-dz_p 
+   '''   
 
