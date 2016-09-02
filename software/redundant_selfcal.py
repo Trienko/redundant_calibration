@@ -65,7 +65,7 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
 
     return z_temp,converged,G,M
 
-def redundant_StEFCal_time(D,phi,tau=1e-3,alpha=0.3,max_itr=3000):
+def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=0.3,max_itr=5000):
     N = D.shape[0]
     L = np.amax(phi)
     PQ = create_PQ(phi,L) 
@@ -104,9 +104,9 @@ def convert_y_to_M(PQ,y,N):
             M[q,p] = np.conjugate(y[i])  
     #from IPython import embed; embed() 
     return M  
-   
+
 if __name__ == "__main__":
-   s = simulator.sim() #INSTANTIATE OBJECT
+   s = simulator.sim(nsteps=600,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
@@ -115,8 +115,8 @@ if __name__ == "__main__":
    s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=10,w_m=None) #CREATE VIS MATRIX
-   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=5,w_m=None) #CREATE VIS MATRIX
+   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=True)    
    z_cal,c_cal,G_cal,M_cal = redundant_StEFCal_time(D,phi)

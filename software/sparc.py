@@ -213,10 +213,10 @@ class SPARC():
                 #print "chi 2 = ",np.linalg.norm(dz)/np.linalg.norm(z)  
                 #print "z = ",z             
 
-                #if np.linalg.norm(dz)/np.linalg.norm(z) < tol2:
+                if np.linalg.norm(dz)/np.linalg.norm(z) < tol2:
                 #   #lam = lam*K
-                #   converged = True
-                #   break 
+                   converged = True
+                   break 
                 
                 if counter > max_itr:
                    break
@@ -352,7 +352,7 @@ class SPARC():
 
 
 if __name__ == "__main__":
-   s = simulator.sim(nsteps=50,layout="HEX",order=1) #INSTANTIATE OBJECT
+   s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
@@ -361,9 +361,9 @@ if __name__ == "__main__":
    s.uv_tracks() #GENERATE UV TRACKS
    #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-   g=s.create_antenna_gains(s.N,0.01,0.005,2,1,5,s.nsteps,plot = True) #GENERATE GAINS
+   g=s.create_antenna_gains(s.N,0.9,0.1,10,1,5,s.nsteps,plot = True) #GENERATE GAINS
    D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
-   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=None,SNR=None,w_m=None) #PREDICTED VIS
+   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=True)    
    
@@ -371,8 +371,8 @@ if __name__ == "__main__":
    z_cal,c_cal,G_cal,M_cal=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method="PCG")
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
-   s.plot_visibilities([0,1],G_cal*M_cal,"g",s=False)
-   s.plot_visibilities([0,1],M_cal,"c",s=True)
+   s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
+   #s.plot_visibilities([0,1],M_cal,"c",s=True)
    
    '''
    g = np.random.randn(s.N)+1j*np.random.randn(s.N)
