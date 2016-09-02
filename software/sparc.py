@@ -20,6 +20,7 @@ class SPARC():
           self.PQ = PQ
           self.itr = 0
           self.itr_vec = np.array([],dtype=int)
+          self.kappa_vec = np.array([],dtype=float)
 
       def compute_v(self,z):
           g = z[:self.N] 
@@ -156,7 +157,15 @@ class SPARC():
       def report(self,xk):
           self.itr = self.itr + 1
 
-      def compute_update_step_cg(self,d,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6):
+      def compute_kappa(self,A):
+          w = np.linalg.eigvals(A)
+          wb0 = w[np.nonzero(w)].real
+          lam_max = np.amax(wb0)
+          lam_min = np.amin(wb0)
+          kappa = lam_max/lam_min
+          return kappa
+
+      def compute_update_step_cg(self,d,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6,kappa=True):
           R = sparc_object.construct_R(r)
 
           H,H_sparse,D_l,D_sparse = self.generate_H_formula(z,psi_func_eval,xi_func_eval,lam=lam)
@@ -164,14 +173,19 @@ class SPARC():
           
           if method == "PCG":
              dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=tol)
+             if kappa:
+                self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(np.dot(D_l,H))])) 
           else:
              dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=None,tol=tol)
+             if kappa:
+                self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(H)])) 
+       
           return dz[:len(dz)/2],info
 
 
       def levenberg_marquardt(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
 
-          K=10
+          #K=10
 
           temp = np.ones((D.shape[0],D.shape[1]) ,dtype=complex)
           z = np.ones((self.N+self.L,),dtype=complex)
@@ -361,19 +375,22 @@ if __name__ == "__main__":
    s.uv_tracks() #GENERATE UV TRACKS
    #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-   g=s.create_antenna_gains(s.N,0.9,0.1,10,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
+   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=5,w_m=None) #CREATE VIS MATRIX
    M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=True)    
    
    sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
-   z_cal,c_cal,G_cal,M_cal=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method="PCG")
+   z_cal,c_cal,G_cal,M_cal=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method="CG")
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
    #s.plot_visibilities([0,1],M_cal,"c",s=True)
-   
+   print "sparc_object.itr_vec = ",sparc_object.itr_vec
+   print "sparc_object.kappa_vec = ",sparc_object.kappa_vec   
+   import IPython
+   IPython.embed()
    '''
    g = np.random.randn(s.N)+1j*np.random.randn(s.N)
    y = np.random.randn(s.L)+1j*np.random.randn(s.L)
