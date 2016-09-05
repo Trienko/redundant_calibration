@@ -165,7 +165,7 @@ class SPARC():
           kappa = lam_max/lam_min
           return kappa
 
-      def compute_update_step_cg(self,d,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6,kappa=True):
+      def compute_update_step_cg(self,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6,kappa=True):
           R = sparc_object.construct_R(r)
 
           H,H_sparse,D_l,D_sparse = self.generate_H_formula(z,psi_func_eval,xi_func_eval,lam=lam)
@@ -183,52 +183,41 @@ class SPARC():
           return dz[:len(dz)/2],info
 
 
-      def levenberg_marquardt(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
-
-          #K=10
+      def levenberg_marquardt(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG",time_var=True):
 
           temp = np.ones((D.shape[0],D.shape[1]) ,dtype=complex)
           z = np.ones((self.N+self.L,),dtype=complex)
-          d = sparc_object.vectorize_D(D)
-  
+ 
           counter = 0
 
           converged = False
 
+          d = sparc_object.vectorize_D(D)
+          
+          start = time.time()
+
           v = sparc_object.compute_v(z)
           r = sparc_object.compute_r(d,v)      
-          old_chi = np.linalg.norm(r)                       
-          olam = lam           
-    
+          
           while (True):
-                #print "lam = ",lam
                 
-
-                dz,info = self.compute_update_step_cg(d,r,z,psi_func_eval,xi_func_eval,lam=lam,method=method,tol=tol3)
+                dz,info = self.compute_update_step_cg(r,z,psi_func_eval,xi_func_eval,lam=lam,method=method,tol=tol3,kappa= not time_var)
                 
                 z = z + dz
 
                 v = sparc_object.compute_v(z)
-                r = sparc_object.compute_r(d,v) 
-                new_chi = np.linalg.norm(r)
+                r = sparc_object.compute_r(d,v)
+               
+                if not time_var:
+                    
+                   new_chi = np.linalg.norm(r)
                 
-                #print "new_chi = ",new_chi
-                if new_chi < tol1:
-                   converged = True 
-                   break
-
-                #if new_chi > old_chi:
-                #   z -= dz
-                #   lam = lam*K
-                #else:
-                #   old_chi = new_chi
-                #   lam = olam
-
-                #print "chi 2 = ",np.linalg.norm(dz)/np.linalg.norm(z)  
-                #print "z = ",z             
+                   #print "new_chi = ",new_chi
+                   if new_chi < tol1:
+                      converged = True 
+                      break
 
                 if np.linalg.norm(dz)/np.linalg.norm(z) < tol2:
-                #   #lam = lam*K
                    converged = True
                    break 
                 
@@ -237,27 +226,28 @@ class SPARC():
           
                 counter = counter + 1
 
-          print "chi = ",new_chi 
-          print "chi 2 = ",np.linalg.norm(dz)/np.linalg.norm(z)  
-          print "counter = ",counter
+          stop = time.time()
+
           G = np.dot(np.diag(z[:self.N]),temp)
           G = np.dot(G,np.diag(z[:self.N].conj()))  
-          #print "self.PQ = ",self.PQ
-          #print "y = ",z[self.N:]
           M = convert_y_to_M(self.PQ,z[self.N:],self.N)  
-          #print "M = ",M    
-          return z,converged,G,M
+                     
+          return z,converged,G,M,start,stop,counter
 
       def levenberg_marquardt_time(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
           z_temp = np.zeros((self.N+self.L,D.shape[2]),dtype=complex)
           M = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
           G = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
           c_temp = np.zeros((D.shape[2],),dtype=bool)
+          t_temp = np.zeros((2,D.shape[2]))
+          count_temp = np.zeros((D.shape[2],),dtype=int)
           for t in xrange(D.shape[2]):
+              print "###########"
               print "t= ",t
-              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method)
-              print "c_temp = ",c_temp[t]  
-          return z_temp,c_temp,G,M    
+              print "###########"
+              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method)
+              #print "c_temp = ",c_temp[t]  
+          return z_temp,c_temp,G,M,t_temp,count_temp    
            
       '''
       INPUTS:
@@ -330,7 +320,7 @@ class SPARC():
           Z = np.zeros((self.L,self.L),dtype=complex)
 
           #CONSTRUCTING A
-          #**************
+          #**************1
           A = np.zeros((self.N+self.L,self.N+self.L),dtype=complex)
           A[:self.N,:self.N] = C
           A[:self.N,self.N:] = D
@@ -362,8 +352,47 @@ class SPARC():
 
           return H_lam,H_sparse,H_D,H_D_sparse
            
+def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX"):
+    order_vec = np.arrange(min_order,max_order+1)
+    dir_name = layout+"_"+method+"_"+str(SNR)
+    
+    if not os.path.isdir("./"+dir_name): 
+       os.system("mkdir "+dir_name)
 
+    for k in xrange(order_vec):
+        print "*********"
+        print "k = "
+        print "*********"
+        s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        point_sources = s.create_point_sources(100,fov=3,a=2)
+        g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
+        D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
+        M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
+       
+        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name
 
+        output = open(file_name, 'wb')
+        pickle.dump(order_vec[k], output) 
+        pickle.dump(s.N, output) 
+        pickle.dump(s.L, output) 
+        pickle.dump(zeta, output)
+        pickle.dump(PQ,output)
+        pickle.dump(z_cal,output)        
+        pickle.dump(c_cal,output)
+        pickle.dump(t,output)
+        pickle.dump(outer_loop,output)
+        pickle.dump(sparc_object.itr_vec,output)
+        pickle.dump(sparc_object.kappa_vec,output)
+        pickle.dump(G_cal,output)
+        pickle.dump(M_cal,output)
+        pickle.dump(D,output)
+        pickle.dump(M,output)
+        output.close()
 
 if __name__ == "__main__":
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
@@ -389,8 +418,8 @@ if __name__ == "__main__":
    #s.plot_visibilities([0,1],M_cal,"c",s=True)
    print "sparc_object.itr_vec = ",sparc_object.itr_vec
    print "sparc_object.kappa_vec = ",sparc_object.kappa_vec   
-   import IPython
-   IPython.embed()
+   #import IPython
+   #IPython.embed()
    '''
    g = np.random.randn(s.N)+1j*np.random.randn(s.N)
    y = np.random.randn(s.L)+1j*np.random.randn(s.L)
