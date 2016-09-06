@@ -467,6 +467,7 @@ class sim():
       '''
       def generate_noise(self,power):
 	  sig = np.sqrt(power/2)
+          #print "sig = ",sig
 	  mat = np.zeros((self.N,self.N,self.nsteps),dtype=complex)
 	  for i in xrange(self.N):
               for j in xrange(i+1,self.N):
@@ -616,7 +617,7 @@ class sim():
                    
           pha = np.random.uniform(low=(min_p/2.)*(np.pi/180), high=(max_p/2.)*(np.pi/180), size = N) 
           phase_phase = np.random.uniform(low=0, high=2*np.pi, size = N)
-          print "pha = ",pha*(180/np.pi)
+          #print "pha = ",pha*(180/np.pi)
 
           for t_v in xrange(time_steps):
 	      g[:,t_v] = (amp*np.cos(2*np.pi*freq*t[t_v] + amp_phase)+1)*np.exp(1j*(pha*np.cos(2*np.pi*freq*t[t_v] + phase_phase)+pha))
