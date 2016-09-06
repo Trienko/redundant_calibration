@@ -7,6 +7,8 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import cg
 from scipy.linalg import pinv
 from scipy.sparse import dia_matrix
+import time
+
 
 class SPARC():
 

@@ -3,6 +3,8 @@ import scipy as sp
 import pylab as plt
 import simulator
 import analytic
+import time
+
 
 def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
     converged = False
@@ -18,6 +20,8 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
     #EXTRACT BASELINE INDICES FOR EACH REDUNDANT SPACING
     if PQ is not None:
        PQ = create_PQ(phi,L)
+
+    start = time.time() 
     
     for i in xrange(max_itr): #MAX NUMBER OF ITRS
         g_old = np.copy(g_temp)
@@ -59,13 +63,16 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
            converged = True 
            break
 
+    #print "i = ",i
+    #print "norm = ",np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))
+    stop = time.time()
     G = np.dot(np.diag(g_temp),temp)
     G = np.dot(G,np.diag(g_temp.conj()))  
     M = convert_y_to_M(PQ,y_temp,N)         
 
-    return z_temp,converged,G,M
+    return z_temp,converged,G,M,start,stop,i
 
-def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=0.3,max_itr=5000):
+def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=5000):
     N = D.shape[0]
     L = np.amax(phi)
     PQ = create_PQ(phi,L) 
@@ -73,11 +80,13 @@ def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=0.3,max_itr=5000):
     M = np.zeros((N,N,D.shape[2]),dtype=complex)
     G = np.zeros((N,N,D.shape[2]),dtype=complex)
     c_temp = np.zeros((D.shape[2],),dtype=bool)
+    t_temp = np.zeros((2,D.shape[2]))
+    count_temp = np.zeros((D.shape[2],),dtype=int)
     for t in xrange(D.shape[2]):
         print "t= ",t
-        z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t] = redundant_StEFCal(D=D[:,:,t],phi=phi,tau=tau,alpha=alpha,max_itr=max_itr,PQ=PQ)
+        z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = redundant_StEFCal(D=D[:,:,t],phi=phi,tau=tau,alpha=alpha,max_itr=max_itr,PQ=PQ)
         print "c_temp = ",c_temp[t]  
-    return z_temp,c_temp,G,M
+    return z_temp,c_temp,G,M,t_temp,count_temp
              
 def create_PQ(phi,L):
 
@@ -105,8 +114,56 @@ def convert_y_to_M(PQ,y,N):
     #from IPython import embed; embed() 
     return M  
 
+def do_red_cal_experiment(SNR=5,min_order=1,max_order=3,layout="HEX"):
+    order_vec = np.arrange(min_order,max_order+1)
+    method = "R_StEFCal"
+    dir_name = layout+"_"+method+"_"+str(SNR)
+    
+    if not os.path.isdir("./"+dir_name): 
+       os.system("mkdir "+dir_name)
+
+    for k in xrange(order_vec):
+        print "*********"
+        print "k = "
+        print "*********"
+        s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        #PQ = s.create_PQ(phi,s.L)
+        point_sources = s.create_point_sources(100,fov=3,a=2)
+        g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
+        D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
+        M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+        z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=5000)
+        
+        #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
+       
+        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name
+
+        output = open(file_name, 'wb')
+        pickle.dump(order_vec[k], output) 
+        pickle.dump(s.N, output) 
+        pickle.dump(s.L, output) 
+        pickle.dump(zeta, output)
+        pickle.dump(PQ,output)
+        pickle.dump(z_cal,output)        
+        pickle.dump(c_cal,output)
+        pickle.dump(t,output)
+        pickle.dump(outer_loop,output)
+        #pickle.dump(sparc_object.itr_vec,output)
+        #pickle.dump(sparc_object.kappa_vec,output)
+        pickle.dump(G_cal,output)
+        pickle.dump(M_cal,output)
+        pickle.dump(D,output)
+        pickle.dump(M,output)
+        output.close()
+
+
+
 if __name__ == "__main__":
-   s = simulator.sim(nsteps=600,layout="HEX",order=1) #INSTANTIATE OBJECT
+   
+   '''
+   s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
@@ -115,7 +172,7 @@ if __name__ == "__main__":
    s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
    point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
    g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=5,w_m=None) #CREATE VIS MATRIX
+   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
    M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=True)    
@@ -123,7 +180,7 @@ if __name__ == "__main__":
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
-   
+   '''
     
    
 
