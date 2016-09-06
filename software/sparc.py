@@ -8,7 +8,9 @@ from scipy.sparse.linalg import cg
 from scipy.linalg import pinv
 from scipy.sparse import dia_matrix
 import time
-
+import pickle
+import os
+import sys, getopt
 
 class SPARC():
 
@@ -140,7 +142,7 @@ class SPARC():
           
           for i in xrange(len(vec2)):
               sum_v = 0j
-              pq = PQ[str(i)]
+              pq = self.PQ[str(i)]
               for k in xrange(len(pq)):
                   p = pq[k][0]
                   q = pq[k][1]
@@ -168,17 +170,17 @@ class SPARC():
           return kappa
 
       def compute_update_step_cg(self,r,z,psi_func_eval,xi_func_eval,lam=0,method="PCG",tol=1e-6,kappa=True):
-          R = sparc_object.construct_R(r)
+          R = self.construct_R(r)
 
           H,H_sparse,D_l,D_sparse = self.generate_H_formula(z,psi_func_eval,xi_func_eval,lam=lam)
           JHr_fun = self.compute_JHr_formula(z,R) #CAN STILL INCREASE THE SPEED BY DIRECTLY COMPUTING R form D and V
           
           if method == "PCG":
-             dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=tol)
+             dz,info = self.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=tol)
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(np.dot(D_l,H))])) 
           else:
-             dz,info = sparc_object.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=None,tol=tol)
+             dz,info = self.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=None,tol=tol)
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(H)])) 
        
@@ -194,12 +196,12 @@ class SPARC():
 
           converged = False
 
-          d = sparc_object.vectorize_D(D)
+          d = self.vectorize_D(D)
           
           start = time.time()
 
-          v = sparc_object.compute_v(z)
-          r = sparc_object.compute_r(d,v)      
+          v = self.compute_v(z)
+          r = self.compute_r(d,v)      
           
           while (True):
                 
@@ -207,8 +209,8 @@ class SPARC():
                 
                 z = z + dz
 
-                v = sparc_object.compute_v(z)
-                r = sparc_object.compute_r(d,v)
+                v = self.compute_v(z)
+                r = self.compute_r(d,v)
                
                 if not time_var:
                     
@@ -248,7 +250,7 @@ class SPARC():
               print "t= ",t
               print "###########"
               z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method)
-              #print "c_temp = ",c_temp[t]  
+              print "c_temp = ",c_temp[t]  
           return z_temp,c_temp,G,M,t_temp,count_temp    
            
       '''
@@ -266,7 +268,7 @@ class SPARC():
               sum_v = 0j
               for k in xrange(self.N):
                   if k != i:
-                     sum_v = np.absolute(g[k])**2*np.absolute(y[zeta[k,i]-1])**2 + sum_v
+                     sum_v = np.absolute(g[k])**2*np.absolute(y[self.zeta[k,i]-1])**2 + sum_v
               C[i,i] = sum_v
 
           #CONSTRUCTING E
@@ -355,13 +357,13 @@ class SPARC():
           return H_lam,H_sparse,H_D,H_D_sparse
            
 def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX"):
-    order_vec = np.arrange(min_order,max_order+1)
+    order_vec = np.arange(min_order,max_order+1)
     dir_name = layout+"_"+method+"_"+str(SNR)
     
     if not os.path.isdir("./"+dir_name): 
        os.system("mkdir "+dir_name)
 
-    for k in xrange(order_vec):
+    for k in xrange(len(order_vec)):
         print "*********"
         print "k = "
         print "*********"
@@ -369,6 +371,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX")
         s.generate_antenna_layout()
         phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
         PQ = s.create_PQ(phi,s.L)
+        s.uv_tracks()
         point_sources = s.create_point_sources(100,fov=3,a=2)
         g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
         D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
@@ -376,7 +379,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX")
         sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
         z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
        
-        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name
+        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
         output = open(file_name, 'wb')
         pickle.dump(order_vec[k], output) 
@@ -396,7 +399,56 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX")
         pickle.dump(M,output)
         output.close()
 
+def main(argv):
+    snr = 1000
+    l = "HEX"
+    min_order = 1 
+    max_order = 2 
+    m = "PCG"
+
+    try:
+       opts, args = getopt.getopt(argv,"hl:s:m:",["minorder=","maxorder="])
+    except getopt.GetoptError:
+       print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
+       print 'Does a sparc experiment'
+       print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
+       print '-m <method> : i.e. PCG or CG. PCG (default)'
+       print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+       print '-- min_order : minimum order of redundant array. 1 default.'
+       print '-- max_order : maximum order of redundant array. 3 default.'
+       sys.exit(2)
+    for opt, arg in opts:
+       if opt == '-h':
+          print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
+          print 'Does a sparc experiment'
+          print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
+          print '-m <method> : i.e. PCG or CG. PCG (default)'
+          print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+          print '-- min_order : minimum order of redundant array. 1 default.'
+          print '-- max_order : maximum order of redundant array. 3 default.'
+          sys.exit()
+       elif opt in ("-l"):
+          l = arg
+       elif opt in ("-s"):
+          snr = int(arg)
+       elif opt in ("-m"):
+          m = arg
+       elif opt in ("--minorder"):
+          min_order = int(arg)
+       elif opt in ("--maxorder"):
+          max_order = int(arg)
+  
+    print 'layout: ', l
+    print 'SNR: ', snr
+    print 'method: ',m
+    print 'maxorder: ',max_order
+    print 'minorder: ',min_order
+    return snr,l,m,max_order,min_order
+
 if __name__ == "__main__":
+   snr,l,m,max_order,min_order = main(sys.argv[1:])
+   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l)
+   '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
@@ -422,6 +474,7 @@ if __name__ == "__main__":
    print "sparc_object.kappa_vec = ",sparc_object.kappa_vec   
    #import IPython
    #IPython.embed()
+   '''
    '''
    g = np.random.randn(s.N)+1j*np.random.randn(s.N)
    y = np.random.randn(s.L)+1j*np.random.randn(s.L)
