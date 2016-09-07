@@ -409,7 +409,7 @@ def main(argv):
     min_order = 1 
     max_order = 2 
     m = "PCG"
-    t = False
+    time_var = False
 
     try:
        opts, args = getopt.getopt(argv,"htl:s:m:",["minorder=","maxorder="])
@@ -437,7 +437,7 @@ def main(argv):
        elif opt in ("-l"):
           l = arg
        elif opt in ("-t"):
-          t = True
+          time_var = True
        elif opt in ("-s"):
           snr = int(arg)
        elif opt in ("-m"):
@@ -454,10 +454,10 @@ def main(argv):
     print 'method: ',m
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
-    print 't: ',t
+    print 't: ',time_var
     print "*****************"
 
-    return snr,l,m,max_order,min_order,t
+    return snr,l,m,max_order,min_order,time_var
 
 if __name__ == "__main__":
    snr,l,m,max_order,min_order,time_var = main(sys.argv[1:])
