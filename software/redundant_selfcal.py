@@ -140,7 +140,7 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX"):
         g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
         D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
         M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
-        z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=5000)
+        z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
         
         #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
        
