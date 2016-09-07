@@ -179,11 +179,15 @@ class SPARC():
              dz,info = self.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=D_sparse,tol=tol)
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(np.dot(D_l,H))])) 
-          else:
+          elif method == "CG":
              dz,info = self.compute_inverse_cg(A=H,b=JHr_fun,M=None,tol=tol)
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(H)])) 
-       
+          elif method == "SVD":
+               H_inv = pinv(H)
+               dz = np.dot(H_inv,JHr_fun)
+               info = None
+            
           return dz[:len(dz)/2],info
 
 
