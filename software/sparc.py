@@ -238,7 +238,7 @@ class SPARC():
                      
           return z,converged,G,M,start,stop,counter
 
-      def levenberg_marquardt_time(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG"):
+      def levenberg_marquardt_time(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG",time_var=False):
           z_temp = np.zeros((self.N+self.L,D.shape[2]),dtype=complex)
           M = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
           G = np.zeros((self.N,self.N,D.shape[2]),dtype=complex)
@@ -249,7 +249,7 @@ class SPARC():
               print "###########"
               print "t= ",t
               print "###########"
-              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method)
+              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method,time_var=time_var)
               print "c_temp = ",c_temp[t]  
           return z_temp,c_temp,G,M,t_temp,count_temp    
            
@@ -356,9 +356,9 @@ class SPARC():
 
           return H_lam,H_sparse,H_D,H_D_sparse
            
-def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX"):
+def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False):
     order_vec = np.arange(min_order,max_order+1)
-    dir_name = layout+"_"+method+"_"+str(SNR)
+    dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(time_var)
     
     if not os.path.isdir("./"+dir_name): 
        os.system("mkdir "+dir_name)
@@ -377,7 +377,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX")
         D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
         M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
         sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
-        z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
+        z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
        
         file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
@@ -389,7 +389,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX")
         pickle.dump(PQ,output)
         pickle.dump(z_cal,output)        
         pickle.dump(c_cal,output)
-        pickle.dump(t,output)
+        pickle.dump(time_mat,output)
         pickle.dump(outer_loop,output)
         pickle.dump(sparc_object.itr_vec,output)
         pickle.dump(sparc_object.kappa_vec,output)
@@ -405,12 +405,14 @@ def main(argv):
     min_order = 1 
     max_order = 2 
     m = "PCG"
+    t = False
 
     try:
-       opts, args = getopt.getopt(argv,"hl:s:m:",["minorder=","maxorder="])
+       opts, args = getopt.getopt(argv,"htl:s:m:",["minorder=","maxorder="])
     except getopt.GetoptError:
-       print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
+       print 'sparc.py -t -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
        print 'Does a sparc experiment'
+       print '-t : set timing to True. False (default)
        print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
        print '-m <method> : i.e. PCG or CG. PCG (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
@@ -421,6 +423,7 @@ def main(argv):
        if opt == '-h':
           print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
           print 'Does a sparc experiment'
+          print '-t : set timing to True. False (default)
           print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
           print '-m <method> : i.e. PCG or CG. PCG (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
@@ -429,6 +432,8 @@ def main(argv):
           sys.exit()
        elif opt in ("-l"):
           l = arg
+       elif opt in ("-t"):
+          t = True
        elif opt in ("-s"):
           snr = int(arg)
        elif opt in ("-m"):
@@ -438,16 +443,21 @@ def main(argv):
        elif opt in ("--maxorder"):
           max_order = int(arg)
   
+    print "OPTIONS SELECTED:"
+    print "*****************"
     print 'layout: ', l
     print 'SNR: ', snr
     print 'method: ',m
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
-    return snr,l,m,max_order,min_order
+    print 't: ',t
+    print "*****************"
+
+    return snr,l,m,max_order,min_order,t
 
 if __name__ == "__main__":
-   snr,l,m,max_order,min_order = main(sys.argv[1:])
-   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l)
+   snr,l,m,max_order,min_order,time_var = main(sys.argv[1:])
+   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var)
    '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
