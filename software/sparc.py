@@ -180,7 +180,7 @@ class SPARC():
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(np.dot(D_l,H))])) 
           else:
-             dz,info = self.compute_inverse_cg(A=H_sparse,b=JHr_fun,M=None,tol=tol)
+             dz,info = self.compute_inverse_cg(A=H,b=JHr_fun,M=None,tol=tol)
              if kappa:
                 self.kappa_vec = np.append(self.kappa_vec,np.array([self.compute_kappa(H)])) 
        
@@ -412,7 +412,7 @@ def main(argv):
     except getopt.GetoptError:
        print 'sparc.py -t -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
        print 'Does a sparc experiment'
-       print '-t : set timing to True. False (default)
+       print '-t : set timing to True. False (default)'
        print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
        print '-m <method> : i.e. PCG or CG. PCG (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
@@ -423,7 +423,7 @@ def main(argv):
        if opt == '-h':
           print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
           print 'Does a sparc experiment'
-          print '-t : set timing to True. False (default)
+          print '-t : set timing to True. False (default)'
           print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
           print '-m <method> : i.e. PCG or CG. PCG (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
