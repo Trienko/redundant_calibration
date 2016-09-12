@@ -379,7 +379,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
             print "k = ",k
             print "order_vec = ",order_vec
             print "*********"
-            s = simulator.sim(nsteps=5,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
+            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
             phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
             PQ = s.create_PQ(phi,s.L)

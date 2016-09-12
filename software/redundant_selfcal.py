@@ -134,7 +134,7 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
             print "e = ",e
             print "k = ",k
             print "*********"
-            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
+            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
             phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
             s.uv_tracks()
