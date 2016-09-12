@@ -75,7 +75,7 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
 
     return z_temp,converged,G,M,start,stop,i
 
-def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=5000):
+def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000):
     N = D.shape[0]
     L = np.amax(phi)
     PQ = create_PQ(phi,L) 
@@ -119,73 +119,78 @@ def convert_y_to_M(PQ,y,N):
     #from IPython import embed; embed() 
     return M  
 
-def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX"):
-    order_vec = np.arange(min_order,max_order+1)
-    method = "R_StEFCal"
-    dir_name = layout+"_"+method+"_"+str(SNR)
+def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=exp_number):
+    for e in xrange(exp_number):
+        order_vec = np.arange(min_order,max_order+1)
+        method = "R_StEFCal"
+        dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(exp_number)
     
-    if not os.path.isdir("./"+dir_name): 
-       os.system("mkdir "+dir_name)
+        if not os.path.isdir("./"+dir_name): 
+           os.system("mkdir "+dir_name)
 
-    for k in xrange(len(order_vec)):
-        print "*********"
-        print "k = ",k
-        print "*********"
-        s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
-        s.generate_antenna_layout()
-        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-        s.uv_tracks()
-        #PQ = s.create_PQ(phi,s.L)
-        point_sources = s.create_point_sources(100,fov=3,a=2)
-        g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
-        D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
-        M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
-        z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
+        for k in xrange(len(order_vec)):
+            print "*********"
+            print "e = ",e
+            print "k = ",k
+            print "*********"
+            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
+            s.generate_antenna_layout()
+            phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+            s.uv_tracks()
+            #PQ = s.create_PQ(phi,s.L)
+            point_sources = s.create_point_sources(100,fov=3,a=2)
+            g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
+            D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
+            M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+            z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
         
-        #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
+            #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
        
-        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
+            file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
-        output = open(file_name, 'wb')
-        pickle.dump(order_vec[k], output) 
-        pickle.dump(s.N, output) 
-        pickle.dump(s.L, output) 
-        pickle.dump(zeta, output)
-        #pickle.dump(PQ,output)
-        pickle.dump(z_cal,output)        
-        pickle.dump(c_cal,output)
-        pickle.dump(t,output)
-        pickle.dump(outer_loop,output)
-        #pickle.dump(sparc_object.itr_vec,output)
-        #pickle.dump(sparc_object.kappa_vec,output)
-        pickle.dump(G_cal,output)
-        pickle.dump(M_cal,output)
-        pickle.dump(D,output)
-        pickle.dump(M,output)
-        output.close()
+            output = open(file_name, 'wb')
+            pickle.dump(order_vec[k], output) 
+            pickle.dump(s.N, output) 
+            pickle.dump(s.L, output) 
+            pickle.dump(zeta, output)
+            #pickle.dump(PQ,output)
+            pickle.dump(z_cal,output)        
+            pickle.dump(c_cal,output)
+            pickle.dump(t,output)
+            pickle.dump(outer_loop,output)
+            #pickle.dump(sparc_object.itr_vec,output)
+            #pickle.dump(sparc_object.kappa_vec,output)
+            pickle.dump(G_cal,output)
+            pickle.dump(M_cal,output)
+            pickle.dump(D,output)
+            pickle.dump(M,output)
+            output.close()
 
 def main(argv):
     snr = 1000
     l = "HEX"
     min_order = 1 
     max_order = 2 
+    exp_number = 5
 
     try:
        opts, args = getopt.getopt(argv,"hl:s:",["minorder=","maxorder="])
     except getopt.GetoptError:
-       print 'redundant_selfcal.py -l <layout> -s <SNR> --minorder <minorder> --maxorder <maxorder>'
+       print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
        print 'Does a redundant stefcal experiment'
        print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+       print '-e <exp_number> : the experiment number. 5 (default)'
        print '-- min_order : minimum order of redundant array. 1 default.'
        print '-- max_order : maximum order of redundant array. 3 default.'
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
-          print 'redundant_selfcal.py -l <layout> -s <SNR> --minorder <minorder> --maxorder <maxorder>'
+          print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_num> --minorder <minorder> --maxorder <maxorder>'
           print 'Does a redundant stefcal experiment'
           print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+          print '-e <exp_number> : the experiment number. 5 (default)'
           print '-- min_order : minimum order of redundant array. 1 default.'
           print '-- max_order : maximum order of redundant array. 3 default.'
           sys.exit()
@@ -193,6 +198,8 @@ def main(argv):
           l = arg
        elif opt in ("-s"):
           snr = int(arg)
+       elif opt in ("-e"):
+          exp_number = int(arg)
        elif opt in ("--minorder"):
           min_order = int(arg)
        elif opt in ("--maxorder"):
@@ -202,11 +209,13 @@ def main(argv):
     print 'SNR: ', snr
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
-    return snr,l,max_order,min_order
+    print 'exp_number: ',exp_number    
+
+    return snr,l,max_order,min_order,exp_number
 
 if __name__ == "__main__":
-   snr,l,max_order,min_order = main(sys.argv[1:])
-   do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l)
+   snr,l,max_order,min_order,exp_number = main(sys.argv[1:])
+   do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number)
 
    '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT

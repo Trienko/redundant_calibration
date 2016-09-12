@@ -7,10 +7,13 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import cg
 from scipy.linalg import pinv
 from scipy.sparse import dia_matrix
+from scipy.stats import mode
 import time
 import pickle
 import os
 import sys, getopt
+from scipy.stats import gaussian_kde
+#from statistics import mode
 
 class SPARC():
 
@@ -360,48 +363,110 @@ class SPARC():
 
           return H_lam,H_sparse,H_D,H_D_sparse
            
-def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False):
-    order_vec = np.arange(min_order,max_order+1)
-    dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(time_var)
+def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False,exp_num=5):
+    for e in xrange(exp_num):
+ 
+    	order_vec = np.arange(min_order,max_order+1)
+        dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(time_var)+"_"+str(e)
     
-    if not os.path.isdir("./"+dir_name): 
-       os.system("mkdir "+dir_name)
+        if not os.path.isdir("./"+dir_name): 
+           os.system("mkdir "+dir_name)
 
-    for k in xrange(len(order_vec)):
-        print "*********"
-        print "k = "
-        print "*********"
-        s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k]) #INSTANTIATE OBJECT
-        s.generate_antenna_layout()
-        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
-        PQ = s.create_PQ(phi,s.L)
-        s.uv_tracks()
-        point_sources = s.create_point_sources(100,fov=3,a=2)
-        g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
-        D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
-        M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
-        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
-        z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
+        for k in xrange(len(order_vec)):
+            print "*********"
+            print "e = "
+            print "k = "
+            print "*********"
+            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
+            s.generate_antenna_layout()
+            phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+            PQ = s.create_PQ(phi,s.L)
+            s.uv_tracks()
+            point_sources = s.create_point_sources(100,fov=3,a=2)
+            g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
+            D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
+            M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+            sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+            z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop=sparc_object.levenberg_marquardt_time  (D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
        
-        file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
+            file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
-        output = open(file_name, 'wb')
-        pickle.dump(order_vec[k], output) 
-        pickle.dump(s.N, output) 
-        pickle.dump(s.L, output) 
-        pickle.dump(zeta, output)
-        pickle.dump(PQ,output)
-        pickle.dump(z_cal,output)        
-        pickle.dump(c_cal,output)
-        pickle.dump(time_mat,output)
-        pickle.dump(outer_loop,output)
-        pickle.dump(sparc_object.itr_vec,output)
-        pickle.dump(sparc_object.kappa_vec,output)
-        pickle.dump(G_cal,output)
-        pickle.dump(M_cal,output)
-        pickle.dump(D,output)
-        pickle.dump(M,output)
-        output.close()
+            output = open(file_name, 'wb')
+            pickle.dump(order_vec[k], output) 
+            pickle.dump(s.N, output) 
+            pickle.dump(s.L, output) 
+            pickle.dump(zeta, output)
+            pickle.dump(PQ,output)
+            pickle.dump(z_cal,output)        
+            pickle.dump(c_cal,output)
+            pickle.dump(time_mat,output)
+            pickle.dump(outer_loop,output)
+            pickle.dump(sparc_object.itr_vec,output)
+            pickle.dump(sparc_object.kappa_vec,output)
+            pickle.dump(G_cal,output)
+            pickle.dump(M_cal,output)
+            pickle.dump(D,output)
+            pickle.dump(M,output)
+            output.close()
+
+def kde_scipy(x, x_grid, bandwidth=0.2, **kwargs):
+    """Kernel Density Estimation with Scipy"""
+    # Note that scipy weights its bandwidth by the covariance of the
+    # input data.  To make the results comparable to the other methods,
+    # we divide the bandwidth by the sample standard deviation here.
+    #kde = gaussian_kde(x, bw_method=bandwidth / x.std(ddof=1), **kwargs)
+    kde = gaussian_kde(x)
+    return kde.evaluate(x_grid)
+
+def plot_kappa_itr():
+    #file_name = "./HEX_PCG_1000_False/5_91_165_HEX_PCG_1000_False.p"
+    #file_name = "./HEX_PCG_1000_False/1_7_9_HEX_PCG_1000_False.p"
+    
+    #file_name = "./HEX_CG_1000_False/5_91_165_HEX_CG_1000_False.p"
+    #file_name = "./HEX_CG_1000_False/1_7_9_HEX_CG_1000_False.p"
+    file_name = "./HEX_PCG_1000_False/2_19_30_HEX_PCG_1000_False.p"
+    
+    file_p = open(file_name, 'rb')
+    order = pickle.load(file_p)
+    N = pickle.load(file_p)
+    L = pickle.load(file_p)
+    zeta = pickle.load(file_p)
+    PQ = pickle.load(file_p)
+    z_cal = pickle.load(file_p)
+    c_cal = pickle.load(file_p)
+    time_mat = pickle.load(file_p)
+    outer_loop = pickle.load(file_p)
+    itr_vec = pickle.load(file_p)
+    kappa_vec = pickle.load(file_p)
+    
+    print "len(itr_vec) = ",len(itr_vec)
+    print "len(kappa_vec) = ",len(kappa_vec)
+    print "mean(itr_vec) = ",np.mean(itr_vec)
+    print "std(itr_vec) = ",np.std(itr_vec)
+    print "mean(kappa_vec) = ",np.mean(kappa_vec)
+    print "std(kappa_vec) = ",np.std(kappa_vec)
+    print "amax(kappa_vec) = ",np.amax(kappa_vec)
+    print "amin(kappa_vec) = ",np.amin(kappa_vec)
+    print "median(kappa_vec) = ",np.median(kappa_vec)
+    print "mad = ",np.median(np.absolute(kappa_vec - np.median(kappa_vec)))
+    print "c_cal = ",c_cal
+
+    x_grid = np.linspace(0,200000,1000)
+ 
+    y = kde_scipy(kappa_vec[kappa_vec<200000], x_grid)
+    
+    plt.plot(x_grid,y)
+    plt.show()
+
+    #n, bins, patches = plt.hist(kappa_vec[kappa_vec<100000], 200, normed=1, facecolor='green', alpha=0.75)
+    #plt.show()
+
+    G_cal = pickle.load(file_p)
+    M_cal = pickle.load(file_p)
+    D = pickle.load(file_p)
+    M = pickle.load(file_p)
+    file_p.close()
+
 
 def main(argv):
     snr = 1000
@@ -410,27 +475,30 @@ def main(argv):
     max_order = 2 
     m = "PCG"
     time_var = False
+    exp_num = 5
 
     try:
-       opts, args = getopt.getopt(argv,"htl:s:m:",["minorder=","maxorder="])
+       opts, args = getopt.getopt(argv,"htl:s:m:e:",["minorder=","maxorder="])
     except getopt.GetoptError:
-       print 'sparc.py -t -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
+       print 'sparc.py -t -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
        print 'Does a sparc experiment'
        print '-t : set timing to True. False (default)'
        print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
        print '-m <method> : i.e. PCG or CG. PCG (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+       print '-e <exp_num> : number of experiments to perform . 5 (default)'
        print '-- min_order : minimum order of redundant array. 1 default.'
        print '-- max_order : maximum order of redundant array. 3 default.'
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
-          print 'sparc.py -l <layout> -s <SNR> -m <method> --minorder <minorder> --maxorder <maxorder>'
+          print 'sparc.py -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
           print 'Does a sparc experiment'
           print '-t : set timing to True. False (default)'
           print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
           print '-m <method> : i.e. PCG or CG. PCG (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
+          print '-e <exp_num> : number of experiments to perform . 5 (default)'
           print '-- min_order : minimum order of redundant array. 1 default.'
           print '-- max_order : maximum order of redundant array. 3 default.'
           sys.exit()
@@ -442,6 +510,8 @@ def main(argv):
           snr = int(arg)
        elif opt in ("-m"):
           m = arg
+       elif opt in ("-m"):
+          exp_num = int(arg)
        elif opt in ("--minorder"):
           min_order = int(arg)
        elif opt in ("--maxorder"):
@@ -455,13 +525,15 @@ def main(argv):
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
     print 't: ',time_var
+    print 'exp_num: ', exp_num
     print "*****************"
 
-    return snr,l,m,max_order,min_order,time_var
+    return snr,l,m,max_order,min_order,time_var,exp_num
 
 if __name__ == "__main__":
-   snr,l,m,max_order,min_order,time_var = main(sys.argv[1:])
-   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var)
+   snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
+   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
+   #plot_kappa_itr()
    '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
