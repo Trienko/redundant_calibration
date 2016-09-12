@@ -119,7 +119,7 @@ def convert_y_to_M(PQ,y,N):
     #from IPython import embed; embed() 
     return M  
 
-def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=exp_number):
+def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5):
     for e in xrange(exp_number):
         order_vec = np.arange(min_order,max_order+1)
         method = "R_StEFCal"
