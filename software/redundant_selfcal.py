@@ -174,13 +174,13 @@ def main(argv):
     exp_number = 5
 
     try:
-       opts, args = getopt.getopt(argv,"hl:s:",["minorder=","maxorder="])
+       opts, args = getopt.getopt(argv,"hl:s:e:",["minorder=","maxorder="])
     except getopt.GetoptError:
        print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
        print 'Does a redundant stefcal experiment'
        print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
-       print '-e <exp_number> : the experiment number. 5 (default)'
+       print '-e <exp_number> : the experiment number. 5 (default).'
        print '-- min_order : minimum order of redundant array. 1 default.'
        print '-- max_order : maximum order of redundant array. 3 default.'
        sys.exit(2)
@@ -190,7 +190,7 @@ def main(argv):
           print 'Does a redundant stefcal experiment'
           print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
-          print '-e <exp_number> : the experiment number. 5 (default)'
+          print '-e <exp_number> : the experiment number. 5 (default).'
           print '-- min_order : minimum order of redundant array. 1 default.'
           print '-- max_order : maximum order of redundant array. 3 default.'
           sys.exit()
