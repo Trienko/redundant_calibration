@@ -120,10 +120,11 @@ def convert_y_to_M(PQ,y,N):
     return M  
 
 def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5):
+    order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_number):
-        order_vec = np.arange(min_order,max_order+1)
+        
         method = "R_StEFCal"
-        dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(exp_number)
+        dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)
     
         if not os.path.isdir("./"+dir_name): 
            os.system("mkdir "+dir_name)

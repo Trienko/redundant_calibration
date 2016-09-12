@@ -364,9 +364,10 @@ class SPARC():
           return H_lam,H_sparse,H_D,H_D_sparse
            
 def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False,exp_num=5):
+    order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_num):
  
-    	order_vec = np.arange(min_order,max_order+1)
+    	
         dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(time_var)+"_"+str(e)
     
         if not os.path.isdir("./"+dir_name): 
@@ -376,6 +377,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
             print "*********"
             print "e = ",e
             print "k = ",k
+            print "order_vec = ",order_vec
             print "*********"
             s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
