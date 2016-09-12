@@ -7,12 +7,12 @@ def screen_func(SNR=1000,method="PCG",min_order=1,max_order=5,layout="HEX",time_
 
     if method == "RSteFCal":
        cmd = cmd + "screen -md -S "+screen_name+" python redundant_selfcal.py"
-       cmd = cmd + " -s "+str(SNR)+" -l "+layout+" -e "+str(exp_number)+" --minorder "+str(min_order)+"-- maxorder "+str(max_order)
+       cmd = cmd + " -s "+str(SNR)+" -l "+layout+" -e "+str(exp_num)+" --minorder "+str(min_order)+"-- maxorder "+str(max_order)
     else:
        cmd = cmd + "screen -md -S "+screen_name+" python sparc.py"
        if time_var:
           cmd = cmd + " -t"
-       cmd = cmd + " -s "+str(SNR)+" -m "+method+ " -l "+layout+" -e "+str(exp_number)+" --minorder "+str(min_order)+"-- maxorder "+str(max_order)
+       cmd = cmd + " -s "+str(SNR)+" -m "+method+ " -l "+layout+" -e "+str(exp_num)+" --minorder "+str(min_order)+"-- maxorder "+str(max_order)
     print "cmd>> ",cmd 
     os.system(cmd)
 
