@@ -19,16 +19,16 @@ def screen_func(SNR=1000,method="PCG",min_order=1,max_order=5,layout="HEX",time_
 if __name__ == "__main__":
 
    #NO TIMING: KAPPA AND ITR NUMBER OF CG
-   #screen_func(SNR=1000,method="CG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5) 
-   #screen_func(SNR=5,method="CG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
+   screen_func(SNR=1000,method="CG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5) 
+   screen_func(SNR=5,method="CG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
    screen_func(SNR=1000,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5) 
-   #screen_func(SNR=5,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
-   #screen_func(SNR=1000,method="RSteFCal",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5) 
-   #screen_func(SNR=5,method="RSteFCal",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
+   screen_func(SNR=5,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
+   screen_func(SNR=1000,method="RSteFCal",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5) 
+   screen_func(SNR=5,method="RSteFCal",min_order=1,max_order=8,layout="HEX",time_var=False,exp_num=5)
 
    #TIMING EXPERIMENTS
-   #screen_func(SNR=1000,method="SVD",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5) 
-   #screen_func(SNR=5,method="SVD",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5)
-   #screen_func(SNR=1000,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5) 
-   #screen_func(SNR=5,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5)
+   screen_func(SNR=1000,method="SVD",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5) 
+   screen_func(SNR=5,method="SVD",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5)
+   screen_func(SNR=1000,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5) 
+   screen_func(SNR=5,method="PCG",min_order=1,max_order=8,layout="HEX",time_var=True,exp_num=5)
    

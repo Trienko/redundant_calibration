@@ -374,8 +374,8 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
 
         for k in xrange(len(order_vec)):
             print "*********"
-            print "e = "
-            print "k = "
+            print "e = ",e
+            print "k = ",k
             print "*********"
             s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
