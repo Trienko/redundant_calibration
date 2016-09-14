@@ -250,6 +250,8 @@ def plot_outer_loop(SNR=10,k_upper=1):
 def plot_time(SNR=1000,k_upper=1):
     
     N = np.array([7,19,37])
+    L = np.array([9,30,63])
+    P = 2*(N+L)
 
     time_pcg_mean = np.zeros((len(N),),dtype=float)
     time_stef_mean = np.zeros((len(N),),dtype=float)
@@ -360,6 +362,30 @@ def plot_time(SNR=1000,k_upper=1):
     #print "z = ",z
     #ax.set_yscale('log')
     ax.set_xlabel(r'$N$')
+    ax.set_ylabel('Average Execution Time per outer loop [$s$]')
+    ax.legend(loc=2)
+    plt.show()
+
+    matplotlib.rcParams.update({'font.size': 22})
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(P,time_pcg_mean,"r",lw=2,label="PCG")
+    ax.fill_between(P,time_pcg_mean-time_pcg_std, time_pcg_mean+time_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
+    #z = np.polyfit(P, time_pcg_mean, 2)
+    #ax.plot(P,z[0]*P**2,"r--")
+    #print "z = ",z
+    ax.plot(P,time_stef_mean,"b",lw=2,label="R-StEFCal")
+    ax.fill_between(P, time_stef_mean-time_stef_std, time_stef_mean+time_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
+    #z = np.polyfit(P, time_stef_mean, 2)
+    #ax.plot(P,z[0]*P**2,"b--")
+    #print "z = ",z
+    ax.plot(P,time_svd_mean,"g",lw=2,label="SVD")
+    ax.fill_between(P, time_svd_mean-time_svd_std, time_svd_mean+time_svd_std,alpha=0.2, edgecolor='k', facecolor='g')
+    #z = np.polyfit(P, time_svd_mean, 3)
+    #ax.plot(P,z[0]*P**3,"g--")
+    #print "z = ",z
+    #ax.set_yscale('log')
+    ax.set_xlabel(r'$P$')
     ax.set_ylabel('Average Execution Time per outer loop [$s$]')
     ax.legend(loc=2)
     plt.show()
