@@ -390,7 +390,42 @@ def plot_time(SNR=1000,k_upper=1):
     ax.legend(loc=2)
     plt.show()
 
+def plot_sparsity():
+    output = open('sparsity.p', 'rb')
+    N = pickle.load(output)
+    gamma = pickle.load(output) 
+    N_REG = pickle.load(output) 
+    gamma_REG = pickle.load(output)
+    S_SQR = pickle.load(output)
+    N_SQR = pickle.load(output)
+    gamma_SQR = pickle.load(output)
+    R_HEX = pickle.load(output)
+    N_HEX = pickle.load(output)
+    gamma_HEX = pickle.load(output)
+    output.close()   
+
+    plt.plot(N,gamma,'r--',lw=1.5)
+    plt.plot(N,5.0/8.0*np.ones(N.shape),'k:',lw=1.5)
+    plt.plot(N_REG,gamma_REG,'ro',ms=8.0,mfc="w",mec='r')
+    plt.plot(N_SQR,gamma_SQR,'gx',ms=8.0)
+    plt.plot(N_HEX,gamma_HEX,'bo',ms=8.0,mfc="w",mec='b')
+    plt.show()
+
+    P = 4*N-2
+    P_REG = 4*N_REG-2
+
+    P_SQR = 2*(N_SQR + 2*S_SQR**2 - 2*S_SQR)
+
+    P_HEX = 2*(N_HEX+6*R_HEX**2 + 3*R_HEX)
+  
+    plt.plot(N,np.log(1-gamma)/np.log(P) + 2,'r--',lw=1.5)
+    plt.plot(N_REG,np.log(1-gamma_REG)/np.log(P_REG)+2,'ro',ms=8.0)
+    plt.plot(N_SQR,np.log(1-gamma_SQR)/np.log(P_SQR)+2,'gx',ms=8.0)
+    plt.plot(N_HEX,np.log(1-gamma_HEX)/np.log(P_HEX)+2,'bo',ms=8.0)
+    plt.show()
+
 if __name__ == "__main__":
    #plot_kappa_itr()
    #plot_outer_loop()
-   plot_time()
+   #plot_time()
+   plot_sparsity()

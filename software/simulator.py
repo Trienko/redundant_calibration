@@ -173,8 +173,8 @@ class sim():
                 
           ant_x = np.zeros((elements,),dtype=float)
           ant_y = np.zeros((elements,),dtype=float)
-          print "len(ant_x) = ",len(ant_x)
-          print "len(ant_y) = ",len(ant_y)
+          #print "len(ant_x) = ",len(ant_x)
+          #print "len(ant_y) = ",len(ant_y)
           x = 0.0
           y = 0.0
 
@@ -215,8 +215,8 @@ class sim():
                        
           ant_x = np.zeros((elements,),dtype=float)
           ant_y = np.zeros((elements,),dtype=float)
-          print "len(ant_x) = ",len(ant_x)
-          print "len(ant_y) = ",len(ant_y)
+          #print "len(ant_x) = ",len(ant_x)
+          #print "len(ant_y) = ",len(ant_y)
           x = 0.0
           y = 0.0
 
@@ -885,7 +885,7 @@ def func_N_to_L_hex(min_v=1,max_v=6):
         phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
         N[k] = s.N
         L[k] = s.L
-        
+    #array([  7,  19,  37,  61,  91, 127, 169, 217, 271, 331, 397, 469, 547])
     #z = np.polyfit(r_v, L, 2) #FITTING A POLYNOMIAL TO DATA    
     #r_t = (-3 + np.sqrt(12*N-3))/6 #LINK BETWEEN AMOUNT OF RINGS AND NUMBER OF ANTENNAS
     #L_t = 6*r_v**2 + 3*r_v #ANALYTIC LINK BETWEEN NUMBER OF RINGS AND REDUNDANT BASELINES

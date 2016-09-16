@@ -362,7 +362,224 @@ class SPARC():
           H_D_sparse = dia_matrix(H_D,dtype=complex)
 
           return H_lam,H_sparse,H_D,H_D_sparse
+
+      '''
+      INPUTS:
+      z - Input vector.
+      '''
+      def generate_H_formula_int(self,psi_func_eval,xi_func_eval):
+                              
+          #CONSTRUCTING C
+          #**************
+          C = np.zeros((self.N,self.N),dtype=float)
+          for i in xrange(self.N):
+              C[i,i] = 1.0
+
+          #CONSTRUCTING E
+          #**************
+          E = np.zeros((self.L,self.L),dtype=float)
+          for i in xrange(self.L):
+              E[i,i] = 1.0
+
+          #CONSTRUCTING D
+          #**************
+          D = np.zeros((self.N,self.L),dtype=float)
+          for i in xrange(self.N):
+              for j in xrange(self.L):
+                  psi,found = psi_func_eval(i,j+1,self.phi)
+                  if found:
+                     D[i,j] = 1.0
+
+          DH = D.transpose() 
+
+          #CONSTRUCTING F
+          #**************
+          F = np.zeros((self.N,self.N),dtype=float)
+          for i in xrange(self.N):
+              for j in xrange(i,self.N):
+                  if i <> j:
+                     F[i,j] = 1.0
+                     F[j,i] = 1.0 
+
+          #CONSTRUCTING G
+          #**************
+          G = np.zeros((self.N,self.L),dtype=float)
+          for i in xrange(self.N):
+              for j in xrange(self.L):
+                  xi,found = xi_func_eval(i,j+1,self.phi)
+                  
+                  if found:
+                     #print "i","j","xi",i+1,j+1,xi+1
+                     #print "found",found
+                     G[i,j] = 1.0
+                  #else:
+                  #   print "i","j","xi",i+1,j+1,xi
+                  #   print "found",found  
+
+          GT = G.transpose() 
+
+          #CONSTRUCTING Z
+          #**************
+          Z = np.zeros((self.L,self.L),dtype=float)
+
+          #CONSTRUCTING A
+          #**************1
+          A = np.zeros((self.N+self.L,self.N+self.L),dtype=float)
+          A[:self.N,:self.N] = C
+          A[:self.N,self.N:] = D
+          A[self.N:,self.N:] = E
+          A[self.N:,:self.N] = DH
+
+          #CONSTRUCTING B
+          #**************
+          B = np.zeros((self.N+self.L,self.N+self.L),dtype=float)
+          B[:self.N,:self.N] = F
+          B[:self.N,self.N:] = G
+          B[self.N:,self.N:] = Z
+          B[self.N:,:self.N] = GT
+
+          #CONSTRUCTING H
+          #**************
+          H = np.zeros((2*(self.N+self.L),2*(self.N+self.L)),dtype=float)
+          H[:self.N+self.L,:self.N+self.L] = A
+          H[:self.N+self.L,self.N+self.L:] = B
+          H[self.N+self.L:,:self.N+self.L] = B
+          H[self.N+self.L:,self.N+self.L:] = A
+
+          return H
            
+def compute_sparsity():
+    N = np.array(xrange(5,332))
+    gamma = (5.0*N**2-7.0*N+3.0)/(8.0*N**2-8.0*N+2)
+
+    N_REG = np.array([5,16,33,63,93,123,153,183,213,243,273,303,331])
+    gamma_REG = np.zeros((len(N_REG),),dtype=float)    
+
+    counter = 0
+
+    for k in xrange(len(N_REG)):
+        print "REG:: k = ",k
+        s = simulator.sim(nsteps=50,layout="REG",order=N_REG[k],seed=1)   
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        H_int = sparc_object.generate_H_formula_int(s.psi_func_eval,s.xi_func_eval)
+        non_zero = np.sum(H_int)
+        gamma_REG[counter] = 1-(1.0*non_zero)/H_int.shape[0]**2 
+        counter = counter + 1
+
+
+    S_SQR = np.array([3,4,6,8,10,12,14,16,18])
+    N_SQR = S_SQR**2
+    gamma_SQR = np.zeros((len(N_SQR),),dtype=float)    
+
+    counter = 0
+
+    for k in xrange(len(S_SQR)):
+        print "SQR:: k = ",k
+        s = simulator.sim(nsteps=50,layout="SQR",order=S_SQR[k],seed=1)   
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        H_int = sparc_object.generate_H_formula_int(s.psi_func_eval,s.xi_func_eval)
+        non_zero = np.sum(H_int)
+        gamma_SQR[counter] = 1-(1.0*non_zero)/H_int.shape[0]**2 
+        counter = counter + 1
+
+
+    R_HEX = np.array([1,2,3,4,5,6,7,8,9,10])
+    N_HEX = 3*R_HEX**2+3*R_HEX+1
+    gamma_HEX = np.zeros((len(N_HEX),),dtype=float)    
+
+    counter = 0
+
+    for k in xrange(len(R_HEX)):
+        print "HEX:: k = ",k
+        s = simulator.sim(nsteps=50,layout="HEX",order=R_HEX[k],seed=1)   
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        H_int = sparc_object.generate_H_formula_int(s.psi_func_eval,s.xi_func_eval)
+        non_zero = np.sum(H_int)
+        gamma_HEX[counter] = 1-(1.0*non_zero)/H_int.shape[0]**2 
+        counter = counter + 1 
+
+    output = open("sparsity.p", 'wb')
+    pickle.dump(N, output) 
+    pickle.dump(gamma, output) 
+    pickle.dump(N_REG, output) 
+    pickle.dump(gamma_REG, output)
+    pickle.dump(S_SQR,output)
+    pickle.dump(N_SQR,output)
+    pickle.dump(gamma_SQR,output)
+    pickle.dump(R_HEX,output)
+    pickle.dump(N_HEX,output)
+    pickle.dump(gamma_HEX,output)
+    output.close()
+   
+
+    '''
+    N_REG = np.array(xrange(5,157,50))
+    N = np.array(xrange(5,315))
+    gamma = np.zeros((len(N_REG),),dtype=float)
+    counter = 0
+    for k in xrange (5,157,50):
+        print "k = ",k
+        s = simulator.sim(nsteps=50,layout="REG",order=k,seed=1) #INSTANTIATE OBJECT
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        H_int = sparc_object.generate_H_formula_int(s.psi_func_eval,s.xi_func_eval)
+        non_zero = np.sum(H_int)
+        gamma[counter] = 1-(1.0*non_zero)/H_int.shape[0]**2   
+        counter = counter + 1 
+    gamma_t = (5.0*N**2-7.0*N+3.0)/(8.0*N**2-8.0*N+2)
+    plt.plot(N_REG,gamma,"ro")
+    plt.plot(N,gamma_t,"r--")
+
+    L_HEX = np.array(xrange (11,12))
+    N_HEX = np.array(xrange (11,12))
+    gamma_HEX = np.zeros((len(N_HEX),),dtype=float)
+
+    counter = 0
+    for k in xrange (11,12):
+        print "k = ",k
+        s = simulator.sim(nsteps=50,layout="HEX",order=k,seed=1) #INSTANTIATE OBJECT
+        s.generate_antenna_layout()
+        phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+        PQ = s.create_PQ(phi,s.L)
+        N_HEX[counter] = s.N
+        print "N = ",s.N
+        L_HEX[counter] = s.L
+        sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
+        H_int = sparc_object.generate_H_formula_int(s.psi_func_eval,s.xi_func_eval)
+        non_zero = np.sum(H_int)
+        gamma_HEX[counter] = 1-(1.0*non_zero)/H_int.shape[0]**2   
+        counter = counter + 1
+    
+    plt.plot(N_HEX,gamma_HEX,"bo")
+
+    plt.show() 
+    P_REG = 4*N_REG-2
+    c_REG = np.log(1-gamma)/np.log(P_REG) + 2
+    
+    P = 4*N-2
+    c = np.log(1-gamma_t)/np.log(P)+2
+
+    P_HEX = 2*(N_HEX+L_HEX)
+    c_HEX = np.log(1-gamma_HEX)/np.log(P_HEX) + 2
+
+    plt.plot(N_REG,c_REG,'ro')
+    plt.plot(N,c,'r--')
+    plt.plot(N_HEX,c_HEX,'bo') 
+    plt.show()
+    '''
+
+
 def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False,exp_num=5):
     order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_num):
@@ -533,9 +750,11 @@ def main(argv):
     return snr,l,m,max_order,min_order,time_var,exp_num
 
 if __name__ == "__main__":
-   snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
-   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
+   #snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
+   #do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
    #plot_kappa_itr()
+
+   compute_sparsity()
    '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
