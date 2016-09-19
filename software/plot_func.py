@@ -289,11 +289,14 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
-def plot_time(SNR=1000,k_upper=1):
+def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     
-    N = np.array([7,19,37])
-    L = np.array([9,30,63])
+    N = np.array([7,19,37,61,91,108,169,217])
+    L = np.array([9,30,63,108,165,234,315,408])
+    
     P = 2*(N+L)
+ 
+     
 
     time_pcg_mean = np.zeros((len(N),),dtype=float)
     time_stef_mean = np.zeros((len(N),),dtype=float)
@@ -312,15 +315,11 @@ def plot_time(SNR=1000,k_upper=1):
         time_stef_dic[str(N[j])]=np.array([],dtype=float)
         time_svd_dic[str(N[j])]=np.array([],dtype=float)
 
-    for k in xrange(k_upper):
-        PCG_DIR = "./HEX_PCG_"+str(SNR)+"_True_"+str(k)
-        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p"]) 
-        #PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p"]) 
-        STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(k)
-        STEF_FILE_LIST = np.array([STEF_DIR+"/1_7_9_"+STEF_DIR[2:]+".p",STEF_DIR+"/2_19_30_"+STEF_DIR[2:]+".p",STEF_DIR+"/3_37_63_"+STEF_DIR[2:]+".p"])
-        #STEF_FILE_LIST = np.array([STEF_DIR+"/1_7_9_"+STEF_DIR[2:]+".p",STEF_DIR+"/2_19_30_"+STEF_DIR[2:]+".p"])
-        SVD_DIR = "./HEX_SVD_"+str(SNR)+"_True_"+str(k)
-        SVD_FILE_LIST = np.array([SVD_DIR+"/1_7_9_"+SVD_DIR[2:]+".p",SVD_DIR+"/2_19_30_"+SVD_DIR[2:]+".p",SVD_DIR+"/3_37_63_"+SVD_DIR[2:]+".p"])
+    for k in xrange(k_upper1):
+        PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)
+    
+        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
+
         #SVD_FILE_LIST = np.array([SVD_DIR+"/1_7_9_"+SVD_DIR[2:]+".p",SVD_DIR+"/2_19_30_"+SVD_DIR[2:]+".p"])
         for i in xrange(len(PCG_FILE_LIST)):
             #LOAD PCG
@@ -341,10 +340,18 @@ def plot_time(SNR=1000,k_upper=1):
             t = (time_mat[1,:] - time_mat[0,:])/(1.0*outer_loop)
             time_pcg_dic[str(N[i])] = np.append(time_pcg_dic[str(N[i])],t)
             file_p.close()
+  
+    for k in xrange(k_upper2):
 
-            #LOAD STEF
-            print "STEF_FILE_LIST = ",STEF_FILE_LIST[i]
-          
+        STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(k)
+        STEF_FILE_LIST = np.array([STEF_DIR+"/1_7_9_"+STEF_DIR[2:]+".p",STEF_DIR+"/2_19_30_"+STEF_DIR[2:]+".p",STEF_DIR+"/3_37_63_"+STEF_DIR[2:]+".p",STEF_DIR+"/4_61_108_"+STEF_DIR[2:]+".p",STEF_DIR+"/5_91_165_"+STEF_DIR[2:]+".p",STEF_DIR+"/6_127_234_"+STEF_DIR[2:]+".p",STEF_DIR+"/7_169_315_"+STEF_DIR[2:]+".p",STEF_DIR+"/8_217_408_"+STEF_DIR[2:]+".p"])
+        
+        #LOAD STEF
+        for i in xrange(len(STEF_FILE_LIST)):
+            print "STEF_FILE_LIST = ",STEF_FILE_LIST[i]   
+            if not os.path.isfile(STEF_FILE_LIST[i]):
+               break
+            
             file_p = open(STEF_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -358,8 +365,15 @@ def plot_time(SNR=1000,k_upper=1):
             time_stef_dic[str(N[i])] = np.append(time_stef_dic[str(N[i])],t)
             file_p.close()
 
-            #LOAD SVD
+    for k in xrange(k_upper3):
+        SVD_DIR = "./HEX_SVD_"+str(SNR)+"_True_"+str(k)
+        SVD_FILE_LIST = np.array([SVD_DIR+"/1_7_9_"+SVD_DIR[2:]+".p",SVD_DIR+"/2_19_30_"+SVD_DIR[2:]+".p",SVD_DIR+"/3_37_63_"+SVD_DIR[2:]+".p",SVD_DIR+"/4_61_108_"+SVD_DIR[2:]+".p",SVD_DIR+"/5_91_165_"+SVD_DIR[2:]+".p",SVD_DIR+"/6_127_234_"+SVD_DIR[2:]+".p",SVD_DIR+"/7_169_315_"+SVD_DIR[2:]+".p",SVD_DIR+"/8_217_408_"+SVD_DIR[2:]+".p"])
+
+        #LOAD SVD
+        for i in xrange(len(SVD_FILE_LIST)):    
             print "SVD_FILE_LIST = ",SVD_FILE_LIST[i]
+            if not os.path.isfile(SVD_FILE_LIST[i]):
+               break
             file_p = open(SVD_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -472,6 +486,6 @@ def plot_sparsity():
 
 if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
-   plot_outer_loop(SNR=5)
-   #plot_time()
+   #plot_outer_loop(SNR=5)
+   plot_time()
    #plot_sparsity()
