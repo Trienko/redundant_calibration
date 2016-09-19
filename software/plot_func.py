@@ -216,6 +216,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
             c_cal = pickle.load(file_p)
             time_mat = pickle.load(file_p)
             outer_loop = pickle.load(file_p)
+            print "len(outer_loop) = ",len(outer_loop)
             outerloop_pcg_dic[str(N[i])] = np.append(outerloop_pcg_dic[str(N[i])],outer_loop)
             file_p.close()
     
@@ -236,6 +237,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
             c_cal = pickle.load(file_p)
             time_mat = pickle.load(file_p)
             outer_loop = pickle.load(file_p)
+            print "len(outer_loop) = ",len(outer_loop) 
             outerloop_stef_dic[str(N[i])] = np.append(outerloop_stef_dic[str(N[i])],outer_loop)
             file_p.close()
     
@@ -469,6 +471,6 @@ def plot_sparsity():
 
 if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
-   plot_outer_loop(SNR=1000)
+   plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
