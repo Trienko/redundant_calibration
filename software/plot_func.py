@@ -25,9 +25,9 @@ def kde_scipy(x, x_grid, bandwidth=0.2, **kwargs):
     kde = gaussian_kde(x)
     return kde.evaluate(x_grid)
 
-def plot_kappa_itr(SNR=10,k_upper=1):
+def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4):
     
-    N = np.array([7,19,37,61,91])
+    N = np.array([7,19,37,61,91,108,169,217])
 
     kappa_pcg_mean = np.zeros((len(N),),dtype=float)
     itr_pcg_mean = np.zeros((len(N),),dtype=float)
@@ -52,14 +52,15 @@ def plot_kappa_itr(SNR=10,k_upper=1):
 
     print "k = ",kappa_pcg_dic[str(N[0])]    
 
-    for k in xrange(k_upper):
+    for k in xrange(k_upper1):
         PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)
-        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p"]) 
-        CG_DIR = "./HEX_CG_"+str(SNR)+"_False_"+str(k)
-        CG_FILE_LIST = np.array([CG_DIR+"/1_7_9_"+CG_DIR[2:]+".p",CG_DIR+"/2_19_30_"+CG_DIR[2:]+".p",CG_DIR+"/3_37_63_"+CG_DIR[2:]+".p",CG_DIR+"/4_61_108_"+CG_DIR[2:]+".p",CG_DIR+"/5_91_165_"+CG_DIR[2:]+".p"])
+        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
+        
         for i in xrange(len(PCG_FILE_LIST)):
             #LOAD PCG
             print "PCG_FILE_LIST = ",PCG_FILE_LIST[i]
+            if not os.path.isfile(PCG_FILE_LIST[i]):
+               break
             file_p = open(PCG_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -76,31 +77,43 @@ def plot_kappa_itr(SNR=10,k_upper=1):
             kappa_pcg_dic[str(N[i])] = np.append(kappa_pcg_dic[str(N[i])],kappa_vec)
             itr_pcg_dic[str(N[i])] = np.append(itr_pcg_dic[str(N[i])],itr_vec)
             file_p.close()
+        
 
+    for k in xrange(k_upper2):
+        CG_DIR = "./HEX_CG_"+str(SNR)+"_False_"+str(k)
+        CG_FILE_LIST = np.array([CG_DIR+"/1_7_9_"+CG_DIR[2:]+".p",CG_DIR+"/2_19_30_"+CG_DIR[2:]+".p",CG_DIR+"/3_37_63_"+CG_DIR[2:]+".p",CG_DIR+"/4_61_108_"+CG_DIR[2:]+".p",CG_DIR+"/5_91_165_"+CG_DIR[2:]+".p",CG_DIR+"/6_127_234_"+CG_DIR[2:]+".p",CG_DIR+"/7_169_315_"+CG_DIR[2:]+".p",CG_DIR+"/8_217_408_"+CG_DIR[2:]+".p"])
             #LOAD CG
-            print "CG_FILE_LIST = ",CG_FILE_LIST[i]
-            file_p = open(CG_FILE_LIST[i], 'rb')
-            order = pickle.load(file_p)
-            N_v = pickle.load(file_p)
-            L = pickle.load(file_p)
-            zeta = pickle.load(file_p)
-            PQ = pickle.load(file_p)
-            z_cal = pickle.load(file_p)
-            c_cal = pickle.load(file_p)
-            time_mat = pickle.load(file_p)
-            outer_loop = pickle.load(file_p)
-            itr_vec = pickle.load(file_p)
-            kappa_vec = pickle.load(file_p)
-            print "s = ",str(N[i])
-            t_kappa = kappa_cg_dic[str(N[i])]
-            t_itr = itr_cg_dic[str(N[i])]
-            kappa_cg_dic[str(N[i])] = np.append(t_kappa,kappa_vec)
-            itr_cg_dic[str(N[i])] = np.append(t_itr,itr_vec)
-            file_p.close()
+
+        for i in xrange(len(CG_FILE_LIST)):
+              print "CG_FILE_LIST = ",CG_FILE_LIST[i]
+              if not os.path.isfile(CG_FILE_LIST[i]):
+                 break
+              file_p = open(CG_FILE_LIST[i], 'rb')
+              order = pickle.load(file_p)
+              N_v = pickle.load(file_p)
+              L = pickle.load(file_p)
+              zeta = pickle.load(file_p)
+              PQ = pickle.load(file_p)
+              z_cal = pickle.load(file_p)
+              c_cal = pickle.load(file_p)
+              time_mat = pickle.load(file_p)
+              outer_loop = pickle.load(file_p)
+              itr_vec = pickle.load(file_p)
+              kappa_vec = pickle.load(file_p)
+              print "s = ",str(N[i])
+              t_kappa = kappa_cg_dic[str(N[i])]
+              t_itr = itr_cg_dic[str(N[i])]
+              kappa_cg_dic[str(N[i])] = np.append(t_kappa,kappa_vec)
+              itr_cg_dic[str(N[i])] = np.append(t_itr,itr_vec)
+              file_p.close()
     
     for n in xrange(len(N)):
+        if len(kappa_pcg_dic[str(N[n])]) == 0:
+           break 
         kappa_pcg_mean[n] = np.mean(kappa_pcg_dic[str(N[n])])
         itr_pcg_mean[n] = np.mean(itr_pcg_dic[str(N[n])])
+        if len(kappa_cg_dic[str(N[n])]) == 0:
+           break
         kappa_cg_median[n] = np.median(kappa_cg_dic[str(N[n])])
         itr_cg_median[n] = np.median(itr_cg_dic[str(N[n])])
 
@@ -246,7 +259,6 @@ def plot_outer_loop(SNR=10,k_upper=1):
     ax.legend(loc=5)
     plt.show()
 
-
 def plot_time(SNR=1000,k_upper=1):
     
     N = np.array([7,19,37])
@@ -283,6 +295,9 @@ def plot_time(SNR=1000,k_upper=1):
         for i in xrange(len(PCG_FILE_LIST)):
             #LOAD PCG
             print "PCG_FILE_LIST = ",PCG_FILE_LIST[i]
+            if not os.path.isfile(PCG_FILE_LIST[i]):
+               break
+            
             file_p = open(PCG_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -299,6 +314,7 @@ def plot_time(SNR=1000,k_upper=1):
 
             #LOAD STEF
             print "STEF_FILE_LIST = ",STEF_FILE_LIST[i]
+          
             file_p = open(STEF_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -425,7 +441,7 @@ def plot_sparsity():
     plt.show()
 
 if __name__ == "__main__":
-   #plot_kappa_itr()
+   plot_kappa_itr()
    #plot_outer_loop()
    #plot_time()
-   plot_sparsity()
+   #plot_sparsity()
