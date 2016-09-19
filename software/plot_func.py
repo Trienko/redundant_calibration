@@ -289,7 +289,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
-def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
+def plot_time(SNR=5,k_upper1=5,k_upper2=5,k_upper3=5):
     
     N = np.array([7,19,37,61,91,108,169,217])
     L = np.array([9,30,63,108,165,234,315,408])
