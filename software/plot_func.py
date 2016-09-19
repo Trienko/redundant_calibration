@@ -472,6 +472,6 @@ def plot_sparsity():
 
 if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
-   plot_outer_loop(SNR=10)
+   plot_outer_loop(SNR=1000)
    #plot_time()
    #plot_sparsity()
