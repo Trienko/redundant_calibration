@@ -243,14 +243,15 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
         outerloop_pcg_vec = outerloop_pcg_dic[str(N[n])]
         
         print "N = ",N[n]
-        print "len(outerloop_pcg_vec) = ",len(outerloop_pcg_vec[outerloop_pcg_vec<=9998])
+        print "len(outerloop_pcg_vec) = ",len(outerloop_pcg_vec)
                   
         if len(outerloop_pcg_vec) == 0:
-           break8
+           break
+
         outerloop_pcg_mean[n] = np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9998])
         outerloop_stef_vec = outerloop_stef_dic[str(N[n])]
 
-        print "len(outerloop_stef_vec) = ",len(outerloop_stef_vec[outerloop_stef_vec<=9998])
+        print "len(outerloop_stef_vec) = ",len(outerloop_stef_vec)
         temp_v = outerloop_stef_vec[outerloop_stef_vec<=9998]
         temp_v = outerloop_stef_vec[temp_v>9000]
         print "len(temp_v) = ",len(temp_v)              
