@@ -260,9 +260,12 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
            break
         
         outerloop_stef_mean[n] = np.median(outerloop_stef_vec[outerloop_stef_vec<=9999])
-        
+
+        print "outerloop_stef_mean = ",outerloop_stef_mean
+                
         outerloop_pcg_std[n] = np.median(np.absolute(outerloop_pcg_vec[outerloop_pcg_vec<=9999] - np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9999])))
         outerloop_stef_std[n] = np.median(np.absolute(outerloop_stef_vec[outerloop_stef_vec<=9999] - np.median(outerloop_stef_vec[outerloop_stef_vec<=9999])))
+        print "outerloop_stef_std = ",outerloop_stef_std 
     
 
     #print "kappa_cg_mad = ",kappa_cg_mad
