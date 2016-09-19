@@ -241,12 +241,20 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     
     for n in xrange(len(N)):
         outerloop_pcg_vec = outerloop_pcg_dic[str(N[n])]
+        
+        print "N = ",N[n]
+        print "len(outerloop_pcg_vec) = ",len(outerloop_pcg_vec[outerloop_pcg_vec<=9999])
+                  
         if len(outerloop_pcg_vec) == 0:
            break
         outerloop_pcg_mean[n] = np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9999])
         outerloop_stef_vec = outerloop_stef_dic[str(N[n])]
+
+        print "len(outerloop_stef_vec) = ",len(outerloop_stef_vec[outerloop_stef_vec<=9999])         
+
         if len(outerloop_stef_vec) == 0:
            break
+        
         outerloop_stef_mean[n] = np.median(outerloop_stef_vec[outerloop_stef_vec<=9999])
         
         outerloop_pcg_std[n] = np.median(np.absolute(outerloop_pcg_vec[outerloop_pcg_vec<=9999] - np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9999])))
@@ -453,6 +461,6 @@ def plot_sparsity():
 
 if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
-   plot_outer_loop(SNR=5)
+   plot_outer_loop(SNR=1000)
    #plot_time()
    #plot_sparsity()
