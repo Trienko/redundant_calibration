@@ -218,6 +218,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
             outer_loop = pickle.load(file_p)
             print "len(outer_loop) = ",len(outer_loop)
             outerloop_pcg_dic[str(N[i])] = np.append(outerloop_pcg_dic[str(N[i])],outer_loop)
+            print "len(outerloop_pcg_dic[str(N[i])]) = ",len(outerloop_pcg_dic[str(N[i])])
             file_p.close()
     
     for k in xrange(k_upper2):
