@@ -140,7 +140,7 @@ Main contributions of the paper:
  **************
  
  \begin{enumerate}
- \item We need the definition of visibilities as in Liu.
+ \item We need the definition of visibilities as in Liu. DEFINE SNR HERE ALREADY together maybe with the sigma value of the noise.
  \item Introduce the array geometery function.
  \item Write down logcal and lincal in matrix form... ?
  \item Short discussion of least squares and jacobian and hessian's. General GN and LM update rules.
@@ -162,7 +162,20 @@ Main contributions of the paper:
  full inverse instead which would hopefully provide enough of a speedup to compensate for the more expensive full-inverse. The algorithm we propose is the conjugate 
  gradient method.
  \item We give the images of the HESSIAN of both lincal and the complex method (number of terms). So we can mention that both are sparse and contain diagonal entries that 
- are more significant than 
+ are more significant than the off-diagonal entries. What linear inversion approach can take advantage of both these phenomenon. One such technique is 
+ cg. 
+ \item Briefly discuss CG and how its computationally bounded by its condition number and its sparsity (how does the diagonal play a role).
+ \item Simulation description
+ \item Will CG improve things?
+ \item Now first discuss the condition
+ number of the Hessian before and after pre-conditioning (pre-codnitioning can only be applied if a good inverse of a matrix is known, if it is known then it can improve 
+ the spectral condition number of a matrix. We present here the kappa and iteration number graphs for the HEXAGONAL layout. Although the
+ \item Now we discuss the sparsity results. 
+ \item Provide a table that theoretical compares R-StEFCal and SPARC.
+ \item Number of outerloop iterations. 
+ \item Timing results.
+ \item Accuracy results.
+ \item Maybe some freq simulations.
  \end{enumerate}
  
  We
