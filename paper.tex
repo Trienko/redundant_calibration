@@ -134,6 +134,30 @@ Main contributions of the paper:
  \item We also mention at this point that in Oleg's paper the question is raised is there a fast way of computing the exact inverse, we then present this new method, which is called
  conjugate gradient method. We discuss the algorithm and the two things which bound its execution time. Which is $kappa$ and $m$ (spectral condition number and its sparsity). Then
  we explore both of these parameters.
+ 
+ **************
+ FLOW OF PAPER
+ **************
+ 
+ \begin{enumerate}
+ \item We need the definition of visibilities as in Liu.
+ \item Introduce the array geometery function.
+ \item Write down logcal and lincal in matrix form... ?
+ \item Short discussion of least squares and jacobian and hessian's. General GN and LM update rules.
+ \item Introduce redundant calibration as a least squares problem.
+ \item Propose a possible solution witch leads to lincal. Mention that this approach works as in this form the function is differentiable (a taylor expansion in the 
+ parameters exists). Maybe mention that we can also divide the problem into real and imaginary etc...
+ \item Show how this relates to lincal for example ---> show lincal is GN.
+ \item Now introduce complex optimization ---> Main motivation for switching to the alternative framework is that the the differentials are very simplistic. We wish to show that
+ we can derive the method of Chengular.
+ \end{enumerate}
+ 
+ We
+ 
+ We neeed LOGCAL and LINCAL in matrix forms
+ 
+ 
+ 
 \end{enumerate} 
 
 %All papers should start with an Introduction section, which sets the work
