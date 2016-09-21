@@ -144,12 +144,25 @@ Main contributions of the paper:
  \item Introduce the array geometery function.
  \item Write down logcal and lincal in matrix form... ?
  \item Short discussion of least squares and jacobian and hessian's. General GN and LM update rules.
- \item Introduce redundant calibration as a least squares problem.
+ \item Introduce redundant calibration as a least squares problem. We will use this general fact to derive both popular methods.
  \item Propose a possible solution witch leads to lincal. Mention that this approach works as in this form the function is differentiable (a taylor expansion in the 
  parameters exists). Maybe mention that we can also divide the problem into real and imaginary etc...
  \item Show how this relates to lincal for example ---> show lincal is GN.
  \item Now introduce complex optimization ---> Main motivation for switching to the alternative framework is that the the differentials are very simplistic. We wish to show that
  we can derive the method of Chengular.
+ \item Do the derivation of Chengular. 
+ \item Brief discussion abouth Chengular and SteFCal and Complex Optimization. Here I show that in Oleg's paper he re-derives an algorithm called SteFCal. Stefcal works
+ on the basis of alternating direction implicit method. The first signs of achieving a similar algorithm already appeared in Stefan's conference paper in which the alternating
+ idea was first proposed. Then I mention Chegular re-derives the expression by using partial derivatives and extends it to redundant. One could also have used the linear alternating
+ approach. In an attempt to merge the terminology that has independently develop in the general calibration and redundant calibration literature and to emphasize the close
+ relationship between Stefcal and the approach derived by I will use the label Redunandat SteFCal (R-Stefcal) to refer to the NLS method proposed by ... Lastly we mention that similarly
+ to how Oleg re-derived stefcal in, we have achieved the same approach.
+ \item Faster Exact inverse. A question that Oleg poses in his paper is, does there exist a faster way to take the exact inverse of JhJ? One that is almost linear, and
+ implies that we can therefore implement the full LM algorithm. The aim here is of course to reduce the number of iterations that are required to converge by using the 
+ full inverse instead which would hopefully provide enough of a speedup to compensate for the more expensive full-inverse. The algorithm we propose is the conjugate 
+ gradient method.
+ \item We give the images of the HESSIAN of both lincal and the complex method (number of terms). So we can mention that both are sparse and contain diagonal entries that 
+ are more significant than 
  \end{enumerate}
  
  We
