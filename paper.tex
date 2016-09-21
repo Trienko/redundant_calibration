@@ -121,6 +121,21 @@ keyword1 -- keyword2 -- keyword3
 
 \section{Introduction}
 
+Main contributions of the paper:
+
+\begin{enumerate}
+ \item Present a general framework which unifies all the techniques developed so far showing they are all related (LINCAL, non-linear estimator, etc ...). They are all non-linear
+ least-squares techniques, i.e. they either employ Gauss-Newton or the Levenberg-Marquardt algorithms. We have to start with LINCAL showing that it is GN, then we have to motivate 
+ why we want to use Oleg's complex optimization framework.
+ \item Use Oleg's complex optimization framework to re-derive the non-linear technique proposed by Marthi and Chengular. The novelty lies, in the fact that by using Oleg's
+ framework we can find analytic expressions for the Jacobian, the Hessian and the Jacobian-residual product (which is not even the case for LINCAL). State that the algorithm is 
+ effectively related to SteFCal and is eff an independent rediscovery of SteFCal and an extension of it into the redundant domain.
+ \item Also we present the array geometry function to help us make the derivations from Marthi and Chengular easier to read and understand for a general layout.
+ \item We also mention at this point that in Oleg's paper the question is raised is there a fast way of computing the exact inverse, we then present this new method, which is called
+ conjugate gradient method. We discuss the algorithm and the two things which bound its execution time. Which is $kappa$ and $m$ (spectral condition number and its sparsity). Then
+ we explore both of these parameters.
+\end{enumerate} 
+
 %All papers should start with an Introduction section, which sets the work
 %in context, cites relevant earlier studies in the field by \citet{Others2013},
 %and describes the problem the authors aim to solve \citep[e.g.][]{Author2012}.
