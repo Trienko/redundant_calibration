@@ -63,6 +63,7 @@
 \newcommand{\bg}{\bmath{g}}
 \newcommand{\bd}{\bmath{d}}
 \newcommand{\bv}{\bmath{v}}
+\newcommand{\bn}{\bmath{n}}
 \newcommand{\by}{\bmath{y}}
 \newcommand{\bJ}{\bmath{J}}
 \newcommand{\bD}{\bmath{D}}
@@ -205,7 +206,41 @@ The thermal noise is normally distributed with a mean of zero and a standard dev
 \sigma = \frac{\sqrt{2}k_{B}T_{\textrm{sys}}}{A\eta\sqrt{\Delta \nu \tau}}, 
 \end{equation}
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
-efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. The  
+efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
+
+Eq can also be re-expressed in vector form 
+\begin{equation}
+\bd = \bv + \bn, 
+\end{equation}
+where 
+where
+\begin{enumerate}
+ \item $\bd$ is the observed visibility vector, i.e. 
+ \begin{equation}
+  \bd = [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q).
+ \end{equation}
+ The vector entry $d_{pq}$ denotes the observed visibility associated with the baseline formed by antenna $p$ and $q$, while $N$ denotes the number or antennas
+ in the array. 
+ \item $\bg = [g_1,g_2,\cdots,g_N]$ represents the instrumental complex antenna gain vector.
+ \item $\bv(\bg)$ denotes the predicted visibility vector, i.e.
+ \begin{equation}
+  \bv(\bg) = [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
+ \end{equation}
+ In Eq... $y_{pq}$ denotes the visibility which was created from a skymodel and is associated with antenna $p$ and $q$. [Need to rw this sentence] 
+\end{enumerate}
+
+The SNR is defined as 
+\begin{equation}
+\textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
+\end{equation}
+where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product.
+
+
+
+
+
+
+
 
 
 and $n_{pq}$ 
