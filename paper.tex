@@ -191,18 +191,21 @@ Main contributions of the paper:
 %and describes the problem the authors aim to solve \citep[e.g.][]{Author2012}.
 
 \section{Visibilities}
-The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
+The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ can be described as
+
 \begin{equation}
 d_{pq} = g_{p}\conj{g}_{q}y_{pq} + n_{pq},
 \end{equation}
-where $g_{p}$ and $g_{q}$ are the direction independent gains respectively associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
-and $n_{pq}$ is the thermal noise. Conjugation is denoted by $\conj{(*)}$. During an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which have 
+where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
+and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which have 
 to be estimated.
 
-The thermal noise has zero-mean and is normally distrubuted with standard deviation  
+The thermal noise is normally distributed with a mean of zero and a standard deviation that is equal to  
 \begin{equation}
- 
+\sigma = \frac{\sqrt{2}k_{B}T_{\textrm{sys}}}{A\eta\sqrt{\Delta \nu \tau}}, 
 \end{equation}
+where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
+efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. The  
 
 
 and $n_{pq}$ 
