@@ -198,7 +198,7 @@ The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ 
 d_{pq} = g_{p}\conj{g}_{q}y_{pq} + n_{pq},
 \end{equation}
 where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
-and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which have 
+and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During the course of an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which infact have 
 to be estimated.
 
 The thermal noise is normally distributed with a mean of zero and a standard deviation that is equal to  
@@ -208,12 +208,31 @@ The thermal noise is normally distributed with a mean of zero and a standard dev
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
 efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-Eq can also be re-expressed in vector form 
+Eq can also be restated in vector form 
 \begin{equation}
 \bd = \bv + \bn, 
 \end{equation}
 where 
-where
+\begin{eqnarray}
+ \bd &=& [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
+ \bv &=& [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
+ \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
+\end{eqnarray}
+
+
+\begin{equation}
+  \bd = [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),
+\end{equation}
+\begin{equation}
+  \bv = [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q)
+\end{equation}
+and
+\begin{equation}
+  \bn = [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
+\end{equation}
+
+
+
 \begin{enumerate}
  \item $\bd$ is the observed visibility vector, i.e. 
  \begin{equation}
