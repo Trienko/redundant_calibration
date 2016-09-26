@@ -209,39 +209,22 @@ The real and imaginary components of the thermal noise is normally distributed w
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
 efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-Eq.~\eqref{eq:vis_definition} can also be expressed in the following vector form 
-\begin{equation}
-\bd = \bv + \bn, 
-\end{equation}
-where 
-\begin{eqnarray}
- \bd &=& [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
- \bv &=& [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
- \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).\label{eq:vec_definitions}
-\end{eqnarray}
-In Eq.~\eqref{eq:vec_definitions}, $N$ denotes the number of antennas in the array.
-
-We will be using the following SNR (signal-to-noise ratio) definition in this paper  
-\begin{equation}
-\textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
-\end{equation}
-where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is similar 
-to the SNR definitions of \citet{Liu2010,Marthi2014}.
-
 \subsection{Redundant Array Geometry Mapping}
 If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
-therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
+therefore also use the following useful indexing strategy: We can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
-Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps antenna indices to the unique redundant baseline indices of the array. This mapping is not symmetric as 
-$\phi_{ij} = 0$ if $i>j$. For an east-west regular array we can construct a simple analytic expression for this mapping:
+Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps composite antenna pairs to the unique redundant baseline indexes of an array. This mapping is not symmetric as 
+$\phi_{ij} = 0$ if $i>j$. It is possible to construct a simple analytic expression for $\phi_{ij}$ when our array is in an east-west regular configuration:
 \begin{equation}
-\widehat{\phi_{ij}} = 
+\phi_{ij} = 
 \begin{cases}
 j-i&\textrm{if}~i<j\\
 0&\textrm{otherwise}
 \end{cases}.
 \end{equation}
-As will become apparent later the following symmetric variant of $\phi_{ij}$ will turn out to be quite useful later on:
+It becomes increasingly more difficult to construct analytic expressions of $\phi_{ij}$ for other more complicated array layouts.
+
+We can also define the following symmetric variant of $\phi_{ij}$:
 \begin{equation}
 \zeta_{ij} = 
 \begin{cases}
@@ -249,7 +232,8 @@ As will become apparent later the following symmetric variant of $\phi_{ij}$ wil
 \phi_{ji}~\textrm{if}~i>j
 \end{cases}.
 \end{equation} 
-It is also crucial to be able to determine the antenna index of the antenna which was used to construct a specific redundant baseline if one is given the other antenna index and the redundant baseline index. This can be calculated via the following two functions:
+If the mapping $\phi_{ij}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline index itself then it is possible 
+to calculate the unknown antenna index. This can be calculated via the following two expressions:
 \begin{equation}
 \xi_{ij} = 
 \begin{cases}
@@ -265,10 +249,36 @@ q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 0~\textrm{otherwise}
 \end{cases}
 \end{equation}
-We use $\xi_{ij}$ to retrieve the index of the second antenna if we know the redundant baseline index and the index of the first antenna used to construct the baseline in question, while we use $\psi_{ij}$ to return the index of the first antenna if we know the 
-index of the second antenna instead. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
-Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
+We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
+a similar result; the second antenna index of the composite antenna pair. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
+
+If the array is redundant and the mapping $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
+\begin{equation}
+\label{eq:vis_red}
+d_{pq} = g_{p}\conj{g}_{q}y_{\phi_{pq}} + n_{pq}.
+\end{equation}
+Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form 
+\begin{equation}
+\bd = \bv + \bn, 
+\end{equation}
+where 
+\begin{eqnarray}
+ \bd &=& [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
+ \bv &=& [g_p y_{\phi_{pq}} \conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
+ \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).\label{eq:vec_definitions}
+\end{eqnarray}
+In Eq.~\eqref{eq:vec_definitions}, $N$ denotes the number of antennas in the array. NB --- above equation is wrong, needs to be baselines ...
+
+We will be using the following SNR (signal-to-noise ratio) definition in this paper  
+\begin{equation}
+\textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
+\end{equation}
+where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is similar 
+to the SNR definitions of \citet{Liu2010,Marthi2014}.
+
+
+
 
 \section{Historical Overview}
 
