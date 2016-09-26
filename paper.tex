@@ -195,20 +195,21 @@ Main contributions of the paper:
 The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ can be described as
 
 \begin{equation}
+\label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g}_{q}y_{pq} + n_{pq},
 \end{equation}
 where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
 and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During the course of an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which infact have 
 to be estimated.
 
-The thermal noise is normally distributed with a mean of zero and a standard deviation that is equal to  
+The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation that is equal to [NB - are the real and imaginary parts defined with same sigma?]  
 \begin{equation}
 \sigma = \frac{\sqrt{2}k_{B}T_{\textrm{sys}}}{A\eta\sqrt{\Delta \nu \tau}}, 
 \end{equation}
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
 efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-Eq can also be restated in vector form 
+Eq.~\eqref{eq:vis_definition} can also be expressed in the following vector form 
 \begin{equation}
 \bd = \bv + \bn, 
 \end{equation}
@@ -216,43 +217,19 @@ where
 \begin{eqnarray}
  \bd &=& [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
  \bv &=& [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q),\nonumber\\
- \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
+ \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).\label{eq:vec_definitions}
 \end{eqnarray}
+In Eq.~\eqref{eq:vec_definitions}, $N$ denotes the number of antennas in the array.
 
-
-\begin{equation}
-  \bd = [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q),
-\end{equation}
-\begin{equation}
-  \bv = [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q)
-\end{equation}
-and
-\begin{equation}
-  \bn = [n_{pq}]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
-\end{equation}
-
-
-
-\begin{enumerate}
- \item $\bd$ is the observed visibility vector, i.e. 
- \begin{equation}
-  \bd = [d_{pq}] \big \} ~ [pq] = 1\cdots N ~ (p<q).
- \end{equation}
- The vector entry $d_{pq}$ denotes the observed visibility associated with the baseline formed by antenna $p$ and $q$, while $N$ denotes the number or antennas
- in the array. 
- \item $\bg = [g_1,g_2,\cdots,g_N]$ represents the instrumental complex antenna gain vector.
- \item $\bv(\bg)$ denotes the predicted visibility vector, i.e.
- \begin{equation}
-  \bv(\bg) = [g_p y_{pq}\conj{g}_q]  \big \} ~ [pq] = 1\cdots N ~ (p<q).
- \end{equation}
- In Eq... $y_{pq}$ denotes the visibility which was created from a skymodel and is associated with antenna $p$ and $q$. [Need to rw this sentence] 
-\end{enumerate}
-
-The SNR is defined as 
+We will be using the following SNR (signal-to-noise ratio) definition in this paper  
 \begin{equation}
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
 \end{equation}
-where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product.
+where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is similar 
+to the SNR definitions that were used in ??,??.
+
+
+
 
 
 
