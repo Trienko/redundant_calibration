@@ -17,6 +17,16 @@
   {mn@eprint@\@tempb}{\@tempb:\@tempc}{\expandafter \expandafter \csname
   mn@eprint@\@tempb\endcsname \expandafter{\@tempc}}}
 
+\bibitem[\protect\citeauthoryear{Liu, Tegmark, Morrison, Lutomirski  \&
+  Zaldarriaga}{Liu et~al.}{2010}]{Liu2010}
+Liu A.,  Tegmark M.,  Morrison S.,  Lutomirski A.,   Zaldarriaga M.,  2010,
+  Monthly Notices of the Royal Astronomical Society, 408, 1029
+
+\bibitem[\protect\citeauthoryear{Marthi \& Chengalur}{Marthi \&
+  Chengalur}{2014}]{Marthi2014}
+Marthi V.~R.,  Chengalur J.,  2014, Monthly Notices of the Royal Astronomical
+  Society, 437, 524
+
 \bibitem[\protect\citeauthoryear{Smirnov \& Tasse}{Smirnov \&
   Tasse}{2015}]{Smirnov2015}
 Smirnov O.,  Tasse C.,  2015, MNRAS, 449, 2668
