@@ -228,21 +228,47 @@ We will be using the following SNR (signal-to-noise ratio) definition in this pa
 where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is similar 
 to the SNR definitions of \citet{Liu2010,Marthi2014}.
 
+\subsection{Redundant Array Geometry Mapping}
+If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
+therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
+Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps antenna indices to the unique redundant baseline indices of the array. This mapping is not symmetric as 
+$\phi_{ij} = 0$ if $i>j$. For an east-west regular array we can construct a simple analytic expression for this mapping:
+\begin{equation}
+\widehat{\phi_{ij}} = 
+\begin{cases}
+j-i&\textrm{if}~i<j\\
+0&\textrm{otherwise}
+\end{cases}.
+\end{equation}
+As will become apparent later the following symmetric variant of $\phi_{ij}$ will turn out to be quite useful later on:
+\begin{equation}
+\zeta_{ij} = 
+\begin{cases}
+\phi_{ij}~\textrm{if}~i\leq j\\
+\phi_{ji}~\textrm{if}~i>j
+\end{cases}.
+\end{equation} 
+It is also crucial to be able to determine the antenna index of the antenna which was used to construct a specific redundant baseline if one is given the other antenna index and the redundant baseline index. This can be calculated via the following two functions:
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+0~\textrm{otherwise}
+\end{cases},
+\end{equation}
+and
+\begin{equation}
+\psi_{ij} = 
+\begin{cases}
+q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
+We use $\xi_{ij}$ to retrieve the index of the second antenna if we know the redundant baseline index and the index of the first antenna used to construct the baseline in question, while we use $\psi_{ij}$ to return the index of the first antenna if we know the 
+index of the second antenna instead. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
-
-
-
-
-
-
-
-
-
-
-
-and $n_{pq}$ 
-zero-mean gaussian noise representing thermal noise. 
+Describe complex optimization, Jacobian, Hessian etc... Benefits drawbacks compared to LINCAL... etc..
 
 \section{Historical Overview}
 
