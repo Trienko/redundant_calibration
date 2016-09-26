@@ -304,6 +304,7 @@ class sim():
     
           plt.ylim(-1.1*m,1.1*m)
           plt.xlim(-1.1*m,1.1*m)
+          plt.tight_layout()
           plt.show() 
 
       '''
@@ -953,8 +954,34 @@ def example_usage():
     s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
     s.plot_visibilities([0,1],M,"r",s=True)
 
+def plot_paper_layouts():
+    s = sim(layout="HEX",order=5) #INSTANTIATE OBJECT
+    s.generate_antenna_layout()
+    s.plot_ant(title="HEX")
+    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+    s.plot_zeta(zeta,10,10,14,'jet') 
+    print "s.L = ",s.L
+    print "s.N = ",s.N
+
+    s = sim(layout="SQR",order=10) #INSTANTIATE OBJECT
+    s.generate_antenna_layout()
+    s.plot_ant(title="SQR")
+    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+    s.plot_zeta(zeta,10,10,14,'jet')
+    print "s.L = ",s.L
+    print "s.N = ",s.N
+
+    s = sim(layout="REG",order=100) #INSTANTIATE OBJECT
+    s.generate_antenna_layout()
+    s.plot_ant(title="REG")
+    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+    s.plot_zeta(zeta,10,10,14,'jet')
+    print "s.L = ",s.L
+    print "s.N = ",s.N
+
 if __name__ == "__main__":
-   example_usage()
+   #example_usage()
+   plot_paper_layouts()
    
    
 
