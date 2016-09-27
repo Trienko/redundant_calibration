@@ -39,7 +39,10 @@
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
 \usepackage{graphicx}
+\usepackage{mathtools}
+
 \newcommand{\bz}{\bmath{z}}
+\newcommand{\bA}{\bmath{A}}
 \newcommand{\br}{\bmath{r}}
 \newcommand{\bg}{\bmath{g}}
 \newcommand{\bd}{\bmath{d}}
@@ -49,6 +52,18 @@
 \newcommand{\bJ}{\bmath{J}}
 \newcommand{\bD}{\bmath{D}}
 \newcommand{\conj}[1]{\overline{#1}}
+
+\newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}^{\mbox{$#1$}}}}#2} 
+
+\newcommand\coolunder[2]{\mathrlap{\smash{\underbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}_{\mbox{$#1$}}}}#2}
+
+\newcommand\coolleftbrace[2]{%
+#1\left\{\vphantom{\begin{matrix} #2 \end{matrix}}\right.}
+
+\newcommand\coolrightbrace[2]{%
+\left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title[Unknown]{TBD}
@@ -160,7 +175,7 @@ efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the
 
 \subsection{Redundant Array Geometry Function}
 If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
-therefore also use the following useful indexing strategy: We can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
+therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
 Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the function that maps composite antenna pairs to the unique redundant baseline indexes of an array. We refer to this function 
 as the redundant array geometry function in this paper. This mapping is not symmetric as 
@@ -172,7 +187,7 @@ $\phi_{ij} = 0$ if $i>j$. We can also define the following symmetric variant of 
 \phi_{ji}~\textrm{if}~i>j
 \end{cases}.
 \end{equation} 
-It is possible to construct a simple analytic expression for $\zeta_{ij}$ when our array is in an east-west regular configuration: $\zeta_{ij} = |j-i|$. 
+It is possible to construct a simple analytic expression for $\zeta_{ij}$ when our array is in an east-west regular configuration, namely $\zeta_{ij} = |j-i|$. 
 It becomes increasingly more difficult to construct analytic expressions of $\zeta_{ij}$ for other more complicated array layouts. The empirically constructed symmetric geometry
 functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{ij}$ with $\mathcal{R}(\zeta_{ij})$. The maximal element 
 that $\zeta_{ij}$ can ascertain is denoted by $L$ and can be construed as the maximal number of unique redundant baselines which can be formed for a given 
@@ -198,11 +213,11 @@ matrices are $N\times N$, where $N$ denotes the number of antennas in the array.
 \caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
 In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
 to construct the the hexagonal layout, while a 100 antennas where used in the square and east-west layouts. The maximal amount of redundant baselines that can be formed for 
-the hexagonal, square and east-west layouts which are depicted in the top panel are 165, 180 and 99 respectively.\label{fig:geometry_function}}
+the hexagonal, square and east-west layouts in the top panel are 165, 180 and 99 baselines respectively.\label{fig:geometry_function}}
 \end{figure*}
 
-If the mapping $\phi_{ij}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline index itself then it is possible 
-to calculate the unknown antenna index. This can be calculated via the following two expressions:
+If the function $\phi_{ij}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline index itself then it is possible 
+to calculate the unknown antenna index. This can be computed via the following two expressions:
 \begin{equation}
 \xi_{ij} = 
 \begin{cases}
@@ -221,7 +236,8 @@ q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
 a similar result; the second antenna index of the composite antenna pair. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
-If the array is redundant and the mapping $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
+\subsection{Signal-to-noise Ratio}
+If the array is redundant and the function $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
 \begin{equation}
 \label{eq:vis_red}
 d_{pq} = g_{p}\conj{g}_{q}y_{\phi_{pq}} + n_{pq}.
@@ -242,8 +258,41 @@ We will be using the following SNR (signal-to-noise ratio) definition in this pa
 \begin{equation}
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
 \end{equation}
-where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is similar 
-to the SNR definitions of \citet{Liu2010,Marthi2014}.
+where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
+
+\subsection{LOGCAL}
+One of the best known algorithms that is currently used to perform redundant calibration involves the use of logarithms. If we ignore the noise term then we can 
+rewrite Eq.~\eqref{eq:vis_red} as
+\begin{eqnarray}
+\ln |d_{ij}| &=& \ln |g_i| + \ln |g_j| + \ln |y_{\phi_{ij}}| \label{eq:logcal_amp}\\
+\angle d_{ij} &=& \angle g_i - \angle g_j + \angle \phi_{ij} \label{eq:logcal_phase}
+\end{eqnarray}
+
+We can easily express Eq.~\eqref{eq:logcal_amp} with the following linear system
+\begin{equation}
+\widetilde{\bd} = \bA\bz, 
+\end{equation}
+which has the following least-squares solution
+\begin{equation}
+\bz = (\bA^T\bA)^{-1}\bA^T\widetilde{\bd},
+\end{equation}
+where
+\begin{equation}
+\widetilde{\bd} = [\ln |d_{pq}|] \big \} ~ [pq] = 1\cdots B ~ (p<q),\nonumber\\ 
+\end{equation}
+and
+\begin{equation}
+\bA = 
+\begin{bmatrix}
+\coolover{{\scriptstyle j=1,\ldots,N}}{1^j_p\vee1^j_q} & \coolover{{\scriptstyle k=1,\ldots,L}\!\!\!\!}{~1_{\phi_{pq}}^k}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{1_{\phi_{pq}}^k}{[pq] = 1,\ldots,B~(p<q)}
+\end{matrix}.
+\end{equation}
+
+
+
 
 \bibliographystyle{mn2e}
 \bibliography{paper}
