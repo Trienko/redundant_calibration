@@ -158,22 +158,13 @@ The real and imaginary components of the thermal noise is normally distributed w
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
 efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-\subsection{Redundant Array Geometry Mapping}
+\subsection{Redundant Array Geometry Function}
 If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
 therefore also use the following useful indexing strategy: We can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
-Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the mapping that maps composite antenna pairs to the unique redundant baseline indexes of an array. This mapping is not symmetric as 
-$\phi_{ij} = 0$ if $i>j$. It is possible to construct a simple analytic expression for $\phi_{ij}$ when our array is in an east-west regular configuration:
-\begin{equation}
-\phi_{ij} = 
-\begin{cases}
-j-i&\textrm{if}~i<j\\
-0&\textrm{otherwise}
-\end{cases}.
-\end{equation}
-It becomes increasingly more difficult to construct analytic expressions of $\phi_{ij}$ for other more complicated array layouts.
-
-We can also define the following symmetric variant of $\phi_{ij}$:
+Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the function that maps composite antenna pairs to the unique redundant baseline indexes of an array. We refer to this function 
+as the redundant array geometry function in this paper. This mapping is not symmetric as 
+$\phi_{ij} = 0$ if $i>j$. We can also define the following symmetric variant of $\phi_{ij}$:
 \begin{equation}
 \zeta_{ij} = 
 \begin{cases}
@@ -181,6 +172,13 @@ We can also define the following symmetric variant of $\phi_{ij}$:
 \phi_{ji}~\textrm{if}~i>j
 \end{cases}.
 \end{equation} 
+It is possible to construct a simple analytic expression for $\zeta_{ij}$ when our array is in an east-west regular configuration: $\zeta_{ij} = |j-i|$. 
+It becomes increasingly more difficult to construct analytic expressions of $\zeta_{ij}$ for other more complicated array layouts. The empirically constructed symmetric geometry
+functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{ij}$ with $\mathcal{R}(\zeta_{ij})$. The maximal element 
+that $\zeta_{ij}$ can ascertain is denoted by $L$ and can be construed as the maximal number of unique redundant baselines which can be formed for a given 
+array layout. Alternatively, we can interpret the symmetric geometry functions 
+in Fig.~\ref{fig:geometry_function} as matrices. In this alternative paradigm, $\zeta_{ij}$ denotes a matrix entry instead. The dimension of these so called geometry 
+matrices are $N\times N$, where $N$ denotes the number of antennas in the array. 
 
 \begin{figure*}
 \centering
@@ -197,8 +195,10 @@ We can also define the following symmetric variant of $\phi_{ij}$:
 {\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
 \subfigure[Regular east-west: $\zeta_{pq}$]
 {\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
-\caption{In the top panel we have three different redundant antenna layouts. In the bottom panel we have the symmetric redundancy geometry mapping $\zeta_{ij}$
-of each of the layouts in the top panel.}
+\caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
+In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
+to construct the the hexagonal layout, while a 100 antennas where used in the square and east-west layouts. The maximal amount of redundant baselines that can be formed for 
+the hexagonal, square and east-west layouts which are depicted in the top panel are 165, 180 and 99 respectively.\label{fig:geometry_function}}
 \end{figure*}
 
 If the mapping $\phi_{ij}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline index itself then it is possible 
@@ -218,8 +218,7 @@ q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 0~\textrm{otherwise}
 \end{cases}
 \end{equation}
-
-We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
+We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
 a similar result; the second antenna index of the composite antenna pair. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
 If the array is redundant and the mapping $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
