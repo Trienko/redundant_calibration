@@ -301,9 +301,12 @@ Moreover, $(*)^T$ denotes the transpose of its operand, $(*)^{-1}$ denotes matri
 A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.
 
 \subsection{LINCAL}
+Assume that $\eta_i,\eta_j,\eta_{\phi_{ij}},\varphi_i,\varphi_j$ and $\varphi_{\phi_{ij}}$ are real valued variables.
+Let us once again ignore the noise term of Eq.~\eqref{eq:vis_red}. Substituting $g_i$ with $e^{\eta_i - i \varphi_i}$, $g_j$ with $e^{\eta_j - i \varphi_j}$ and $y_{\phi_{ij}}$ with $e^{\eta_{\phi_{ij}}- i \varphi_{\phi_{ij}}}$ in Eq.~\eqref{eq:vis_red} results in  
 \begin{equation}
-c_{ij} = y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
+d_{ij} =  e^{\eta_i - i \varphi_i} e^{\eta_{\phi_{ij}}- i \varphi_{\phi_{ij}}} e^{\eta_j + i \varphi_j}.
 \end{equation}
+The following partial derivatives are easily computed
 
 \begin{eqnarray}
 \frac{c_{ij}}{\partial \eta_i} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
@@ -312,6 +315,7 @@ c_{ij} = y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
 \frac{c_{ij}}{\partial \varphi_j} &=&  i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
 \frac{y_{i-j}}{\partial \varphi_j} &=&  e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
 \end{eqnarray}
+
 
 The Wirtinger derivative is used in the last equation.
 
