@@ -278,18 +278,30 @@ which has the following least-squares solution
 \end{equation}
 where
 \begin{equation}
-\widetilde{\bd} = [\ln |d_{pq}|] \big \} ~ [pq] = 1\cdots B ~ (p<q),\nonumber\\ 
+\widetilde{\bd} = [\ln |d_{pq}|] \big \} ~ [pq] = 1,\cdots,B ~ (p<q),\nonumber\\ 
 \end{equation}
 and
 \begin{equation}
 \bA = 
 \begin{bmatrix}
-\coolover{{\scriptstyle j=1,\ldots,N}}{1^j_p\vee1^j_q} & \coolover{{\scriptstyle k=1,\ldots,L}\!\!\!\!}{~1_{\phi_{pq}}^k}
+\coolover{{\scriptstyle j=1,\ldots,N}}{\delta^j_p\vee\delta^j_q} & \coolover{{\scriptstyle k=1,\ldots,L}\!\!\!\!}{~\delta_{\phi_{pq}}^k}
 \end{bmatrix}
 \begin{matrix}% matrix for right braces 
-\coolrightbrace{1_{\phi_{pq}}^k}{[pq] = 1,\ldots,B~(p<q)}
+\coolrightbrace{\delta_{\phi_{pq}}^k}{[pq] = 1,\ldots,B~(p<q)}
 \end{matrix}.
 \end{equation}
+
+Moreover, $(*)^T$ denotes the transpose of its operand, $(*)^{-1}$ denotes matrix inversion, $\vee$ denotes the logical or operator and
+\begin{equation}
+\delta_y^x  = \begin{cases}
+          1 & \textrm{if}~x=y\\
+          0 & \textrm{otherwise}
+         \end{cases}.
+\end{equation}
+A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.
+
+\subsection{LINCAL}
+
 
 
 
