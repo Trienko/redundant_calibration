@@ -51,6 +51,8 @@
 \newcommand{\by}{\bmath{y}}
 \newcommand{\bJ}{\bmath{J}}
 \newcommand{\bD}{\bmath{D}}
+\newcommand{\bN}{\bmath{N}}
+\newcommand{\bM}{\bmath{M}}
 \newcommand{\conj}[1]{\overline{#1}}
 
 \newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
@@ -301,11 +303,94 @@ Moreover, $(*)^T$ denotes the transpose of its operand, $(*)^{-1}$ denotes matri
 A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.
 
 \subsection{LINCAL}
-Assume that $\eta_i,\eta_j,\eta_{\phi_{ij}},\varphi_i,\varphi_j$ and $\varphi_{\phi_{ij}}$ are real valued variables.
-Let us once again ignore the noise term of Eq.~\eqref{eq:vis_red}. Substituting $g_i$ with $e^{\eta_i - i \varphi_i}$, $g_j$ with $e^{\eta_j - i \varphi_j}$ and $y_{\phi_{ij}}$ with $e^{\eta_{\phi_{ij}}- i \varphi_{\phi_{ij}}}$ in Eq.~\eqref{eq:vis_red} results in  
+Assume that $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$ are real valued variables.
+Substituting $g_i$ with $e^{\eta_i - i \varphi_i}$, $g_j$ with $e^{\eta_j - i \varphi_j}$ and $y_{\phi_{ij}}$ with $e^{\eta_{\widetilde{\phi}_{ij}}- i \widetilde{\varphi}_{\phi_{ij}}}$ in Eq.~\eqref{eq:vis_red} results in  
 \begin{equation}
-d_{ij} =  e^{\eta_i - i \varphi_i} e^{\eta_{\phi_{ij}}- i \varphi_{\phi_{ij}}} e^{\eta_j + i \varphi_j}.
+\label{eq:lincal}
+d_{ij} =  e^{\eta_i - i \varphi_i} e^{\widetilde{\eta}_{\phi_{ij}}- i \widetilde{\varphi}_{\phi_{ij}}} e^{\eta_j + i \varphi_j} + n_{ij}.
 \end{equation}
+
+A possible approach one can use to solve the unknowns in Eq.~\eqref{eq:lincal} is to write down the Taylor expansion of the first term of the right hand side of Eq.~\eqref{eq:lincal} around some 
+initial fiducial guess of $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$, which we denote with 
+$\eta_i^0,\eta_j^0,\widetilde{\eta}_{\phi_{ij}}^0,\varphi_i^0,\varphi_j^0$ and $\widetilde{\varphi}_{\phi_{ij}}^0$, and then to solve the perturbations from this 
+initial guess that minimize the difference between the right and left hand side of Eq.~\eqref{eq:lincal}. Once the perturbation values 
+have been computed it is trivial to obtain an estimate of $g_i$, $g_j$ and $y_{\phi_{ij}}$. 
+
+If we Taylor expand the first term on the right hand side of Eq.~\eqref{eq:lincal} around a fiducial initial guess we obtain
+\begin{equation}
+\label{eq:taylor_expansion}
+d_{ij} = v_{ij}^0[1+\Delta \eta_i + \Delta \eta_j + i \varphi_i - i \Delta \varphi_j + \Delta \widetilde{\eta}_{\phi_{ij}} + i\Delta \widetilde{\eta}_{\phi_{ij}}] + n_{ij}, 
+\end{equation}
+where
+\begin{equation}
+v_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\widetilde{\eta}_{\phi_{ij}}^0 - i \widetilde{\varphi}_{\phi_{ij}}^0} e^{\eta_j^0 + i \varphi_j^0}, 
+\end{equation}
+and $\eta_i^0,\eta_j^0,\widetilde{\eta}_{\phi_{ij}}^0,\varphi_i^0,\varphi_j^0$ and $\widetilde{\varphi}_{\phi_{ij}}^0$ respectively denote the initial guess for $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$.
+Eq.~\eqref{eq:taylor_expansion} can be used to construct the following linear system
+\begin{equation}
+\breve{\br} = \bJ\Delta\widetilde{\bz}, 
+\end{equation}
+where 
+\begin{equation}
+\breve{\br} = [d_{ij}-v_{ij}^0] \big \} ~ [ij] = 1\cdots 2B, 
+\end{equation}
+\begin{equation}
+\label{eq:jac_lincal}
+\bJ = \begin{bmatrix}
+      \bN & \bM\\
+      \conj{\bN} & \conj{\bM}
+      \end{bmatrix}
+\end{equation}
+and
+\begin{equation}
+\Delta\widetilde{\bz} = 
+\begin{bmatrix}
+\Delta \eta_i \\
+\Delta \varphi_j \\
+\Delta \widetilde{\eta}_k \\
+\Delta \widetilde{\varphi}_l \\
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\eta_i}{i = 1\cdots N}\\
+\coolrightbrace{\eta_i}{j = 1\cdots N}\\
+\coolrightbrace{\eta_i}{k = 1\cdots L}\\
+\coolrightbrace{\eta_i}{l = 1 \cdots L}
+\end{matrix}.
+\end{equation}
+
+In Eq.~\eqref{eq:jac_lincal} 
+
+\begin{eqnarray}
+\bN &=& 
+\begin{bmatrix}
+\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{\frac{\partial v_{pq}}{\partial \eta_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{~\frac{\partial v_{pq}}{\partial \varphi_k}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+&=& \begin{bmatrix}
+\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{n_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{(-1)^{\delta_q^k}i n_{k,pq}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+\end{eqnarray}
+
+Moreover,
+\begin{equation}
+n_{j,pq} = (\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq} 
+\end{equation}
+
+
+
+
+
+
+
+
+
+fiducial initial guess 
+
 The following partial derivatives are now easily computed
 
 \begin{eqnarray}
