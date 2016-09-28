@@ -376,68 +376,80 @@ In Eq.~\eqref{eq:jac_lincal}
 \end{matrix}\\
 \end{eqnarray}
 
+\begin{eqnarray}
+\bM &=& 
+\begin{bmatrix}
+\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,L}}{\frac{\partial v_{pq}}{\partial \widetilde{\eta}_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,L}}{~\frac{\partial v_{pq}}{\partial \widetilde{\varphi}_k}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+&=& \begin{bmatrix}
+\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{m_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{i m_{k,pq}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+\end{eqnarray}
+
 Moreover,
 \begin{equation}
 n_{j,pq} = (\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq} 
 \end{equation}
-
-
-
-
-
-
-
-
-
-fiducial initial guess 
-
-The following partial derivatives are now easily computed
-
-\begin{eqnarray}
-\frac{c_{ij}}{\partial \eta_i} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
-\frac{c_{ij}}{\partial \varphi_i} &=&  -i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
-\frac{c_{ij}}{\partial \eta_j} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
-\frac{c_{ij}}{\partial \varphi_j} &=&  i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
-\frac{y_{i-j}}{\partial \varphi_j} &=&  e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
-\end{eqnarray}
-
-
-The Wirtinger derivative is used in the last equation.
-
-\begin{eqnarray}
-c_{ij} &\approx& c_{ij}^0 + \Delta \eta_i(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) + \Delta \eta_j(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-&& -i\Delta\varphi_i (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) +i\Delta\varphi_j (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-&& y_{i-j}^1(y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-&\approx&  c_{ij}^0 + e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i))
-\end{eqnarray}
-
+and
 \begin{equation}
-\label{eq:residual}
-r_{ij} = \delta_{ij} = c_{ij}-c_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i)) 
+m_{j,pq} = \delta_{\phi_{pq}}^{j} v_{pq}.
 \end{equation}
 
-Eq.~\ref{eq:residual} allows us to construct the following linear system:
-
-\begin{equation}
-\boldsymbol{J}[\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = \boldsymbol{r}, 
-\end{equation}
-
-where $\boldsymbol{J}$ is equal to 
-\begin{equation}
-\boldsymbol{J} = \bigg [\overbrace{\frac{c_{pq}}{\partial \eta_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial \varphi_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial y_{t}}}^{t=1\cdots r_s} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q) 
-\end{equation}
-or
-\begin{equation}
-\boldsymbol{J} = \bigg [\frac{c_{pq}}{\partial \boldsymbol{\eta}},~\frac{c_{pq}}{\partial \boldsymbol{\varphi}},~\frac{c_{pq}}{\partial \boldsymbol{y}} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q). 
-\end{equation}
-
-The last column is again a Wirtinger derivative.
-
-Which means we can obtain the least-squares estimate as follows:
-
-\begin{equation}
-[\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = [\boldsymbol{J}^H\boldsymbol{J}]^{-1}\boldsymbol{J}^H\boldsymbol{r}.
-\end{equation}
+% fiducial initial guess 
+% 
+% The following partial derivatives are now easily computed
+% 
+% \begin{eqnarray}
+% \frac{c_{ij}}{\partial \eta_i} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
+% \frac{c_{ij}}{\partial \varphi_i} &=&  -i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
+% \frac{c_{ij}}{\partial \eta_j} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
+% \frac{c_{ij}}{\partial \varphi_j} &=&  i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
+% \frac{y_{i-j}}{\partial \varphi_j} &=&  e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
+% \end{eqnarray}
+% 
+% 
+% The Wirtinger derivative is used in the last equation.
+% 
+% \begin{eqnarray}
+% c_{ij} &\approx& c_{ij}^0 + \Delta \eta_i(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) + \Delta \eta_j(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+% && -i\Delta\varphi_i (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) +i\Delta\varphi_j (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+% && y_{i-j}^1(y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
+% &\approx&  c_{ij}^0 + e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i))
+% \end{eqnarray}
+% 
+% \begin{equation}
+% \label{eq:residual}
+% r_{ij} = \delta_{ij} = c_{ij}-c_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i)) 
+% \end{equation}
+% 
+% Eq.~\ref{eq:residual} allows us to construct the following linear system:
+% 
+% \begin{equation}
+% \boldsymbol{J}[\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = \boldsymbol{r}, 
+% \end{equation}
+% 
+% where $\boldsymbol{J}$ is equal to 
+% \begin{equation}
+% \boldsymbol{J} = \bigg [\overbrace{\frac{c_{pq}}{\partial \eta_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial \varphi_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial y_{t}}}^{t=1\cdots r_s} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q) 
+% \end{equation}
+% or
+% \begin{equation}
+% \boldsymbol{J} = \bigg [\frac{c_{pq}}{\partial \boldsymbol{\eta}},~\frac{c_{pq}}{\partial \boldsymbol{\varphi}},~\frac{c_{pq}}{\partial \boldsymbol{y}} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q). 
+% \end{equation}
+% 
+% The last column is again a Wirtinger derivative.
+% 
+% Which means we can obtain the least-squares estimate as follows:
+% 
+% \begin{equation}
+% [\boldsymbol{\Delta \eta},\boldsymbol{\Delta \varphi},\boldsymbol{\Delta y}]^T = [\boldsymbol{J}^H\boldsymbol{J}]^{-1}\boldsymbol{J}^H\boldsymbol{r}.
+% \end{equation}
 
 
 
