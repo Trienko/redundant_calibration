@@ -401,6 +401,33 @@ and
 m_{j,pq} = \delta_{\phi_{pq}}^{j} v_{pq}.
 \end{equation}
 
+\section{Least Squares}
+Scalar redundant calibration can be achieved by solving the following optimization problem
+\begin{equation}
+\min_{\bg,\by} \|\bd - \bv(\bg,\by)\|. 
+\end{equation}
+The most standard way of solving a least squares method is to use a gradient type of minimization algorithm to iteratively perturb the parameters so that the ... minimize the 
+difference between observed and predicted visibilities. The gradient based minimization algorithms generally requires the model $\bv$ to be differentiable
+towards each unknown. When the problem is complex, which is the case for Eq..., it becomes difficult to directly apply gradient methods to such problems. The reason being,
+many complex functions are not analytic nor differentiable (no Taylor expansion exists) if we use classical definitions. For instance if the 
+classical definition of differentiaton is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
+
+The standard way of avoiding such complications is to divide the problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+Recently cite the complex paper has proposed to extend the problem into [RW HERE NEED TO STATE BETTER] its conjugate domain and then to solve for the parameters and there complex conjugates. This can be accomplished
+if we introduce Wirtinger derivatives. (I have to look into how to write this better).
+
+The solution to Eq. can now be obtained by using a gradient type of minimization algorithm, like GN and LM. 
+
+The GN update rule is given by\\
+
+GN UPDATE RULE
+
+
+
+
+
+
+
 % fiducial initial guess 
 % 
 % The following partial derivatives are now easily computed
