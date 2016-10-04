@@ -66,6 +66,43 @@
 
 \newcommand\coolrightbrace[2]{%
 \left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
+
+%MATRIX
+% Load TikZ
+\usepackage{tikz}
+\usetikzlibrary{matrix,decorations.pathreplacing,calc}
+
+% Set various styles for the matrices and braces. It might pay off to fiddle around with the values a little bit
+\pgfkeys{tikz/mymatrixenv/.style={decoration=brace,every left delimiter/.style={xshift=3pt},every right delimiter/.style={xshift=-3pt}}}
+\pgfkeys{tikz/mymatrix/.style={matrix of math nodes,left delimiter=[,right delimiter={]},inner sep=2pt,column sep=1em,row sep=0.5em,nodes={inner sep=0pt}}}
+\pgfkeys{tikz/mymatrixbrace/.style={decorate,thick}}
+\newcommand\mymatrixbraceoffseth{0.5em}
+\newcommand\mymatrixbraceoffsetv{0.2em}
+
+% Now the commands to produce the braces. (I'll explain below how to use them.)
+\newcommand*\mymatrixbraceright[4][m]{
+    \draw[mymatrixbrace] ($(#1.north west)!(#1-#3-1.south west)!(#1.south west)-(\mymatrixbraceoffseth,0)$)
+        -- node[left=2pt] {#4} 
+        ($(#1.north west)!(#1-#2-1.north west)!(#1.south west)-(\mymatrixbraceoffseth,0)$);
+}
+\newcommand*\mymatrixbraceleft[4][m]{
+    \draw[mymatrixbrace] ($(#1.north east)!(#1-#2-1.north east)!(#1.south east)+(\mymatrixbraceoffseth,0)$)
+        -- node[right=2pt] {#4} 
+        ($(#1.north east)!(#1-#3-1.south east)!(#1.south east)+(\mymatrixbraceoffseth,0)$);
+}
+\newcommand*\mymatrixbracetop[4][m]{
+    \draw[mymatrixbrace] ($(#1.north west)!(#1-1-#2.north west)!(#1.north east)+(0,\mymatrixbraceoffsetv)$)
+        -- node[above=2pt] {#4} 
+        ($(#1.north west)!(#1-1-#3.north east)!(#1.north east)+(0,\mymatrixbraceoffsetv)$);
+}
+\newcommand*\mymatrixbracebottom[4][m]{
+    \draw[mymatrixbrace] ($(#1.south west)!(#1-1-#3.south east)!(#1.south east)-(0,\mymatrixbraceoffsetv)$)
+        -- node[below=2pt] {#4} 
+        ($(#1.south west)!(#1-1-#2.south west)!(#1.south east)-(0,\mymatrixbraceoffsetv)$);
+}
+
+%%END MATRIX
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title[Unknown]{TBD}
@@ -249,12 +286,22 @@ Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form
 \bd = \bv + \bn, 
 \end{equation}
 where 
-\begin{eqnarray}
- \bd &=& [d_{pq}] \big \} ~ [pq] = 1\cdots B ~ (p<q),\nonumber\\
- \bv &=& [g_p y_{\phi_{pq}} \conj{g}_q]  \big \} ~ [pq] = 1\cdots B ~ (p<q),\nonumber\\
- \bn &=& [n_{pq}]  \big \} ~ [pq] = 1\cdots B ~ (p<q).\label{eq:vec_definitions}
-\end{eqnarray}
-In Eq.~\eqref{eq:vec_definitions}, $B$ denotes the number of baselines in the array.
+\begin{align}
+ \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g}_q\nonumber\\
+ \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
+\end{align}
+In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$, which denotes the number of baselines in the array. Moreover,
+\begin{equation}
+\alpha_{pq} =
+\begin{cases}
+(q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
+0 & \textrm{otherwise}
+\end{cases}.
+\end{equation}
+The easiest way to construct the vectors in Eq.~\ref{eq:vec_definitions} is to enumerate through the composite indexes $pq$ in the following order $12, 13,\cdots,1N,23,\cdots$.
+For each composite index we then compute the right hand side of the appropriate equation in Eq.~\ref{eq:vec_definitions} which we then need to assign to the 
+correct position in the vector. The correct position is calculated with $\alpha_{pq}$. Using the aforementioned order, however, allows you to fill the array in numerical order, i.e. $12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B$.  
+
 
 We will be using the following SNR (signal-to-noise ratio) definition in this paper  
 \begin{equation}
@@ -422,6 +469,45 @@ The GN update rule is given by\\
 
 GN UPDATE RULE
 
+
+\begin{equation}
+\begin{tikzpicture}[mymatrixenv]
+    \matrix[mymatrix] (m)  {
+        a & b & c & d \\
+        e & f & g & h \\
+        i & j & k & l \\
+        m & n & o & p \\
+    };
+    \mymatrixbraceright{1}{3}{$A$}
+    \mymatrixbracetop{2}{4}{$R$}
+\end{tikzpicture}
+\end{equation}
+
+\begin{equation}
+\begin{tikzpicture}[mymatrixenv]
+    \matrix[mymatrix] (m)  {
+        \frac{\partial v_{pq}}{\partial \eta_j} & \frac{\partial v_{pq}}{\partial \varphi_k}\\
+    };
+    \mymatrixbraceleft{1}{1}{A}
+    \mymatrixbracetop{2}{2}{$j=1,\ldots,N$}
+\end{tikzpicture}
+\end{equation}
+
+\begin{eqnarray}
+\bN &=& 
+\begin{bmatrix}
+\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{\frac{\partial v_{pq}}{\partial \eta_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{~\frac{\partial v_{pq}}{\partial \varphi_k}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+&=& \begin{bmatrix}
+\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{n_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{(-1)^{\delta_q^k}i n_{k,pq}}
+\end{bmatrix}
+\begin{matrix}% matrix for right braces 
+\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
+\end{matrix}\\
+\end{eqnarray}
 
 
 
