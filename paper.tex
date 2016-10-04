@@ -39,7 +39,6 @@
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
 \usepackage{graphicx}
-\usepackage{mathtools}
 
 \newcommand{\bz}{\bmath{z}}
 \newcommand{\bA}{\bmath{A}}
@@ -54,54 +53,6 @@
 \newcommand{\bN}{\bmath{N}}
 \newcommand{\bM}{\bmath{M}}
 \newcommand{\conj}[1]{\overline{#1}}
-
-\newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
-    \begin{matrix} #2 \end{matrix}}}^{\mbox{$#1$}}}}#2} 
-
-\newcommand\coolunder[2]{\mathrlap{\smash{\underbrace{\phantom{%
-    \begin{matrix} #2 \end{matrix}}}_{\mbox{$#1$}}}}#2}
-
-\newcommand\coolleftbrace[2]{%
-#1\left\{\vphantom{\begin{matrix} #2 \end{matrix}}\right.}
-
-\newcommand\coolrightbrace[2]{%
-\left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
-
-%MATRIX
-% Load TikZ
-\usepackage{tikz}
-\usetikzlibrary{matrix,decorations.pathreplacing,calc}
-
-% Set various styles for the matrices and braces. It might pay off to fiddle around with the values a little bit
-\pgfkeys{tikz/mymatrixenv/.style={decoration=brace,every left delimiter/.style={xshift=3pt},every right delimiter/.style={xshift=-3pt}}}
-\pgfkeys{tikz/mymatrix/.style={matrix of math nodes,left delimiter=[,right delimiter={]},inner sep=2pt,column sep=1em,row sep=0.5em,nodes={inner sep=0pt}}}
-\pgfkeys{tikz/mymatrixbrace/.style={decorate,thick}}
-\newcommand\mymatrixbraceoffseth{0.5em}
-\newcommand\mymatrixbraceoffsetv{0.2em}
-
-% Now the commands to produce the braces. (I'll explain below how to use them.)
-\newcommand*\mymatrixbraceright[4][m]{
-    \draw[mymatrixbrace] ($(#1.north west)!(#1-#3-1.south west)!(#1.south west)-(\mymatrixbraceoffseth,0)$)
-        -- node[left=2pt] {#4} 
-        ($(#1.north west)!(#1-#2-1.north west)!(#1.south west)-(\mymatrixbraceoffseth,0)$);
-}
-\newcommand*\mymatrixbraceleft[4][m]{
-    \draw[mymatrixbrace] ($(#1.north east)!(#1-#2-1.north east)!(#1.south east)+(\mymatrixbraceoffseth,0)$)
-        -- node[right=2pt] {#4} 
-        ($(#1.north east)!(#1-#3-1.south east)!(#1.south east)+(\mymatrixbraceoffseth,0)$);
-}
-\newcommand*\mymatrixbracetop[4][m]{
-    \draw[mymatrixbrace] ($(#1.north west)!(#1-1-#2.north west)!(#1.north east)+(0,\mymatrixbraceoffsetv)$)
-        -- node[above=2pt] {#4} 
-        ($(#1.north west)!(#1-1-#3.north east)!(#1.north east)+(0,\mymatrixbraceoffsetv)$);
-}
-\newcommand*\mymatrixbracebottom[4][m]{
-    \draw[mymatrixbrace] ($(#1.south west)!(#1-1-#3.south east)!(#1.south east)-(0,\mymatrixbraceoffsetv)$)
-        -- node[below=2pt] {#4} 
-        ($(#1.south west)!(#1-1-#2.south west)!(#1.south east)-(0,\mymatrixbraceoffsetv)$);
-}
-
-%%END MATRIX
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -290,17 +241,19 @@ where
  \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g}_q\nonumber\\
  \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
 \end{align}
-In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$, which denotes the number of baselines in the array. Moreover,
+In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$ (i.e. $p<q$), which denotes the number of baselines in the array. Moreover,
 \begin{equation}
 \alpha_{pq} =
 \begin{cases}
 (q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
+B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
+%B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
 0 & \textrm{otherwise}
 \end{cases}.
 \end{equation}
 The easiest way to construct the vectors in Eq.~\ref{eq:vec_definitions} is to enumerate through the composite indexes $pq$ in the following order $12, 13,\cdots,1N,23,\cdots$.
-For each composite index we then compute the right hand side of the appropriate equation in Eq.~\ref{eq:vec_definitions} which we then need to assign to the 
-correct position in the vector. The correct position is calculated with $\alpha_{pq}$. Using the aforementioned order, however, allows you to fill the array in numerical order, i.e. $12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B$.  
+For each composite index we then compute the right hand side of the appropriate vector element definition which we then need to assign to the 
+correct vector position. The correct position is calculated with $\alpha_{pq}$. Using the aforementioned order, however, allows you to fill the vector in numerical order, i.e. $12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B$.  
 
 
 We will be using the following SNR (signal-to-noise ratio) definition in this paper  
@@ -310,76 +263,85 @@ We will be using the following SNR (signal-to-noise ratio) definition in this pa
 where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
 
 \subsection{LOGCAL}
+NEED BETTER INTRO\\
 One of the best known algorithms that is currently used to perform redundant calibration involves the use of logarithms. If we ignore the noise term then we can 
 rewrite Eq.~\eqref{eq:vis_red} as
 \begin{eqnarray}
-\ln |d_{ij}| &=& \ln |g_i| + \ln |g_j| + \ln |y_{\phi_{ij}}| \label{eq:logcal_amp}\\
-\angle d_{ij} &=& \angle g_i - \angle g_j + \angle \phi_{ij} \label{eq:logcal_phase}
+\ln |d_{pq}| &=& \ln |g_p| + \ln |g_q| + \ln |y_{\phi_{pq}}| \label{eq:logcal_amp}\\
+\angle d_{pq} &=& \angle g_p - \angle g_q + \angle \phi_{pq} \label{eq:logcal_phase}
 \end{eqnarray}
 
 We can easily express Eq.~\eqref{eq:logcal_amp} with the following linear system
 \begin{equation}
-\widetilde{\bd} = \bA\bz, 
-\end{equation}
-which has the following least-squares solution
-\begin{equation}
-\bz = (\bA^T\bA)^{-1}\bA^T\widetilde{\bd},
+\widetilde{\bd} = \bA\widetilde{\bz}, 
 \end{equation}
 where
 \begin{equation}
-\widetilde{\bd} = [\ln |d_{pq}|] \big \} ~ [pq] = 1,\cdots,B ~ (p<q),\nonumber\\ 
+\left [ \widetilde{\bd}\right ]_{\alpha_{pq}} = \ln |d_{pq}|,\nonumber\\ 
+\end{equation}
+\begin{equation}
+\widetilde{\bz} = \begin{bmatrix}
+                  \ln | \bg |\\
+                  \ln | \by |
+                  \end{bmatrix},
+\end{equation}
+with $\bg = [g_1,g_2,\cdots,g_N]^T$ and $\by = [y_1,y_2,\cdots,y_L]^T$.
+
+Furthermore,
+\begin{equation}
+\label{eq:A}
+\bA = \begin{bmatrix}
+       \bA_1 & \bA_2
+      \end{bmatrix}
 \end{equation}
 and
 \begin{equation}
-\bA = 
-\begin{bmatrix}
-\coolover{{\scriptstyle j=1,\ldots,N}}{\delta^j_p\vee\delta^j_q} & \coolover{{\scriptstyle k=1,\ldots,L}\!\!\!\!}{~\delta_{\phi_{pq}}^k}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\delta_{\phi_{pq}}^k}{[pq] = 1,\ldots,B~(p<q)}
-\end{matrix}.
+\left [ \bA_1 \right ]_{\alpha_{pq},j} = \delta^j_p\vee\delta^j_q,  ~~~ \left [ \bA_2 \right ]_{\alpha_{pq},j} = \delta_{\phi_{pq}}^j. 
 \end{equation}
 
-Moreover, $(*)^T$ denotes the transpose of its operand, $(*)^{-1}$ denotes matrix inversion, $\vee$ denotes the logical or operator and
+The dimensions of $\bA_1$ and $\bA_2$ are $B\times N$ and $B\times L$.
+Moreover, $\vee$ denotes the logical or operator and
 \begin{equation}
 \delta_y^x  = \begin{cases}
           1 & \textrm{if}~x=y\\
           0 & \textrm{otherwise}
          \end{cases}.
 \end{equation}
-A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.
+A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.\\
+
+NEED TO ROUND OF HERE STILL 
 
 \subsection{LINCAL}
-Assume that $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$ are real valued variables.
-Substituting $g_i$ with $e^{\eta_i - i \varphi_i}$, $g_j$ with $e^{\eta_j - i \varphi_j}$ and $y_{\phi_{ij}}$ with $e^{\eta_{\widetilde{\phi}_{ij}}- i \widetilde{\varphi}_{\phi_{ij}}}$ in Eq.~\eqref{eq:vis_red} results in  
+Assume that $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$ are real valued variables.
+Substituting $g_p$ with $e^{\eta_p - i \varphi_p}$, $g_q$ with $e^{\eta_q - i \varphi_q}$ and $y_{\phi_{pq}}$ with $e^{\eta_{\widetilde{\phi}_{pq}}- i \widetilde{\varphi}_{\phi_{pq}}}$ in Eq.~\eqref{eq:vis_red} results in  
 \begin{equation}
 \label{eq:lincal}
-d_{ij} =  e^{\eta_i - i \varphi_i} e^{\widetilde{\eta}_{\phi_{ij}}- i \widetilde{\varphi}_{\phi_{ij}}} e^{\eta_j + i \varphi_j} + n_{ij}.
+d_{pq} =  e^{\eta_p - i \varphi_p} e^{\widetilde{\eta}_{\phi_{pq}}- i \widetilde{\varphi}_{\phi_{pq}}} e^{\eta_q + i \varphi_q} + n_{pq}.
 \end{equation}
 
 A possible approach one can use to solve the unknowns in Eq.~\eqref{eq:lincal} is to write down the Taylor expansion of the first term of the right hand side of Eq.~\eqref{eq:lincal} around some 
-initial fiducial guess of $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$, which we denote with 
-$\eta_i^0,\eta_j^0,\widetilde{\eta}_{\phi_{ij}}^0,\varphi_i^0,\varphi_j^0$ and $\widetilde{\varphi}_{\phi_{ij}}^0$, and then to solve the perturbations from this 
+initial fiducial guess of $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$, which we denote with 
+$\eta_p^0,\eta_q^0,\widetilde{\eta}_{\phi_{pq}}^0,\varphi_p^0,\varphi_q^0$ and $\widetilde{\varphi}_{\phi_{pq}}^0$, and then to solve the perturbations from this 
 initial guess that minimize the difference between the right and left hand side of Eq.~\eqref{eq:lincal}. Once the perturbation values 
 have been computed it is trivial to obtain an estimate of $g_i$, $g_j$ and $y_{\phi_{ij}}$. 
 
 If we Taylor expand the first term on the right hand side of Eq.~\eqref{eq:lincal} around a fiducial initial guess we obtain
 \begin{equation}
 \label{eq:taylor_expansion}
-d_{ij} = v_{ij}^0[1+\Delta \eta_i + \Delta \eta_j + i \varphi_i - i \Delta \varphi_j + \Delta \widetilde{\eta}_{\phi_{ij}} + i\Delta \widetilde{\eta}_{\phi_{ij}}] + n_{ij}, 
+d_{pq} = v_{pq}^0[1+\Delta \eta_p + \Delta \eta_q + i \varphi_p - i \Delta \varphi_q + \Delta \widetilde{\eta}_{\phi_{pq}} + i\Delta \widetilde{\eta}_{\phi_{pq}}] + n_{pq}, 
 \end{equation}
 where
 \begin{equation}
-v_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\widetilde{\eta}_{\phi_{ij}}^0 - i \widetilde{\varphi}_{\phi_{ij}}^0} e^{\eta_j^0 + i \varphi_j^0}, 
+v_{pq}^0 = e^{\eta_p^0 - i \varphi_p^0} e^{\widetilde{\eta}_{\phi_{pq}}^0 - i \widetilde{\varphi}_{\phi_{pq}}^0} e^{\eta_q^0 + i \varphi_q^0}, 
 \end{equation}
-and $\eta_i^0,\eta_j^0,\widetilde{\eta}_{\phi_{ij}}^0,\varphi_i^0,\varphi_j^0$ and $\widetilde{\varphi}_{\phi_{ij}}^0$ respectively denote the initial guess for $\eta_i,\eta_j,\widetilde{\eta}_{\phi_{ij}},\varphi_i,\varphi_j$ and $\widetilde{\varphi}_{\phi_{ij}}$.
+and $\eta_p^0,\eta_q^0,\widetilde{\eta}_{\phi_{pq}}^0,\varphi_p^0,\varphi_q^0$ and $\widetilde{\varphi}_{\phi_{pq}}^0$ respectively denote the initial guess for $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$.
 Eq.~\eqref{eq:taylor_expansion} can be used to construct the following linear system
 \begin{equation}
-\breve{\br} = \bJ\Delta\widetilde{\bz}, 
+\breve{\br} = \bJ\Delta\widehat{\bz}, 
 \end{equation}
 where 
 \begin{equation}
-\breve{\br} = [d_{ij}-v_{ij}^0] \big \} ~ [ij] = 1\cdots 2B, 
+\left [ \breve{\br} \right ]_{\alpha_{pq}} = d_{pq}-v_{pq}^0, 
 \end{equation}
 \begin{equation}
 \label{eq:jac_lincal}
@@ -390,63 +352,57 @@ where
 \end{equation}
 and
 \begin{equation}
-\Delta\widetilde{\bz} = 
+\Delta\widehat{\bz} = 
 \begin{bmatrix}
-\Delta \eta_i \\
-\Delta \varphi_j \\
-\Delta \widetilde{\eta}_k \\
-\Delta \widetilde{\varphi}_l \\
+\Delta \bmath{\eta} \\
+\Delta \bmath{\varphi} \\
+\Delta \widetilde{\bmath{\eta}} \\
+\Delta \widetilde{\bmath{\varphi}},
 \end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\eta_i}{i = 1\cdots N}\\
-\coolrightbrace{\eta_i}{j = 1\cdots N}\\
-\coolrightbrace{\eta_i}{k = 1\cdots L}\\
-\coolrightbrace{\eta_i}{l = 1 \cdots L}
-\end{matrix}.
 \end{equation}
+with
+\begin{align}
+ \Delta \bmath{\eta} &= [\Delta \eta_1,\Delta \eta_2,\cdots \Delta \eta_N]^T\nonumber\\
+ \Delta \bmath{\varphi} &= [\Delta \varphi_1,\Delta \varphi_2,\cdots \Delta \varphi_N]^T\nonumber\\
+ \Delta \widetilde{\bmath{\eta}} &= [\Delta \widetilde{\eta_1},\Delta \widetilde{\eta_2},\cdots \Delta \widetilde{\eta_N}]^T\nonumber\\
+ \Delta \widetilde{\bmath{\varphi}} &= [\Delta \widetilde{\varphi_1},\Delta \widetilde{\varphi_2},\cdots \Delta \widetilde{\varphi_N}]^T.
+\end{align}
 
-In Eq.~\eqref{eq:jac_lincal} 
-
-\begin{eqnarray}
-\bN &=& 
-\begin{bmatrix}
-\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{\frac{\partial v_{pq}}{\partial \eta_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{~\frac{\partial v_{pq}}{\partial \varphi_k}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-&=& \begin{bmatrix}
-\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{n_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{(-1)^{\delta_q^k}i n_{k,pq}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-\end{eqnarray}
-
-\begin{eqnarray}
-\bM &=& 
-\begin{bmatrix}
-\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,L}}{\frac{\partial v_{pq}}{\partial \widetilde{\eta}_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,L}}{~\frac{\partial v_{pq}}{\partial \widetilde{\varphi}_k}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-&=& \begin{bmatrix}
-\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{m_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{i m_{k,pq}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-\end{eqnarray}
+Furthermore, 
+\begin{equation}
+\bN = \begin{bmatrix}
+      \bN_1 & \bN_2 
+      \end{bmatrix},
+\end{equation}
+with 
+\begin{align}
+[\bN_1]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \eta_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
+&= (\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq}^0,
+\end{align}
+and
+\begin{align}
+ [\bN_2]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \varphi_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
+ &= (-1)^{\delta_{q}^{j}}i(\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq}^0. 
+\end{align}
 
 Moreover,
 \begin{equation}
-n_{j,pq} = (\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq} 
+\bM = \begin{bmatrix}
+      \bM_1 & \bM_2 
+      \end{bmatrix},
 \end{equation}
+with
+\begin{align}
+[\bM_1]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \widetilde{\eta}_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
+&=  \delta_{\phi_{pq}}^{j} v_{pq}^0,
+\end{align}
 and
-\begin{equation}
-m_{j,pq} = \delta_{\phi_{pq}}^{j} v_{pq}.
-\end{equation}
+\begin{align}
+[\bM_2]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \widetilde{\varphi}_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
+&= i\delta_{\phi_{pq}}^{j} v_{pq}^0,
+\end{align}
+
+STILL NEEDS LOTS OF WORK.
 
 \section{Least Squares}
 Scalar redundant calibration can be achieved by solving the following optimization problem
@@ -470,75 +426,31 @@ The GN update rule is given by\\
 GN UPDATE RULE
 
 
-\begin{equation}
-\begin{tikzpicture}[mymatrixenv]
-    \matrix[mymatrix] (m)  {
-        a & b & c & d \\
-        e & f & g & h \\
-        i & j & k & l \\
-        m & n & o & p \\
-    };
-    \mymatrixbraceright{1}{3}{$A$}
-    \mymatrixbracetop{2}{4}{$R$}
-\end{tikzpicture}
-\end{equation}
-
-\begin{equation}
-\begin{tikzpicture}[mymatrixenv]
-    \matrix[mymatrix] (m)  {
-        \frac{\partial v_{pq}}{\partial \eta_j} & \frac{\partial v_{pq}}{\partial \varphi_k}\\
-    };
-    \mymatrixbraceleft{1}{1}{A}
-    \mymatrixbracetop{2}{2}{$j=1,\ldots,N$}
-\end{tikzpicture}
-\end{equation}
-
-\begin{eqnarray}
-\bN &=& 
-\begin{bmatrix}
-\coolover{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{\frac{\partial v_{pq}}{\partial \eta_j}} & \coolover{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{~\frac{\partial v_{pq}}{\partial \varphi_k}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-&=& \begin{bmatrix}
-\coolunder{\!\!\!\!\!\!\!{\scriptstyle j=1,\ldots,N}}{n_{j,pq}} & \coolunder{\!\!\!\!{\scriptstyle k=1,\ldots,N}}{(-1)^{\delta_q^k}i n_{k,pq}}
-\end{bmatrix}
-\begin{matrix}% matrix for right braces 
-\coolrightbrace{\frac{\partial v_{ij}}{\partial \eta_j}}{\scriptstyle [pq] = 1,\ldots,B~(p<q)}
-\end{matrix}\\
-\end{eqnarray}
-
-
-
-
-
-
 % fiducial initial guess 
 % 
 % The following partial derivatives are now easily computed
 % 
 % \begin{eqnarray}
-% \frac{c_{ij}}{\partial \eta_i} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
-% \frac{c_{ij}}{\partial \varphi_i} &=&  -i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
-% \frac{c_{ij}}{\partial \eta_j} &=& y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\ 
-% \frac{c_{ij}}{\partial \varphi_j} &=&  i y_{i-j} e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}\\
-% \frac{y_{i-j}}{\partial \varphi_j} &=&  e^{\eta_i - i \varphi_i} e^{\eta_j - i \varphi_j}
+% \frac{c_{ij}}{\partial \eta_p} &=& y_{i-j} e^{\eta_p - i \varphi_p} e^{\eta_q - i \varphi_q}\\ 
+% \frac{c_{ij}}{\partial \varphi_p} &=&  -i y_{i-j} e^{\eta_p - i \varphi_p} e^{\eta_q - i \varphi_q}\\
+% \frac{c_{ij}}{\partial \eta_q} &=& y_{i-j} e^{\eta_p - i \varphi_p} e^{\eta_q - i \varphi_q}\\ 
+% \frac{c_{ij}}{\partial \varphi_q} &=&  i y_{i-j} e^{\eta_p - i \varphi_p} e^{\eta_q - i \varphi_q}\\
+% \frac{y_{i-j}}{\partial \varphi_q} &=&  e^{\eta_p - i \varphi_p} e^{\eta_q - i \varphi_q}
 % \end{eqnarray}
 % 
 % 
 % The Wirtinger derivative is used in the last equation.
 % 
 % \begin{eqnarray}
-% c_{ij} &\approx& c_{ij}^0 + \Delta \eta_i(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) + \Delta \eta_j(y_{i-j}^0 e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-% && -i\Delta\varphi_i (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}) +i\Delta\varphi_j (y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-% && y_{i-j}^1(y_{i-j}^0e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0})\\
-% &\approx&  c_{ij}^0 + e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i))
+% c_{ij} &\approx& c_{ij}^0 + \Delta \eta_p(y_{i-j}^0 e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0}) + \Delta \eta_q(y_{i-j}^0 e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0})\\
+% && -i\Delta\varphi_p (y_{i-j}^0e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0}) +i\Delta\varphi_q (y_{i-j}^0e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0})\\
+% && y_{i-j}^1(y_{i-j}^0e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0})\\
+% &\approx&  c_{ij}^0 + e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_p+ \Delta \eta_q - i\Delta\varphi_p + i\Delta\varphi_p))
 % \end{eqnarray}
 % 
 % \begin{equation}
 % \label{eq:residual}
-% r_{ij} = \delta_{ij} = c_{ij}-c_{ij}^0 = e^{\eta_i^0 - i \varphi_i^0} e^{\eta_j^0 - i \varphi_j^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_i+ \Delta \eta_j - i\Delta\varphi_i + i\Delta\varphi_i)) 
+% r_{ij} = \delta_{ij} = c_{ij}-c_{ij}^0 = e^{\eta_p^0 - i \varphi_p^0} e^{\eta_q^0 - i \varphi_q^0}(y_{i-j}^1 + y_{i-j}^0( \Delta \eta_p+ \Delta \eta_q - i\Delta\varphi_p + i\Delta\varphi_p)) 
 % \end{equation}
 % 
 % Eq.~\ref{eq:residual} allows us to construct the following linear system:
@@ -549,7 +461,7 @@ GN UPDATE RULE
 % 
 % where $\boldsymbol{J}$ is equal to 
 % \begin{equation}
-% \boldsymbol{J} = \bigg [\overbrace{\frac{c_{pq}}{\partial \eta_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial \varphi_i}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial y_{t}}}^{t=1\cdots r_s} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q) 
+% \boldsymbol{J} = \bigg [\overbrace{\frac{c_{pq}}{\partial \eta_p}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial \varphi_p}}^{i= 1\cdots N},~\overbrace{\frac{c_{pq}}{\partial y_{t}}}^{t=1\cdots r_s} \bigg ] \bigg \} [pq] = 1\cdots N_{\textrm{b}} (p<q) 
 % \end{equation}
 % or
 % \begin{equation}
