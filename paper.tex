@@ -407,16 +407,38 @@ STILL NEEDS LOTS OF WORK.
 \section{Least Squares}
 Scalar redundant calibration can be achieved by solving the following optimization problem
 \begin{equation}
-\min_{\bg,\by} \|\bd - \bv(\bg,\by)\|. 
+\label{eq:red_least_squares}
+\min_{\bz} \|\bd - \bv(\bz)\|, 
 \end{equation}
-The most standard way of solving a least squares method is to use a gradient type of minimization algorithm to iteratively perturb the parameters so that the ... minimize the 
+where $\bz = [\bg,\by]^T$.
+The most standard way of solving a least squares problem is to use a gradient type of minimization algorithm to iteratively perturb the parameters so that the ... minimize the 
 difference between observed and predicted visibilities. The gradient based minimization algorithms generally requires the model $\bv$ to be differentiable
 towards each unknown. When the problem is complex, which is the case for Eq..., it becomes difficult to directly apply gradient methods to such problems. The reason being,
 many complex functions are not analytic nor differentiable (no Taylor expansion exists) if we use classical definitions. For instance if the 
 classical definition of differentiaton is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
 
-The standard way of avoiding such complications is to divide the problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
-Recently cite the complex paper has proposed to extend the problem into [RW HERE NEED TO STATE BETTER] its conjugate domain and then to solve for the parameters and there complex conjugates. This can be accomplished
+The only way to circumvent the differentiability conundrum is to recast our optimization problem in such a way that $\bv$ becomes analytic in its argument.
+The standard way of achieving this to divide the optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+
+Recently Kreutz-Delgado and Sorber have proposed an alternative strategy, which involves the use of Wirtinger calculus (Wirtinger 1927). The Wirtinger derivatives 
+are defined to be 
+\begin{align}
+\frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
+\end{align}
+
+
+\cite{Smirnov2015} recently proposed to use this alternative framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
+that this framework can also be applied to redundant calibration. The first step is to write down the conjugated augmented version of Eq.~\eqref{eq:red_least_squares}, which is equal 
+to
+\begin{equation}
+\label{eq:red_least_squares_complex}
+\min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
+\end{equation}
+where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. 
+In Eq.~\eqref{eq:red_least_squares_complex} $\breve{\bv}$ is analytic in its argument and its complex conjugate as a whole under the
+assumption that the Wirtinger derivative is used to define the gradient operator.
+
+cite the complex paper has proposed to extend the problem into [RW HERE NEED TO STATE BETTER] its conjugate domain and then to solve for the parameters and there complex conjugates. This can be accomplished
 if we introduce Wirtinger derivatives. (I have to look into how to write this better).
 
 The solution to Eq. can now be obtained by using a gradient type of minimization algorithm, like GN and LM. 
