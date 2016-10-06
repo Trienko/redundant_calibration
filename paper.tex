@@ -405,38 +405,44 @@ and
 STILL NEEDS LOTS OF WORK.
 
 \section{Least Squares}
-Scalar redundant calibration can be achieved by solving the following optimization problem
+Redundant calibration can be achieved by solving the following optimization problem
 \begin{equation}
 \label{eq:red_least_squares}
 \min_{\bz} \|\bd - \bv(\bz)\|, 
 \end{equation}
-where $\bz = [\bg,\by]^T$.
-The most standard way of solving a least squares problem is to use a gradient type of minimization algorithm to iteratively perturb the parameters so that the ... minimize the 
-difference between observed and predicted visibilities. The gradient based minimization algorithms generally requires the model $\bv$ to be differentiable
-towards each unknown. When the problem is complex, which is the case for Eq..., it becomes difficult to directly apply gradient methods to such problems. The reason being,
-many complex functions are not analytic nor differentiable (no Taylor expansion exists) if we use classical definitions. For instance if the 
-classical definition of differentiaton is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
+where $\bz = [\bg,\by]^T$. Eq.~\eqref{eq:red_least_squares} is a nonlinear least squares problem.
 
-The only way to circumvent the differentiability conundrum is to recast our optimization problem in such a way that $\bv$ becomes analytic in its argument.
-The standard way of achieving this to divide the optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+The most standard way of solving a general least squares problem is to use a gradient type of minimization algorithm whose main purpose is to find the model parameters that 
+minimizes the difference between the observed and model data. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt (cite LM here). For the redundant calibration problem in Eq.~\eqref{eq:red_least_squares} $\bd$, which is the corrupted observed visibilities, is the observed data,
+while $\bv$, which is the predicted visibilities, represents the model data.\footnote{In this paper we use the same symbol to denote predicted visibilities and true observed visibilities as it
+is trivial to distinguish which one is implied from the context.}   
 
-Recently Kreutz-Delgado and Sorber have proposed an alternative strategy, which involves the use of Wirtinger calculus (Wirtinger 1927). The Wirtinger derivatives 
+The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bv$ to be differentiable
+towards each model parameter. When the least squares problem is complex, which is the case for Eq.~\eqref{eq:red_least_squares}, it becomes less straightforward to apply these gradient based minimization methods. The reason being,
+many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if we make use of classic differentiation. For instance if the 
+classical definition of differentiation is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
+
+The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bv$ becomes analytic in its argument.
+The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+
+Recently Kreutz-Delgado and Sorber proposed an alternative strategy, which involves the use of Wirtinger calculus (Wirtinger 1927). The Wirtinger derivatives 
 are defined to be 
 \begin{align}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
 \end{align}
 
-
-\cite{Smirnov2015} recently proposed to use this alternative framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
-that this framework can also be applied to redundant calibration. The first step is to write down the conjugated augmented version of Eq.~\eqref{eq:red_least_squares}, which is equal 
-to
+\cite{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
+that this framework can also be applied to redundant calibration. Analogous to Smirnov and Tasse, we recast Eq.~\eqref{eq:red_least_squares} to 
 \begin{equation}
 \label{eq:red_least_squares_complex}
 \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
-where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. 
-In Eq.~\eqref{eq:red_least_squares_complex} $\breve{\bv}$ is analytic in its argument and its complex conjugate as a whole under the
-assumption that the Wirtinger derivative is used to define the gradient operator.
+where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:red_least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:red_least_squares}.
+If we use the Wirtinger derivative instead of the standard derivative to define the gradient operator then 
+$\breve{\bv}$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole (cite smirnov). The fact that $\breve{\bv}$ is now analytic in its argument implies that we can use the complex Gauss-Newton
+and Levenberg-Marquardt equivalent algorithms to so solve Eq.~\eqref{eq:red_least_squares_complex}.
+
+
 
 cite the complex paper has proposed to extend the problem into [RW HERE NEED TO STATE BETTER] its conjugate domain and then to solve for the parameters and there complex conjugates. This can be accomplished
 if we introduce Wirtinger derivatives. (I have to look into how to write this better).
