@@ -454,6 +454,8 @@ If we use the Wirtinger derivative instead of the classic notion of a derivative
 $\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole. The fact that $\bv$ is now analytic in its argument has the immediate consequence that it becomes possible to use the Gauss-Newton
 and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex} \citep{Smirnov2015}.
 
+STILL NEEDS LOADS OF WORK. REFERENCES.
+
 \subsection{Complex GN and LM}
 In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:red_least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
 \begin{equation}
@@ -470,6 +472,7 @@ where
 In Eq.~\eqref{eq:Jacobian}, $\frac{\partial}{\partial \bz}$ and $\frac{\partial}{\partial \conj{\bz}}$ respectively denote the cogradient operator and the conjugate cogradient operator (cite Sorber).
 The GN update step is now defined as:
 \begin{equation}
+\label{eq:GN_update}
  \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br}.
 \end{equation}
 The LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
@@ -568,6 +571,23 @@ Moreover, $(*)^T$ denotes matrix transposition and
 \begin{equation}
 \mathcal{PQ}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
+
+\subsection{Simplifying GN}
+
+The following identities,
+\begin{align}
+\label{eq:identities}
+\frac{1}{3}\bJ\breve{\bz} &= \breve{\bv}, & \bJ^H\breve{\bv} &= (\bI\odot\bH)\breve{\bz} 
+\end{align}
+are trivially established by mechanically showing that the left hand side of each identity in Eq.~\eqref{eq:identities} is equal to its right hand side.
+
+The first identity in Eq.~\eqref{eq:identities} can now be used to simplify Eq.~\eqref{eq:GN_update} as follows:
+\begin{align}
+\Delta \breve{\bz} &= (\bJ^H\bJ)^{-1}\bJ^H(\breve{\bd}-\breve{\bv})\\
+&=(\bJ^H\bJ)^{-1}\bJ^H\breve{\bd}-\frac{1}{3}\breve{\bz}
+\end{align}
+
+
 
 HAVE TO MAKE SURE I DEFINE ALL THE MATH SYMBOLS THAT I USE. IF NOT HERE THEN EARLIER....
 
