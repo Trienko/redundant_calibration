@@ -52,6 +52,8 @@
 \newcommand{\bD}{\bmath{D}}
 \newcommand{\bN}{\bmath{N}}
 \newcommand{\bM}{\bmath{M}}
+\newcommand{\bI}{\bmath{I}}
+\newcommand{\bzero}{\bmath{0}}
 \newcommand{\conj}[1]{\overline{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -408,7 +410,7 @@ STILL NEEDS LOTS OF WORK.
 Redundant calibration can be achieved by solving the following optimization problem
 \begin{equation}
 \label{eq:red_least_squares}
-\min_{\bz} \|\bd - \bv(\bz)\|, 
+\min_{\bz} \|\br\| = \min_{\bz} \|\bd - \bv(\bz)\|, 
 \end{equation}
 where $\bz = [\bg,\by]^T$. Eq.~\eqref{eq:red_least_squares} is a nonlinear least squares problem.
 
@@ -439,12 +441,88 @@ Using the above definitions we can now easily compute the following:
 that the Wirtinger framework can also be applied to redundant calibration. Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:red_least_squares} to 
 \begin{equation}
 \label{eq:red_least_squares_complex}
-\min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
+\min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
 where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:red_least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:red_least_squares}.
 If we use the Wirtinger derivative instead of the classic notion of a derivative to define the gradient operator then 
-$\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}. The fact that $\breve{\bv}$ is now analytic in its argument has the immediate consequence that we can use the complex variants of the Gauss-Newton
-and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex}.
+$\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole. The fact that $\bv$ is now analytic in its argument has the immediate consequence that it becomes possible to use the Gauss-Newton
+and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex} \citep{Smirnov2015}.
+
+\subsection{Complex GN and LM}
+In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:red_least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
+\begin{equation}
+\label{eq:Jacobian}
+\bJ = \begin{bmatrix}
+       \bJ & \bJ^*\\
+       \conj{\bJ}^* & \conj{\bJ} 
+      \end{bmatrix},
+\end{equation}
+where 
+\begin{align}
+\bJ &= \frac{\partial \bv}{\partial \bz}, & \bJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
+\end{align}
+In Eq.~\eqref{eq:Jacobian}, $\frac{\partial}{\partial \bz}$ and $\frac{\partial}{\partial \conj{\bz}}$ respectively denote the cogradient operator and the conjugate cogradient operator (cite Sorber).
+The GN update step is now defined as:
+\begin{equation}
+ \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br}.
+\end{equation}
+The LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
+\begin{equation}
+\Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
+\end{equation}
+where $\bD=\bI\odot\bJ^H\bJ$. 
+NEED TO MENTION THE SILENT INDEX $k$ AND HOW THE UPDATE RULE IS ITERATIVE. ALSO MENTION THAT $\lambda$ IMPROVES THE CONVERGENCE PROPERTIES. WE WILL REFER TO $\bJ^H\bJ$ AS THE 
+HESSIAN.
+
+\subsection{Redundant Jacobian and Hessian}
+If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:red_least_squares_complex} we obtain the following analytic result:
+\begin{equation}
+\label{eq:Jacobian_red}
+\bJ = \begin{bmatrix}
+       \bM & \bN\\
+       \conj{\bN} & \conj{\bM}
+      \end{bmatrix},
+\end{equation}
+where
+\begin{equation}
+\bM =\begin{bmatrix}
+      \bM_1 & \bM_2
+     \end{bmatrix},
+\end{equation}
+and 
+\begin{equation}
+\bN = \begin{bmatrix}
+       \bN_1 & \bzero
+      \end{bmatrix}.
+\end{equation}
+Moreover,
+\begin{align}
+\left [ \bM_1 \right ]_{\alpha_{pq},j} &= y_{\phi_{pq}}\conj{g}_q\delta_p^j, & \left [ \bM_2 \right ]_{\alpha_{pq},j} &= g_p\conj{g}_q\delta_{\phi_{pq}}^j 
+\end{align}
+and
+\begin{equation}
+\left [ \bN_1 \right ]_{\alpha_{pq},j} = g_py_{\phi_{pq}}\delta^j_q. 
+\end{equation}
+
+It is now trivial to compute the Hessian $\bJ^H\bJ$ by using Eq.~\eqref{eq:Jacobian_red}. If we substitute Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\bJ$
+we obtain 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
