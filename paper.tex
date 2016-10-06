@@ -419,7 +419,7 @@ is trivial to distinguish which one is implied from the context.}
 
 The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bv$ to be differentiable
 towards each model parameter. When the least squares problem is complex, which is the case for Eq.~\eqref{eq:red_least_squares}, it becomes less straightforward to apply these gradient based minimization methods. The reason being,
-many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if we make use of classic differentiation. For instance if the 
+many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance if the 
 classical definition of differentiation is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
 
 The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bv$ becomes analytic in its argument.
@@ -430,17 +430,21 @@ are defined to be
 \begin{align}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
 \end{align}
+Using the above definitions we can now easily compute the following:
+\begin{align}
+\frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
+\end{align}
 
-\cite{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
-that this framework can also be applied to redundant calibration. Analogous to Smirnov and Tasse, we recast Eq.~\eqref{eq:red_least_squares} to 
+\citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
+that the Wirtinger framework can also be applied to redundant calibration. Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:red_least_squares} to 
 \begin{equation}
 \label{eq:red_least_squares_complex}
 \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
 where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:red_least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:red_least_squares}.
-If we use the Wirtinger derivative instead of the standard derivative to define the gradient operator then 
-$\breve{\bv}$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole (cite smirnov). The fact that $\breve{\bv}$ is now analytic in its argument implies that we can use the complex Gauss-Newton
-and Levenberg-Marquardt equivalent algorithms to so solve Eq.~\eqref{eq:red_least_squares_complex}.
+If we use the Wirtinger derivative instead of the classic notion of a derivative to define the gradient operator then 
+$\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}. The fact that $\breve{\bv}$ is now analytic in its argument has the immediate consequence that we can use the complex variants of the Gauss-Newton
+and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex}.
 
 
 
