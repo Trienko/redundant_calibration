@@ -59,6 +59,8 @@
 \newcommand{\bN}{\bmath{N}}
 \newcommand{\bM}{\bmath{M}}
 \newcommand{\bI}{\bmath{I}}
+\newcommand{\ba}{\bmath{a}}
+\newcommand{\bb}{\bmath{b}}
 \newcommand{\bzero}{\bmath{0}}
 \newcommand{\conj}[1]{\overline{#1}}
 
@@ -538,7 +540,7 @@ where
 \begin{equation}
 [\bD]_{ij} = 
 \begin{cases}
- g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
+ g_i \conj{y}_j  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
  0 & \textrm{otherwise}
 \end{cases},
 \end{equation}
@@ -572,6 +574,48 @@ Moreover, $(*)^T$ denotes matrix transposition and
 \mathcal{PQ}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
 
+HAVE TO MAKE SURE I DEFINE ALL THE MATH SYMBOLS THAT I USE. IF NOT HERE THEN EARLIER....
+
+Furthermore, substituting Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\breve{\br}$ results in
+\begin{equation}
+\bJ^H\breve{\br} = \begin{bmatrix}
+                   \ba & \bb & \conj{\ba} & \conj{\bb}\\
+                   \end{bmatrix}^T,
+\end{equation}
+where
+\begin{align}
+\left [ \ba \right ]_i &= \sum_{k\neq i} g_k \widetilde{y}_{ik}r_{ik},  & \left [ \bb \right ]_i &= \sum_{pq\in\mathcal{PQ}_i}\conj{g}_p g_q r_{pq},
+\end{align}
+and
+\begin{equation}
+\widetilde{y}_{ik} = 
+\begin{cases}
+\conj{y}_{\zeta_{ik}} & \textrm{if}~k > i\\
+y_{\zeta_{ik}} & \textrm{otherwise}
+\end{cases}.
+\end{equation}
+
+HAVE TO RECHECK THE ABOVE EQUATIONS DIRECTLY FROM THE CODE.
+
+HAVE TO STATE WHETHER COLUMN OR ROW VECTOR.
+
+
+% \begin{equation}
+% \boldsymbol{J}^H\breve{\boldsymbol{d}} = 
+% \begin{bmatrix}
+% \sum_{k\neq i } g_k x_{ik}d_{ik}\\
+% \sum_{pq \in \mathcal{I}_j} \conj{g}_p g_q d_{pq}\\
+% \downarrow^{*}
+% \end{bmatrix}
+% \begin{matrix}% matrix for right braces 
+% \coolrightbrace{\sum g_k x_{\zeta_{ik}}d_{ik}}{i = 1\cdots N}\\
+% \coolrightbrace{\sum \conj{g}_p g_q d_{pq}}{j = 1\cdots L}\\
+% \vphantom{\downarrow^{*}}
+% \end{matrix}
+% \end{equation}
+
+
+
 \subsection{Simplifying GN}
 
 The following identities,
@@ -589,7 +633,7 @@ The first identity in Eq.~\eqref{eq:identities} can now be used to simplify Eq.~
 
 
 
-HAVE TO MAKE SURE I DEFINE ALL THE MATH SYMBOLS THAT I USE. IF NOT HERE THEN EARLIER....
+
 
 
 
