@@ -42,6 +42,11 @@
 
 \newcommand{\bz}{\bmath{z}}
 \newcommand{\bA}{\bmath{A}}
+\newcommand{\bB}{\bmath{B}}
+\newcommand{\bC}{\bmath{C}}
+\newcommand{\bE}{\bmath{E}}
+\newcommand{\bF}{\bmath{F}}
+\newcommand{\bG}{\bmath{G}}
 \newcommand{\br}{\bmath{r}}
 \newcommand{\bg}{\bmath{g}}
 \newcommand{\bd}{\bmath{d}}
@@ -50,6 +55,7 @@
 \newcommand{\by}{\bmath{y}}
 \newcommand{\bJ}{\bmath{J}}
 \newcommand{\bD}{\bmath{D}}
+\newcommand{\bH}{\bmath{H}}
 \newcommand{\bN}{\bmath{N}}
 \newcommand{\bM}{\bmath{M}}
 \newcommand{\bI}{\bmath{I}}
@@ -506,9 +512,64 @@ and
 
 It is now trivial to compute the Hessian $\bJ^H\bJ$ by using Eq.~\eqref{eq:Jacobian_red}. If we substitute Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\bJ$
 we obtain 
+\begin{equation}
+\bH = \bJ^H\bJ = 
+\begin{bmatrix}
+\bA & \bB\\
+\conj{\bB} & \conj{\bA}
+\end{bmatrix},
+\end{equation}
+where
 
+\begin{align}
+\bA &= \begin{bmatrix} \bC & \bD\\ \bD^H & \bE \end{bmatrix}, & \bB &= \begin{bmatrix} \bF & \bG\\ \bG^T & \bzero \end{bmatrix},
+\end{align}
 
+\begin{equation}
+[\bC]_{ij} = 
+\begin{cases}
+ \sum_{k \neq i} \left | g_k \right |^2 \left | y_{\zeta_{ik}} \right |^2 & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases},
+\end{equation}
+\begin{equation}
+[\bD]_{ij} = 
+\begin{cases}
+ g_i y_j^*  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
+ 0 & \textrm{otherwise}
+\end{cases},
+\end{equation}
 
+\begin{equation}
+[\bE]_{ij} = 
+\begin{cases}
+ \sum_{pq \in \mathcal{PQ}_i} \left | g_p \right |^2 \left | g_q \right |^2  & \textrm{if} ~ i=j\\
+ 0 & \textrm{otherwise}
+\end{cases},
+\end{equation}
+\begin{equation}
+[\bF]_{ij} = 
+\begin{cases}
+ g_i g_j  \left | y_{\zeta_{ij}} \right |^2  & \textrm{if} ~ i \neq j\\
+ 0 & \textrm{otherwise}
+\end{cases},
+\end{equation}
+and
+\begin{equation}
+[\boldsymbol{G}]_{ij} = 
+\begin{cases}
+ g_i y_j  \left | g_{\xi_{ij}} \right |^2  & \textrm{if} ~ \xi_{ij}\neq0\\
+ 0 & \textrm{otherwise}
+\end{cases}.
+\end{equation}
+
+Moreover, $(*)^T$ denotes matrix transposition and
+
+\begin{equation}
+\mathcal{PQ}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
+\end{equation}
+
+HAVE TO MAKE SURE I DEFINE ALL THE MATH SYMBOLS THAT I USE. IF NOT HERE THEN EARLIER....
 
 
 
