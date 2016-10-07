@@ -728,20 +728,23 @@ in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Moreover, the StEFCal e
 \end{align}
 
 On the odd iterations $\lambda$ is chosen to be zero, which corresponds to an $\alpha$ equal to one. On the even iteration $\lambda$ is chosen to be equal to one, which corresponds
-to an $\alpha$ equal to a half. On the odd iteration 
+to an $\alpha$ equal to a half. Note that, on the odd iteration the influence that the estimate of the parameters of the previous iteration has on the current estimate is scaled
+by a half. Which is exactly the same as in, Eq.~\eqref{eq:one_half}.  
 
-\begin{align}
-\breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k, \label{eq:alpha}  
-\end{align}
+If we wish to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
+
+At this point there is no way of knowing if this is mere coincidence. DEF REWRITE THIS.
+
+REWRTIE THIS IN A DIFFERENT WAY. START WITH CHENGULAR AND JUST MENTION THE LINK TO STEFCAL'S CHOICE OF ALPHA.
+
+The update rules in Eq.~\eqref{eq:lambda} and Eq.~\eqref{eq:alpha} have been derived before, by Chengular... The approach they followed is discussed in the Appendix.
+
+Interestingly enough, if we substitute $\alpha = 1$ into Eq.~\ref{eq:g_update} then it reduces to the skymodel-based StEFCal update rule.
+
+In an attempt to merge the terminology that has independently develop in the general calibration and redundant calibration literature and to emphasize the close
+relationship between Stefcal and the approach derived by I will use the label Redunandat SteFCal (R-Stefcal) to refer to the NLS method proposed by ... 
 
 
-
-
-
-
-
-Interestingly enough, if we substitute $\alpha = 1$ into Eq.~\ref{eq:g_update} then it reduces to the skymodel-based StEFCal update rule .
 
 
 
