@@ -482,6 +482,7 @@ The GN update step is now defined as:
 \end{equation}
 The LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
 \begin{equation}
+\label{eq:LM_update}
 \Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
 where $\bD=\bI\odot\bJ^H\bJ$. 
@@ -521,6 +522,7 @@ and
 It is now trivial to compute the Hessian $\bJ^H\bJ$ by using Eq.~\eqref{eq:Jacobian_red}. If we substitute Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\bJ$
 we obtain 
 \begin{equation}
+\label{eq:red_H}
 \bH = \bJ^H\bJ = 
 \begin{bmatrix}
 \bA & \bB\\
@@ -587,6 +589,7 @@ Furthermore, substituting Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\breve{\br}$ re
 \end{equation}
 where
 \begin{align}
+\label{eq:ab}
 \left [ \ba \right ]_i &= \sum_{k\neq i} g_k \widetilde{y}_{ik}r_{ik},  & \left [ \bb \right ]_i &= \sum_{pq\in\mathcal{PQ}_i}\conj{g}_p g_q r_{pq},
 \end{align}
 and
@@ -624,17 +627,27 @@ HAVE TO STATE WHETHER COLUMN OR ROW VECTOR.
 The following identities,
 \begin{align}
 \label{eq:identities}
-\frac{1}{3}\bJ\breve{\bz} &= \breve{\bv}, & \bJ^H\breve{\bv} &= (\bI\odot\bH)\breve{\bz} 
+\frac{1}{3}\bJ\breve{\bz} &= \breve{\bv}, & \bJ^H\breve{\bv} &= \widetilde{\bH}\breve{\bz} 
 \end{align}
 are trivially established by mechanically showing that the left hand side of each identity in Eq.~\eqref{eq:identities} is equal to its right hand side.
+In Eq.~\eqref{eq:identities}, $\widetilde{\bH}$ denotes $\bI\odot\bH$.
 
-The first identity in Eq.~\eqref{eq:identities} can now be used to simplify Eq.~\eqref{eq:GN_update} as follows:
-\begin{align}
-\Delta \breve{\bz} &= (\bJ^H\bJ)^{-1}\bJ^H(\breve{\bd}-\breve{\bv})\\
-&=(\bJ^H\bJ)^{-1}\bJ^H\breve{\bd}-\frac{1}{3}\breve{\bz}
-\end{align}
-
-STILL NEED TO ADD z k+1 EXPRESSION.
+Replacing $\breve{\br}$ with $\breve{\bd}-\breve{\bv}$ in Eq.~\eqref{eq:GN_update} results in
+\begin{equation}
+\label{eq:temp_GN_eq}
+\Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H(\breve{\bd}-\breve{\bv}), 
+\end{equation}
+Substituting the first identity of Eq.~\eqref{eq:identities} into Eq.~\eqref{eq:temp_GN_eq} and simplifying we obtain
+\begin{equation}
+\label{eq:two_thrids}
+\Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd}-\frac{1}{3}\breve{\bz}.
+\end{equation}
+It now trivially follows from Eq.~\eqref{eq:two_thrids} that:
+\begin{equation}
+\breve{\bz}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{2}{3}\breve{\bz}_{k}. 
+\end{equation}
+%STILL NEED TO ADD z k+1 EXPRESSION.
+THE TAKE HOME HERE IS WE CAN CALCULATE THE UPDATE STEP WITHOUT CALCULATING THE RESIDUAL.
 
 \subsection{GN and LINCAL}
 As we mentioned at the start of this section, the Wirtinger framework is not the only way in which we can ensure that $\bv$ is analytic in its argument. We could also 
@@ -664,7 +677,67 @@ By approximating $\bH$ by its diagonal and substituting this approximate Hessian
 averaging update step used on even iterations can be derived by substituting the approximate $H$ into the LM update step, whilst setting $\lambda$ to one.
 
 The natural question now arises: is it possible to derive a redundant calibration variant of the SteFCal algorithm if we follow a similar approach to what \citet{Smirnov2015}
-proposed? We now attempt to try and answer that exact question:   
+proposed?
+
+Inspecting Eq.~\eqref{eq:red_H} reveals that in the case of redundant calibration the Hessian's diagonal entries are also more significant than its off-diagonal entries.
+If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ (by its diagonal approximation) and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
+\begin{equation}
+\label{eq:appr_GN}
+ \Delta \breve{\bz} \approx \widetilde{\bH}^{-1}\bJ^H(\breve{\bd}-\breve{\bv})
+\end{equation}
+Utilizing the second identity in Eq.~\eqref{eq:identities} allows us to simplify Eq.~\eqref{eq:appr_GN} to
+\begin{equation}
+  \Delta \breve{\bz} \approx \widetilde{\bH}^{-1}\bJ^H\breve{\bd}-\breve{\bz}.
+\end{equation}
+It now trivially follows that
+\begin{equation}
+ \breve{\bz}_{k+1} \approx \widetilde{\bH}^{-1}\bJ^H\breve{\bd}.
+\end{equation}
+We obtain a similar result if we repeat the above procedure, only in this case we use Eq.~\eqref{eq:LM_update} instead,
+namely
+\begin{align}
+\breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k, \label{eq:alpha}  
+\end{align}
+where $\alpha = \frac{1}{1+\lambda}$. Moreover, $\lambda = \frac{1-\alpha}{\alpha}$. The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
+expression of $\bJ^H\breve{\br}$, the only difference being that in Eq.~\eqref{eq:ab} the letter $r$ would be replaced by a $d$. If we substitute the analytic expression
+of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which is easily computed as the matrix is a diagonal matrix) into Eq.~\eqref{eq:alpha} we obtain the following two update rules:
+\begin{equation}
+\label{eq:g_update}
+g_{i}^{k+1} = \alpha \frac{\sum_{j\neq i} g_j^k \widetilde{y}_{ij}^{~\!\!k} d_{ij}}{\sum_{j\neq i} |g_j^k|^2|y_{\zeta_{ij}}^k|^2} + (1-\alpha) g_i^k, 
+\end{equation}
+and
+\begin{equation}
+\label{eq:y_update}
+y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq}}{\sum_{pq \in \mathcal{PQ}_i}|g_p^k|^2|g_q^k|^2} + (1-\alpha) y_i^k 
+\end{equation}
+
+
+
+
+
+
+Interestingly enough, if we substitute $\alpha = 1$ into Eq.~\ref{eq:g_update} then it reduces to the skymodel-based StEFCal update rule .
+
+
+
+
+
+\begin{eqnarray}
+\begin{bmatrix} \Delta \boldsymbol{z}\\ \Delta \conj{\boldsymbol{z}} \end{bmatrix} &\approx& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H(\breve{\boldsymbol{d}}-\breve{\boldsymbol{v}})\\ 
+&=& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} -  \widetilde{\boldsymbol{H}}^{-1}\widetilde{\boldsymbol{H}}\breve{\boldsymbol{z}}\\
+\breve{\boldsymbol{z}}_{k+1} &\approx& \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}}
+\end{eqnarray}
+
+Levenberg-Marquardt:
+
+\begin{eqnarray}
+\breve{\boldsymbol{z}}_{k+1} &\approx& \frac{1}{1+\lambda}\widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} + \frac{\lambda}{1+\lambda} \breve{\boldsymbol{z}}_k\\
+ &=& \alpha \widetilde{\boldsymbol{H}}^{-1}\boldsymbol{J}^H\breve{\boldsymbol{d}} + (1-\alpha)\breve{\boldsymbol{z}}_k 
+\end{eqnarray}
+
+with $\alpha = \frac{1}{1+\lambda}$. Moreover $\lambda = \frac{1-\alpha}{\alpha}$. So in Marthi and Chengular (2014) they use an $\alpha$ of 0.3, which corresponds to an LM damping factor $\lambda$
+of $2\frac{1}{3}$.
 
 
 
