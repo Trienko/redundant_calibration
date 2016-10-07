@@ -651,7 +651,25 @@ Eq.~\eqref{eq:red_least_squares_lincal} is equal to the Eq xxx in the LINCAL sec
 We have therefore shown that doing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in the Appendix from first principles.
 An easy why of improving the convergence properties of LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
 
-\subsection{LM and StEFCal}
+\subsection{Diagonalization and StEFCal}
+StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
+that their conjugates are unknown (REMEMBER TO CITE ALL THE STEFCAL PAPERS MITCHELL ETC...). Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
+is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative update step [MUST IMPROVE HERE]. \cite{Salvini2014} also show that
+the convergence of the algorithm can be improved if for every even iteration the basic update step is modified as follows: the current gain estimate is replaced by the average of the current gain solution and the gain solution of the previous odd iteration.
+StEFCal lowers the computational complexity of normal skymodel-based calibration from O$(P^3)$ to O$(P^2)$. 
+
+\citet{Smirnov2015} recently showed that one can also derive StEFCal by viewing normal skymodel-based calibration as a complex optimization problem. They first compute the skymodel-based calibration equivalent analytic expressions of $\bJ$,
+$\bH$ and $\bJ^H\breve{\br}$. While inspecting the skymodel-based $\bH$ it becomes apparent that its diagonal entries are much more significant than its off-diagonal entries.
+By approximating $\bH$ by its diagonal and substituting this approximate Hessian back into the GN update step they are able to re-derive the fundamental StEFCal update step. They then show that the 
+averaging update step used on even iterations can be derived by substituting the approximate $H$ into the LM update step, whilst setting $\lambda$ to one.
+
+The natural question now arises: is it possible to derive a redundant calibration variant of the SteFCal algorithm if we follow a similar approach to what \citet{Smirnov2015}
+proposed? We now attempt to try and answer that exact question:   
+
+
+
+
+a very fast computational calibration This linearization trick improves  
 
 
 
