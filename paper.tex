@@ -639,11 +639,12 @@ Replacing $\breve{\br}$ with $\breve{\bd}-\breve{\bv}$ in Eq.~\eqref{eq:GN_updat
 \end{equation}
 Substituting the first identity of Eq.~\eqref{eq:identities} into Eq.~\eqref{eq:temp_GN_eq} and simplifying we obtain
 \begin{equation}
-\label{eq:two_thrids}
+\label{eq:one_thrid}
 \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd}-\frac{1}{3}\breve{\bz}.
 \end{equation}
-It now trivially follows from Eq.~\eqref{eq:two_thrids} that:
+It now trivially follows from Eq.~\eqref{eq:one_thrid} that:
 \begin{equation}
+\label{eq:two_thrids}
 \breve{\bz}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{2}{3}\breve{\bz}_{k}. 
 \end{equation}
 %STILL NEED TO ADD z k+1 EXPRESSION.
@@ -709,8 +710,31 @@ g_{i}^{k+1} = \alpha \frac{\sum_{j\neq i} g_j^k \widetilde{y}_{ij}^{~\!\!k} d_{i
 and
 \begin{equation}
 \label{eq:y_update}
-y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq}}{\sum_{pq \in \mathcal{PQ}_i}|g_p^k|^2|g_q^k|^2} + (1-\alpha) y_i^k 
+y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq}}{\sum_{pq \in \mathcal{PQ}_i}|g_p^k|^2|g_q^k|^2} + (1-\alpha) y_i^k. 
 \end{equation}
+
+The question now arises what value should we use for $\alpha$? Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
+venture a clever guess by studying what the choice of $\alpha$ is in the case of StEFCal. The StEFCal equivalent of Eq.~\eqref{eq:two_thrids}
+is equal to
+\begin{equation}
+\label{eq:one_half}
+\breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}. 
+\end{equation}
+Note that in Eq.~\eqref{eq:one_half} the influence that the estimate of the parameters from the previous iteration has on the current iteration is scaled by a half, while
+in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Moreover, the StEFCal equivalent of Eq.~\eqref{eq:lambda} and Eq.~\eqref{eq:alpha} are
+\begin{align}
+\breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k,\label{eq:stef_lambda}\\
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, \label{eq:stef_alpha}  
+\end{align}
+
+On the odd iterations $\lambda$ is chosen to be zero, which corresponds to an $\alpha$ equal to one. On the even iteration $\lambda$ is chosen to be equal to one, which corresponds
+to an $\alpha$ equal to a half. On the odd iteration 
+
+\begin{align}
+\breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k, \label{eq:alpha}  
+\end{align}
+
 
 
 
