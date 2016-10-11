@@ -436,42 +436,38 @@ $\bA$ is a square positive semi-definite Hermitian matrix, then the conjugate gr
 conjugate gradient method to solve Eq.~\eqref{eq:linear_system} will only be computationally advantageous if $\bA$ is also sparse (contain many zero entries).
 
 The Conjugate Gradient method was independently discovered by Hestenes and Stiefel. They later published a joint paper, n, which is now considered as the seminal
-reference on CG. Kaniel was able to determined convergence bounds for CG using Chebyshev polynomial. A much more in depth analysis of CG convergence was conducted 
-by van erSluis and van der Vorst. Reid is credited for popularizing CG as an iterative method that can be used to solve sparse linear systems. 
-
-In the early fifties, the method of Conjugate Gradients
-was discovered independently by Hestenes [10] and Stiefel [15]; shortly thereafter, they jointly published
-what is considered the seminal reference on CG [11]. Convergence bounds for CG in terms of Chebyshev
-polynomials were developed by Kaniel [12]. A more thorough analysis of CG convergence is provided by
-van der Sluis and van der Vorst [16]. CG was popularized as an iterative method for large, sparse matrices
-by Reid [13] in 1971.
+reference on CG. Kaniel was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence was conducted 
+by van erSluis and van der Vorst. [Reid is credited for popularizing CG as an iterative method that can efficiently solve large sparse linear systems] RW. 
 
 \begin{algorithm}
 \caption{Conjugate Gradient Method}\label{algo:extrap_algo}
 \begin{algorithmic}[1]
-\State $\br_0 \gets \bA\bx_0 - \bb$
-\State $\bp_0 \gets -\br_0$
-\State $\bmath{u} \gets \text{linspace}(u_{\text{min}},u_{\text{max}},u_{\text{dim}})$
-\State $\bmath{v} \gets \text{linspace}(v_{\text{min}},v_{\text{max}},v_{\text{dim}})$ 
-\State $g_{pq} \gets \text{zeros}((u_{\text{dim}},v_{\text{dim}}),\text{dtype}=\text{complex})$ \Comment {define your 2D extrapolated regular $uv$-grid}
-\State $i \gets 1$
-\For{$i\leq u_{\text{dim}}$}  
-\State $j \gets 1$
-\For{$j\leq v_{\text{dim}}$}  
-\State $\bb \gets (\bmath{u}_i,\bmath{v}_j)^T$
-%\State $\Rcal \gets \left\{ \sum_{k\in\mathcal{K}}A_k e^{-2\pi i [\widehat{X}_{rs} \circ \widehat{X}^{-1}_{pq}(\bb)]^T\cdot\bs_k} \right \}_{rs}$
-%\State $\Mcal \gets \left\{ \sum_{h\in\mathcal{H}}A_h e^{-2\pi i [\widehat{X}_{rs} \circ \widehat{X}^{-1}_{pq}(\bb)]^T\cdot\bs_h} \right \}_{rs}$
-%\Comment {with $\mathcal{K}$ containing the index values of all the sources in the field of view and $\mathcal{L}$ containing the index values of the sources that are included in the
-%calibration model}
-%\State $\Gcal \gets \text{calibrate}(\Rcal,\Mcal)$
-%\Comment {any calibration algorithm can be used here (we assume here that the algorithm outputs $\Gcal$)}
-%\State $g_{pq}^{ij} \gets [\Gcal]_{pq}$
-\State $j \gets j + 1$
-\EndFor
-\State $i \gets i + 1$
+\State $\br \gets \bA\bx_0 - \bb$
+\State $\bp \gets -\br_0$
+\For{$k\leq k_{\textrm{max}}$}
+\State $\alpha_k \gets \frac{\br_k^H\br_k}{\bp_k^H\bA\bp_k}$
+\State $\bx_{k+1} \gets \bx_k + \alpha_k\bp_k$
+\State $\br_{k+1} \gets \br_k - \alpha_k\bA\bp_k$
+\If{$\|\br_{k+1}\|<\epsilon\|\br_0\|$}
+\State break
+\EndIf
+\State $\beta_{k} \gets \frac{\br_{k+1}^H\br_{k+1}}{\br_k^H\br_k}$
+\State $\bp_{k+1} \gets \br_{k+1} + \beta_{k}\bp_k$
+\State $k \gets k + 1$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
+
+In general, when $\bA$ is neither square, positive semi-definite or Hermitian we can use the normal equation 
+\begin{equation}
+\label{eq:normal_equation}
+\bA^H\bA\bx = \bA^H\bb 
+\end{equation}
+to estimate the $\bx$ that minimizes
+\begin{equation}
+\|\bb-\bA\bx\|. 
+\end{equation}
+The CG method is gaurenteed to converge if we use it to solve Eq.~\eqref{eq:normal_equation}. 
 
 
 
