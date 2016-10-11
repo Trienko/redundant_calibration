@@ -458,23 +458,6 @@ by van erSluis and van der Vorst. [Reid is credited for popularizing CG as an it
 \end{algorithmic}
 \end{algorithm}
 
-In general, when $\bA$ has dimensions $m\times n$, with $m > n$ we can use the normal equation 
-\begin{equation}
-\label{eq:normal_equation}
-\bA^H\bA\bx = \bA^H\bb 
-\end{equation}
-to estimate the $\bx$ that minimizes
-\begin{equation}
-\label{eq:norm_ls}
-\|\bb-\bA\bx\|. 
-\end{equation}
-If $\bA^H\bA$ is invertiable then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bA^H\bA$ is singular there are an infinite amount of solutions
-that minimizes Eq.~\eqref{eq:norm_ls}. Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
-and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
-\begin{equation}
-\bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
-\end{equation}
-
 The computational complexity of CG is $\mathbb{O}(\sqrt{\kappa}m)$, where $\kappa$ is the generalized specctral condition number of the matrix $\bA$ and $m$ is the number of
 non-zero entries in the matrix $\bA$. The mathematical
 definition of $\kappa(\bA)$ is
@@ -502,9 +485,24 @@ symmetric, positive-definite matrix that approximates, but is easier to invert. 
 The best precondtioner would be the preconditioner which makes $\kappa$ unity, i.e. completly
 eliminating it from the computational complexity equation. The only choice of $\bM$ which is capable of best way to do this is to chooose as preconditioner the matrix $(\bA)^{-1}$, which is what we would like to determine in the frist place.
 If the diagonal entries of $\bA$ are more significant than its off-diagonal entries, then the Jacobian preconditioner is a good preconditioner to use. 
+State better that the choice of preconditioner, the value of kappa and what the effect of this would be on the computational complexity of the method.
 
-
-
+In general, when $\bA$ has dimensions $m\times n$, with $m > n$ we can use the normal equation 
+\begin{equation}
+\label{eq:normal_equation}
+\bA^H\bA\bx = \bA^H\bb 
+\end{equation}
+to estimate the $\bx$ that minimizes
+\begin{equation}
+\label{eq:norm_ls}
+\|\bb-\bA\bx\|. 
+\end{equation}
+If $\bA^H\bA$ is invertiable then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bA^H\bA$ is singular there are an infinite amount of solutions
+that minimizes Eq.~\eqref{eq:norm_ls}. Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
+and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
+\begin{equation}
+\bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
+\end{equation}
 
 
 
