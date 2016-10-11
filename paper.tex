@@ -458,16 +458,23 @@ by van erSluis and van der Vorst. [Reid is credited for popularizing CG as an it
 \end{algorithmic}
 \end{algorithm}
 
-In general, when $\bA$ is neither square, positive semi-definite or Hermitian we can use the normal equation 
+In general, when $\bA$ has dimensions $m\times n$, with $m > n$ we can use the normal equation 
 \begin{equation}
 \label{eq:normal_equation}
 \bA^H\bA\bx = \bA^H\bb 
 \end{equation}
 to estimate the $\bx$ that minimizes
 \begin{equation}
+\label{eq:norm_ls}
 \|\bb-\bA\bx\|. 
 \end{equation}
-The CG method is gaurenteed to converge if we use it to solve Eq.~\eqref{eq:normal_equation}. 
+If $\bA^H\bA$ is invertiable then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bA^H\bA$ is singular there are an infinite amount of solutions
+that minimizes Eq.~\eqref{eq:norm_ls}. Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
+and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
+\begin{equation}
+\bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
+\end{equation}
+The CG method is gaurenteed to converge if we use it to solve Eq.~\eqref{eq:normal_equation}.  
 
 
 
