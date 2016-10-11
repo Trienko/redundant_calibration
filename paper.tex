@@ -474,7 +474,37 @@ and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
 \begin{equation}
 \bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
 \end{equation}
-The CG method is gaurenteed to converge if we use it to solve Eq.~\eqref{eq:normal_equation}.  
+
+The computational complexity of CG is $\mathbb{O}(\sqrt{\kappa}m)$, where $\kappa$ is the generalized specctral condition number of the matrix $\bA$ and $m$ is the number of
+non-zero entries in the matrix $\bA$. The mathematical
+definition of $\kappa(\bA)$ is
+\begin{equation}
+\kappa(\bA) = \frac{\lambda_{\textrm{max}}}{\lambda^{+}_{\textrm{min}}}, 
+\end{equation}
+where $\lambda_{\textrm{max}}$ denotes the largest eigenvalue of $\bA$ and $\lambda^{+}_{\textrm{min}}$ presents the smallest positive eigenvalue. 
+Interpreting the computational complexity equation further. Note from Algorithm 1 that the CG method has one major outer loop. In the worst possible case, the amount of iterations needed to converge is
+proportional to $\sqrt{\kappa}$. Also notice that the most expensive 
+operation that is conducted within each loop is the vector-matrix product, which has complexity $\mathbb{O}(m)$, where $m$ is the number of non-zero entries in the matrix.
+The computational complexity of the CG method is therefore 
+\begin{equation}
+\mathbb{O}(\sqrt{\kappa}m) 
+\end{equation}
+
+It should now be clear to
+the reader why the CG method is espicially applicable to sparse linear systems, since in those cases $m < N^2$. 
+We can improve the computational complexity of the CG method by preconditioning. 
+[Preconditioning is a technique for improving the condition number of a matrix. Suppose that ' is a
+symmetric, positive-definite matrix that approximates, but is easier to invert. We can solve indirectly by solving] - RW directly coppied from source
+\begin{equation}
+\bM^{-1}\bA\bx = \bM^{-1}\bb
+\end{equation}
+
+The best precondtioner would be the preconditioner which makes $\kappa$ unity, i.e. completly
+eliminating it from the computational complexity equation. The only choice of $\bM$ which is capable of best way to do this is to chooose as preconditioner the matrix $(\bA)^{-1}$, which is what we would like to determine in the frist place.
+If the diagonal entries of $\bA$ are more significant than its off-diagonal entries, then the Jacobian preconditioner is a good preconditioner to use. 
+
+
+
 
 
 
