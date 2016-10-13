@@ -1,25 +1,19 @@
 \begin{thebibliography}{}
-\makeatletter
-\relax
-\def\mn@urlcharsother{\let\do\@makeother \do\$\do\&\do\#\do\^\do\_\do\%\do\~}
-\def\mn@doi{\begingroup\mn@urlcharsother \@ifnextchar [ {\mn@doi@}
-  {\mn@doi@[]}}
-\def\mn@doi@[#1]#2{\def\@tempa{#1}\ifx\@tempa\@empty \href
-  {http://dx.doi.org/#2} {doi:#2}\else \href {http://dx.doi.org/#2} {#1}\fi
-  \endgroup}
-\def\mn@eprint#1#2{\mn@eprint@#1:#2::\@nil}
-\def\mn@eprint@arXiv#1{\href {http://arxiv.org/abs/#1} {{\tt arXiv:#1}}}
-\def\mn@eprint@dblp#1{\href {http://dblp.uni-trier.de/rec/bibtex/#1.xml}
-  {dblp:#1}}
-\def\mn@eprint@#1:#2:#3:#4\@nil{\def\@tempa {#1}\def\@tempb {#2}\def\@tempc
-  {#3}\ifx \@tempc \@empty \let \@tempc \@tempb \let \@tempb \@tempa \fi \ifx
-  \@tempb \@empty \def\@tempb {arXiv}\fi \@ifundefined
-  {mn@eprint@\@tempb}{\@tempb:\@tempc}{\expandafter \expandafter \csname
-  mn@eprint@\@tempb\endcsname \expandafter{\@tempc}}}
 
-\bibitem[\protect\citeauthoryear{Liu, Tegmark, Morrison, Lutomirski  \&
+\bibitem[\protect\citeauthoryear{Hestenes}{Hestenes}{1973}]{Hestenes1973}
+Hestenes M.~R.,  1973, Journal of Optimization Theory and Applications, 11, 323
+
+\bibitem[\protect\citeauthoryear{Hestenes \& Stiefel}{Hestenes \&
+  Stiefel}{1952}]{Hestenes1952}
+Hestenes M.~R.,  Stiefel E.,  1952, Journal of Research of the National Bureau
+  of Standards, 49
+
+\bibitem[\protect\citeauthoryear{Kaniel}{Kaniel}{1966}]{Kaniel1966}
+Kaniel S.,  1966, Mathematics of Computation, 20, 369
+
+\bibitem[\protect\citeauthoryear{Liu, Tegmark, Morrison, Lutomirski \&
   Zaldarriaga}{Liu et~al.}{2010}]{Liu2010}
-Liu A.,  Tegmark M.,  Morrison S.,  Lutomirski A.,   Zaldarriaga M.,  2010,
+Liu A.,  Tegmark M.,  Morrison S.,  Lutomirski A.,    Zaldarriaga M.,  2010,
   Monthly Notices of the Royal Astronomical Society, 408, 1029
 
 \bibitem[\protect\citeauthoryear{Marthi \& Chengalur}{Marthi \&
@@ -27,9 +21,28 @@ Liu A.,  Tegmark M.,  Morrison S.,  Lutomirski A.,   Zaldarriaga M.,  2010,
 Marthi V.~R.,  Chengalur J.,  2014, Monthly Notices of the Royal Astronomical
   Society, 437, 524
 
+\bibitem[\protect\citeauthoryear{Reid}{Reid}{1971}]{Reid1971}
+Reid J.~K., , 1971, {On the method of conjugate gradients for the solution of
+  large sparse systems of linear equations}
+
+\bibitem[\protect\citeauthoryear{Salvini \& Wijnholds}{Salvini \&
+  Wijnholds}{2014}]{Salvini2014}
+Salvini S.,  Wijnholds S.~J.,  2014, A\&A, 571, A97
+
+\bibitem[\protect\citeauthoryear{Shewchuk}{Shewchuk}{1994}]{Shewchuk1994}
+Shewchuk J.~R., , 1994, {An introduction to the conjugate gradient method
+  without the agonizing pain}
+
 \bibitem[\protect\citeauthoryear{Smirnov \& Tasse}{Smirnov \&
   Tasse}{2015}]{Smirnov2015}
 Smirnov O.,  Tasse C.,  2015, MNRAS, 449, 2668
 
-\makeatother
+\bibitem[\protect\citeauthoryear{Stiefel}{Stiefel}{1952}]{Stiefel1952}
+Stiefel E.,  1952, Zeitschrift f{\"u}r angewandte Mathematik und Physik ZAMP,
+  3, 1
+
+\bibitem[\protect\citeauthoryear{{Van der Sluis} \& van~der Vorst}{{Van der
+  Sluis} \& van~der Vorst}{1986}]{Sluis1986}
+{Van der Sluis} A.,  van~der Vorst H.~A.,  1986, Numerische Mathematik, 48, 543
+
 \end{thebibliography}

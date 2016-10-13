@@ -422,25 +422,20 @@ and
 STILL NEEDS LOTS OF WORK.
 
 \section{Conjugate Gradient Method}
-
-
-
-The conjugate gradient method is an iterative method which is used to solve large linear systems, i.e.
+The Conjugate Gradient (CG) method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
+reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear systems. The CG method is generally used to solve
 \begin{equation}
 \label{eq:linear_system}
 \bb = \bA\bx,
 \end{equation}
-where $\bb$ is a known complex column vector, $\bx$ is the unknown complex column vector with the same length as $\bb$, and $\bA$ is a square complex matrix with appropriate dimensions.  
-The conjugate gradient method can in general only be applied to the above linear system if $\bA$ is a square positive-definite or a positive semi-definite Hermitian matrix. If
-$\bA$ is a square positive semi-definite Hermitian matrix, then the conjugate gradient method only converges if $\bb$ is in the column range of $\bA$ (cite Lu2016). Moreover, using the 
-conjugate gradient method to solve Eq.~\eqref{eq:linear_system} will only be computationally advantageous if $\bA$ is also sparse (contain many zero entries).
+where $\bb\in\mathbb{C}^P$ is a known complex column vector of size $P$, $\bx\in\mathbb{C}^P$ is an unknown complex column vector with the same length as $\bb$, and $\bA\in\mathbb{C}^{P\times P}$ is a square positive-definite Hermitian matrix with the appropriate dimensions.  
+Moreover, using the CG method to solve Eq.~\eqref{eq:linear_system} will only be computationally advantageous if $\bA$ is also sparse (contain many zero entries).
+Using the iterative CG method to solve large sparse linear sytems was popularized by \citet{Reid1971}. A good tutorial on the CG method can be found in \citep{Shewchuk1994}.
 
-The Conjugate Gradient method was independently discovered by Hestenes and Stiefel. They later published a joint paper, n, which is now considered as the seminal
-reference on CG. Kaniel was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence was conducted 
-by van erSluis and van der Vorst. [Reid is credited for popularizing CG as an iterative method that can efficiently solve large sparse linear systems] RW. 
+%If $\bA$ is a square positive semi-definite Hermitian matrix, then the conjugate gradient method only converges if $\bb$ is in the column range of $\bA$ (cite Lu2016).
 
 \begin{algorithm}
-\caption{Conjugate Gradient Method}\label{algo:extrap_algo}
+\caption{Conjugate Gradient Method}\label{algo:CG}
 \begin{algorithmic}[1]
 \State $\br \gets \bA\bx_0 - \bb$
 \State $\bp \gets -\br_0$
@@ -458,6 +453,9 @@ by van erSluis and van der Vorst. [Reid is credited for popularizing CG as an it
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{Computational Complexity}
+\citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
+\citep{Sluis1986}.
 The computational complexity of CG is $\mathbb{O}(\sqrt{\kappa}m)$, where $\kappa$ is the generalized specctral condition number of the matrix $\bA$ and $m$ is the number of
 non-zero entries in the matrix $\bA$. The mathematical
 definition of $\kappa(\bA)$ is
