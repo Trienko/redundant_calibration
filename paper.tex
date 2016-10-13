@@ -483,9 +483,12 @@ Moreover, the inverse of $\bM$ must also be much easier to compute than the inve
 \bM^{-1}\bA\bx = \bM^{-1}\bb.
 \end{equation}
 The logic behind using Eq.~\eqref{eq:prec} rather than Eq.~\eqref{eq:linear_system} to obtain $\bx$ is that if $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e.
-by preconditioning we reduce $\kappa$ which improves the convergence rate of CG. The best choice of $\bM$ would be $\bA$, which would reduce $\kappa$ to unity which reduces
-Eq.~\eqref{eq:cg_bound} to $\mathbb{O}(m)$. But of course, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and we would not need CG or any other type of 
-linear solver for that mattter to compute it in the first place. If the diagonal entries of $\bA$ is much more significant than its off-diagonal entries then the 
+by preconditioning we reduce $\kappa$ which improves the convergence rate of CG. The best choice of $\bM$ would be $\bA$, which would reduce $\kappa$ (as the largest and smallest eignevalue of the Identity matrix is equal to one) to unity which reduces
+Eq.~\eqref{eq:cg_bound} to $\mathbb{O}(m)$. But of course, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
+The better $\bM$ approximates $\bA$ the better preconditioner it will be. However, if it is not much less expensive to 
+compute the inverse of $\bM$ thant that of $\bA$ we gain nothing, as we still need to 
+
+If the diagonal entries of $\bA$ is much more significant than its off-diagonal entries then the 
 Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner is computed as follows:
 \begin{equation}
 \bM = \bA\odot\bI, 
