@@ -459,7 +459,7 @@ The iterative CG method is presented in Algorithm \ref{algo:CG}.
 \subsection{Computational Complexity}
 \citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
 \citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
-the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the specctral condition number of the matrix $\bA$.
+the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the spectral condition number of the matrix $\bA$.
 The mathematical definition of $\kappa(\bA)$ is
 \begin{equation}
 \label{eq:kappa}
@@ -511,32 +511,25 @@ to estimate the $\bx$ that minimizes
 \end{equation}
 There are a few important observations that we can make while inspecting Eq.~\eqref{eq:normal_equation}:
 \begin{enumerate}
-\item $\bB^H\bB$ is an Hermitian positive semi-definite square matrix by construction.
+\item $\bB^H\bB$ is a square positive semi-definite Hermitian matrix by construction.
 \item $\bB^H\bb$ is in the column range of $\bB^H\bB$; this follows trivially from 
 \begin{equation}
 \bB^H\bb \in \mathcal{R}(\bB^H) \implies \bB^H\bb \in \mathcal{R}(\bB^H\bB).   
 \end{equation}
 \end{enumerate}
 
-Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is an Hermitian positive-definite square matrix. Recently,
+Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is a square positive-definite Hermitian matrix. Recently,
 \citet{Lu2015} showed that the CG method has an even broader applicability, it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is an Hermitian positive semi-definite
-square Hermitian matrix as long as $\bb$ is in the column range of $\bA$. Combining the result from Lu with the aformentioned two observations we made in regards to Eq.~\eqref{}  
+square matrix as long as $\bb$ is in the column range of $\bA$.
 
-It now trivially follows \citet{Lu2015} from follows that we can apply the CG method to solve any normal equation. We have already  
+In light of \citet{Lu2015}, the two observations in the numbered list we presented earlier in this section imply that Eq.~\eqref{eq:normal_equation}
+can be solved by employing the CG method. The solution returned by CG is however only unique if $\bB^H\bB$ is positive-definite (invertible). The solution
+obtained by CG, whether it be unique or not, does however minimize Eq.~\eqref{eq:norm_ls} in a least squares sense.
 
-
-%It is a well known fact that the normal equation has at least one solution. If $\bB^H\bB$ is invertible then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bB^H\bB$ is singular there are an infinite amount of solutions
-%that minimizes Eq.~\eqref{eq:norm_ls}. 
-%Interestingly enough, we can use the CG method to solve Eq.~\eqref{eq:normal_equation} in either one of the previously mentioned scenarios.
-
-
-Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
-and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
-\begin{equation}
-\bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
-\end{equation}
-
-
+Note that if $\bA$ is positive semi-definite its smallest eigenvalue is zero, which implies that Eq.~\eqref{eq:kappa} is not defined. \citet{Lu2015} show that when $\bA$
+is a square positive semi-definite Hermitian matrix we do not use the spectral condition number to bound the convergence complexity of CG, but the general spectral condition
+number instead. The general spectral condition number is very similar to the spectral condition number, the only difference being that in Eq.~\eqref{eq:kappa} we replace  
+$\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
 \section{Least Squares}
 Redundant calibration can be achieved by solving the following optimization problem
