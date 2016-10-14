@@ -458,67 +458,79 @@ The iterative CG method is presented in Algorithm \ref{algo:CG}.
 
 \subsection{Computational Complexity}
 \citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
-\citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of only one major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
-the number of major outer iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the generalized specctral condition number of the matrix $\bA$ \citep{Lu2015}.
+\citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
+the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the specctral condition number of the matrix $\bA$.
 The mathematical definition of $\kappa(\bA)$ is
 \begin{equation}
 \label{eq:kappa}
-\kappa(\bA) = \frac{\lambda_{\textrm{max}}}{\lambda^{+}_{\textrm{min}}}, 
+\kappa(\bA) = \frac{\lambda_{\textrm{max}}}{\lambda_{\textrm{min}}}, 
 \end{equation}
-where $\lambda_{\textrm{max}}$ and $\lambda^{+}_{\textrm{min}}$ respectively denote the largest eigenvalue and the smallest positive eigenvalue of $\bA$.
-Note that, since $\bA$ is positive-definite all its eigenvalues will be positive. The reason why it is required to spcifically add the positivity requirement to Eq.~\eqref{eq:kappa} will become
-apparent after reading Sec \textbf{??}. Furthermore, the most expensive operation that is conducted within each major loop of Algorithm~\ref{algo:CG} is the vector-matrix product $\bA\bp$, which has a complexity of $\mathbb{O}(m)$, where $m$ is the number of non-zero entries in $\bA$.
+where $\lambda_{\textrm{max}}$ and $\lambda_{\textrm{min}}$ respectively denote the largest and the smallest eigenvalue of $\bA$.
+Moreover, the most expensive operation that is conducted within each major loop of Algorithm~\ref{algo:CG} is the vector-matrix product $\bA\bp$, which has a complexity of $\mathbb{O}(m)$, where $m$ is the number of non-zero entries in $\bA$.
 The computational complexity of CG is therefore 
 \begin{equation}
 \label{eq:cg_bound}
 \mathbb{O}(\sqrt{\kappa}m). 
 \end{equation}
-It should now also be clear to the reader why the CG method is espicially applicable to sparse linear systems, since in those cases $m < P^2$.
+It should now also be clear to the reader why the CG method is especially applicable to sparse linear systems, since in those cases $m < P^2$.
 
 \subsection{Preconditioning}
-Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix which approximates $\bA$.
-Moreover, the inverse of $\bM$ must also be much easier to compute than the inverse of $\bA$. We can now indirectly solve for $\bx$ by using 
+Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix.
+We can now indirectly solve for $\bx$ by using 
 \begin{equation}
 \label{eq:prec}
 \bM^{-1}\bA\bx = \bM^{-1}\bb.
 \end{equation}
-The logic behind using Eq.~\eqref{eq:prec} rather than Eq.~\eqref{eq:linear_system} to obtain $\bx$ is that if $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e.
-by preconditioning we reduce $\kappa$ which improves the convergence rate of CG. The best choice of $\bM$ would be $\bA$, which would reduce $\kappa$ (as the largest and smallest eignevalue of the Identity matrix is equal to one) to unity which reduces
-Eq.~\eqref{eq:cg_bound} to $\mathbb{O}(m)$. But of course, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
-The better $\bM$ approximates $\bA$ the better preconditioner it will be. However, if it is not much less expensive to 
-compute the inverse of $\bM$ thant that of $\bA$ we gain nothing, as we still need to 
+If $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e. a good preconditioner lowers the condition number of a matrix which in turn increases the convergence speed 
+of CG (see Eq.~\eqref{eq:cg_bound}). The best possible choice of $\bM$ would therefore be $\bA$, which would lead to $\kappa$ (as the largest and smallest eigenvalue of the Identity matrix is equal to one) becoming unity.
+If $\kappa$ is one then Eq.~\eqref{eq:cg_bound} simplifies and becomes $\mathbb{O}(m)$. However, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
+In short, a good preconditioner $\bM$ must approximate $\bA$ fairly accurately. However, if it is not much less expensive to 
+compute the inverse of $\bM$ than that of $\bA$ we actually gain nothing (see Eq.~\eqref{eq:prec}).  
 
 If the diagonal entries of $\bA$ is much more significant than its off-diagonal entries then the 
 Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner is computed as follows:
 \begin{equation}
 \bM = \bA\odot\bI, 
 \end{equation}
-where $\bI$ is the identity matrix. Since the Jacobian preconditioner is a diagonal matrix is inverse can be computed trivially.
+where $\bI$ is the identity matrix. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
 
-
-
-
-Using preconditioning will therefore improve the 
-, which 
-implies that the computational complexity of the CG algorithm will be less in the case of  Eq.~\eqref{eq:prec} than in the case of Eq.~\eqref{eq:linear_system}. 
-
-The best precondtioner would be the preconditioner which makes $\kappa$ unity, i.e. completly
-eliminating it from the computational complexity equation. The only choice of $\bM$ which is capable of best way to do this is to chooose as preconditioner the matrix $(\bA)^{-1}$, which is what we would like to determine in the frist place.
-If the diagonal entries of $\bA$ are more significant than its off-diagonal entries, then the Jacobian preconditioner is a good preconditioner to use. 
-State better that the choice of preconditioner, the value of kappa and what the effect of this would be on the computational complexity of the method.
-
-In general, when $\bA$ has dimensions $m\times n$, with $m > n$ we can use the normal equation 
+\subsection{Normal Equation}
+Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
+\begin{equation}
+ \bb = \bB\bx,
+\end{equation}
+where $\bb\in\mathbb{C}^K$, $\bx\in\mathbb{C}^P$  and $\bB\in\mathbb{C}^{K \times P}$, with $K > P$. We can use the normal equation 
 \begin{equation}
 \label{eq:normal_equation}
-\bA^H\bA\bx = \bA^H\bb 
+\bB^H\bB\bx = \bB^H\bb 
 \end{equation}
 to estimate the $\bx$ that minimizes
 \begin{equation}
 \label{eq:norm_ls}
-\|\bb-\bA\bx\|. 
+\|\bb-\bB\bx\|_F^2. 
 \end{equation}
-If $\bA^H\bA$ is invertiable then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bA^H\bA$ is singular there are an infinite amount of solutions
-that minimizes Eq.~\eqref{eq:norm_ls}. Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
+There are a few important observations that we can make while inspecting Eq.~\eqref{eq:normal_equation}:
+\begin{enumerate}
+\item $\bB^H\bB$ is an Hermitian positive semi-definite square matrix by construction.
+\item $\bB^H\bb$ is in the column range of $\bB^H\bB$; this follows trivially from 
+\begin{equation}
+\bB^H\bb \in \mathcal{R}(\bB^H) \implies \bB^H\bb \in \mathcal{R}(\bB^H\bB).   
+\end{equation}
+\end{enumerate}
+
+Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is an Hermitian positive-definite square matrix. Recently,
+\citet{Lu2015} showed that the CG method has an even broader applicability, it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is an Hermitian positive semi-definite
+square Hermitian matrix as long as $\bb$ is in the column range of $\bA$. Combining the result from Lu with the aformentioned two observations we made in regards to Eq.~\eqref{}  
+
+It now trivially follows \citet{Lu2015} from follows that we can apply the CG method to solve any normal equation. We have already  
+
+
+%It is a well known fact that the normal equation has at least one solution. If $\bB^H\bB$ is invertible then the solution that minimizes Eq.~\eqref{eq:norm_ls} is unique. In contrast, if $\bB^H\bB$ is singular there are an infinite amount of solutions
+%that minimizes Eq.~\eqref{eq:norm_ls}. 
+%Interestingly enough, we can use the CG method to solve Eq.~\eqref{eq:normal_equation} in either one of the previously mentioned scenarios.
+
+
+Moreover, we can use the CG method to solve Eq.~\eqref{eq:normal_equation}, since $\bA^H\bA$ is Hermitian by construction 
 and $\bA^H\bb$ is in the column range of $\bA^H\bA$.
 \begin{equation}
 \bA^H\bb \in \mathcal{R}(\bA^H) \implies \bA^H\bb \in \mathcal{R}(\bA^H\bA).   
