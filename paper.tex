@@ -518,9 +518,8 @@ There are a few important observations that we can make while inspecting Eq.~\eq
 \end{equation}
 \end{enumerate}
 
-Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is a square positive-definite Hermitian matrix. Recently,
-\citet{Lu2015} showed that the CG method has an even broader applicability, it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is an Hermitian positive semi-definite
-square matrix as long as $\bb$ is in the column range of $\bA$.
+Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is a square positive-definite Hermitian matrix. The CG method actually has an even broader applicability, it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is an Hermitian positive semi-definite
+square matrix as long as $\bb$ is in the column range of $\bA$ \citep{Lu2015}.
 
 In light of \citet{Lu2015}, the two observations in the numbered list we presented earlier in this section imply that Eq.~\eqref{eq:normal_equation}
 can be solved by employing the CG method. The solution returned by CG is however only unique if $\bB^H\bB$ is positive-definite (invertible). The solution
@@ -528,7 +527,7 @@ obtained by CG, whether it be unique or not, does however minimize Eq.~\eqref{eq
 
 Note that if $\bA$ is positive semi-definite its smallest eigenvalue is zero, which implies that Eq.~\eqref{eq:kappa} is not defined. \citet{Lu2015} show that when $\bA$
 is a square positive semi-definite Hermitian matrix we do not use the spectral condition number to bound the convergence complexity of CG, but the general spectral condition
-number instead. The general spectral condition number is very similar to the spectral condition number, the only difference being that in Eq.~\eqref{eq:kappa} we replace  
+number instead. The general spectral condition number is very similar to the spectral condition number; the only difference being that in Eq.~\eqref{eq:kappa} we replace  
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
 \section{Least Squares}
