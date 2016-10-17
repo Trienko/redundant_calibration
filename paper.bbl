@@ -11,10 +11,19 @@ Hestenes M.~R.,  Stiefel E.,  1952, Journal of Research of the National Bureau
 \bibitem[\protect\citeauthoryear{Kaniel}{Kaniel}{1966}]{Kaniel1966}
 Kaniel S.,  1966, Mathematics of Computation, 20, 369
 
+\bibitem[\protect\citeauthoryear{Levenberg}{Levenberg}{1944}]{Levenberg1944}
+Levenberg K.,  1944, The Quarterly J. of App. Math., 2, 164
+
 \bibitem[\protect\citeauthoryear{Liu, Tegmark, Morrison, Lutomirski \&
   Zaldarriaga}{Liu et~al.}{2010}]{Liu2010}
 Liu A.,  Tegmark M.,  Morrison S.,  Lutomirski A.,    Zaldarriaga M.,  2010,
   Monthly Notices of the Royal Astronomical Society, 408, 1029
+
+\bibitem[\protect\citeauthoryear{Lu \& Chen}{Lu \& Chen}{2015}]{Lu2015}
+Lu Z.,  Chen X.,  2015, arXiv preprint arXiv:1511.07837
+
+\bibitem[\protect\citeauthoryear{Marquardt}{Marquardt}{1963}]{Marquardt1963}
+Marquardt D.,  1963, SIAM J. of App. Math., 11, 431
 
 \bibitem[\protect\citeauthoryear{Marthi \& Chengalur}{Marthi \&
   Chengalur}{2014}]{Marthi2014}
@@ -37,6 +46,11 @@ Shewchuk J.~R., , 1994, {An introduction to the conjugate gradient method
   Tasse}{2015}]{Smirnov2015}
 Smirnov O.,  Tasse C.,  2015, MNRAS, 449, 2668
 
+\bibitem[\protect\citeauthoryear{Sorber, Barel \& Lathauwer}{Sorber
+  et~al.}{2012}]{Sorber2012}
+Sorber L.,  Barel M.~V.,    Lathauwer L.~D.,  2012, SIAM Journal on
+  Optimization, 22, 879
+
 \bibitem[\protect\citeauthoryear{Stiefel}{Stiefel}{1952}]{Stiefel1952}
 Stiefel E.,  1952, Zeitschrift f{\"u}r angewandte Mathematik und Physik ZAMP,
   3, 1
@@ -44,5 +58,8 @@ Stiefel E.,  1952, Zeitschrift f{\"u}r angewandte Mathematik und Physik ZAMP,
 \bibitem[\protect\citeauthoryear{{Van der Sluis} \& van~der Vorst}{{Van der
   Sluis} \& van~der Vorst}{1986}]{Sluis1986}
 {Van der Sluis} A.,  van~der Vorst H.~A.,  1986, Numerische Mathematik, 48, 543
+
+\bibitem[\protect\citeauthoryear{Wirtinger}{Wirtinger}{1927}]{Wirtinger1927}
+Wirtinger W.,  1927, Mathematische Annalen, 97, 357
 
 \end{thebibliography}
