@@ -171,7 +171,7 @@ The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ 
 
 \begin{equation}
 \label{eq:vis_definition}
-d_{pq} = g_{p}\conj{g}_{q}y_{pq} + n_{pq},
+d_{pq} = g_{p}\conj{g_q}y_{pq} + n_{pq},
 \end{equation}
 where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
 and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During the course of an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which infact have 
@@ -251,7 +251,7 @@ a similar result; the second antenna index of the composite antenna pair. \textb
 If the array is redundant and the function $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
 \begin{equation}
 \label{eq:vis_red}
-d_{pq} = g_{p}\conj{g}_{q}y_{\phi_{pq}} + n_{pq}.
+d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq}.
 \end{equation}
 Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form 
 \begin{equation}
@@ -259,7 +259,7 @@ Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form
 \end{equation}
 where 
 \begin{align}
- \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g}_q\nonumber\\
+ \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q}\nonumber\\
  \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
 \end{align}
 In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$ (i.e. $p<q$), which denotes the number of baselines in the array. Moreover,
@@ -620,12 +620,12 @@ We use Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} to iteratively updat
 parameter vector as follows:
 \begin{equation}
 \label{eq:update}
-\breve{\bz}_{k+1} \gets \breve{\bz}_{k} + \Delta \breve{\bz}_{k}. 
+\breve{\bz}_{k+1} = \breve{\bz}_{k} + \Delta \breve{\bz}_{k}. 
 \end{equation}
 We update our parameter vector by using Eq.~\eqref{eq:update} until convergence is reached. To improve readability we do not explicitly denote the iteration subscript $k$ in 
 Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
-\subsection{Redundant Jacobian and Hessian}
+\subsection{Analytic Expressions}
 If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:least_squares_complex} we obtain the following analytic result:
 \begin{equation}
 \label{eq:Jacobian_red}
@@ -647,15 +647,35 @@ and
       \end{bmatrix}.
 \end{equation}
 Moreover,
-\begin{align}
-\left [ \bM_1 \right ]_{\alpha_{pq},j} &= y_{\phi_{pq}}\conj{g}_q\delta_p^j, & \left [ \bM_2 \right ]_{\alpha_{pq},j} &= g_p\conj{g}_q\delta_{\phi_{pq}}^j 
-\end{align}
-and
 \begin{equation}
-\left [ \bN_1 \right ]_{\alpha_{pq},j} = g_py_{\phi_{pq}}\delta^j_q. 
+\left [ \bO  \right ]_{\alpha_{pq},j} = \begin{cases}
+                                         y_{\phi_{pq}}\conj{g_q} & \textrm{if}~p=j\\
+                                         0  & \textrm{otherwise} 
+                                        \end{cases},
 \end{equation}
 
-It is now trivial to compute the Hessian $\bJ^H\bJ$ by using Eq.~\eqref{eq:Jacobian_red}. If we substitute Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\bJ$
+\begin{equation}
+\left [ \bP  \right ]_{\alpha_{pq},j} = \begin{cases}
+                                         g_p\conj{g_q} & \textrm{if}~\phi_{pq}=j\\
+                                         0  & \textrm{otherwise} 
+                                        \end{cases}
+\end{equation}
+and
+\begin{equation}
+\left [ \bQ  \right ]_{\alpha_{pq},j} = \begin{cases}
+                                         g_py_{\phi_{pq}} & \textrm{if}~q=j\\
+                                         0  & \textrm{otherwise} 
+                                        \end{cases}
+\end{equation}
+
+%\begin{align}
+%\left [ \bM_1 \right ]_{\alpha_{pq},j} &= y_{\phi_{pq}}\conj{g_q}\delta_p^j, & \left [ \bM_2 \right ]_{\alpha_{pq},j} &= g_p\conj{g_q}\delta_{\phi_{pq}}^j 
+%\end{align}
+%\begin{equation}
+%\left [ \bN_1 \right ]_{\alpha_{pq},j} = g_py_{\phi_{pq}}\delta^j_q. 
+%\end{equation}
+
+It is now trivial to compute the Hessian $\bH$ by using Eq.~\eqref{eq:Jacobian_red}. If we substitute Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\bJ$
 we obtain 
 \begin{equation}
 \label{eq:red_H}
@@ -708,20 +728,19 @@ and
  0 & \textrm{otherwise}
 \end{cases}.
 \end{equation}
-
 Moreover, $(*)^T$ denotes matrix transposition and
-
 \begin{equation}
 \mathcal{PQ}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
 \end{equation}
 
-HAVE TO MAKE SURE I DEFINE ALL THE MATH SYMBOLS THAT I USE. IF NOT HERE THEN EARLIER....
-
 Furthermore, substituting Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\breve{\br}$ results in
 \begin{equation}
 \bJ^H\breve{\br} = \begin{bmatrix}
-                   \ba & \bb & \conj{\ba} & \conj{\bb}\\
-                   \end{bmatrix}^T,
+                   \ba \\
+                   \bb \\
+                   \conj{\ba}\\
+                   \conj{\bb}
+                   \end{bmatrix},
 \end{equation}
 where
 \begin{align}
@@ -736,11 +755,10 @@ and
 y_{\zeta_{ik}} & \textrm{otherwise}
 \end{cases}.
 \end{equation}
+Moreover $\ba$ and $\bb$ are both column vectors.
 
 HAVE TO RECHECK THE ABOVE EQUATIONS DIRECTLY FROM THE CODE.
-
-HAVE TO STATE WHETHER COLUMN OR ROW VECTOR.
-
+DEFINED ALL OPERATORS AND SYMBOLS?
 
 % \begin{equation}
 % \boldsymbol{J}^H\breve{\boldsymbol{d}} = 
@@ -773,18 +791,25 @@ Replacing $\breve{\br}$ with $\breve{\bd}-\breve{\bv}$ in Eq.~\eqref{eq:GN_updat
 \label{eq:temp_GN_eq}
 \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H(\breve{\bd}-\breve{\bv}), 
 \end{equation}
-Substituting the first identity of Eq.~\eqref{eq:identities} into Eq.~\eqref{eq:temp_GN_eq} and simplifying we obtain
+Substituting the first identity of Eq.~\eqref{eq:identities} into Eq.~\eqref{eq:temp_GN_eq} and simplifying the result 
 \begin{equation}
 \label{eq:one_thrid}
 \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd}-\frac{1}{3}\breve{\bz}.
 \end{equation}
-It now trivially follows from Eq.~\eqref{eq:one_thrid} that:
+It now trivially follows that:
 \begin{equation}
 \label{eq:two_thrids}
 \breve{\bz}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{2}{3}\breve{\bz}_{k}. 
 \end{equation}
-%STILL NEED TO ADD z k+1 EXPRESSION.
-THE TAKE HOME HERE IS WE CAN CALCULATE THE UPDATE STEP WITHOUT CALCULATING THE RESIDUAL.
+Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we can calculate the GN update step without calculating the residual. The 
+normal skymodel-based equivalent of Eq.~\eqref{eq:two_thrids} is equal to \citep{Smirnov2015}:
+\begin{equation}
+\label{eq:one_half}
+\breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}, 
+\end{equation}
+where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
+
+FIX TRANSPOSE PROBLEM
 
 \subsection{GN and LINCAL}
 As we mentioned at the start of this section, the Wirtinger framework is not the only way in which we can ensure that $\bv$ is analytic in its argument. We could also 
