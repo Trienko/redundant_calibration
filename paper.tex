@@ -531,17 +531,16 @@ number instead. The general spectral condition number is very similar to the spe
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
 \section{Least Squares}
-Redundant calibration can be achieved by solving the following optimization problem
+The method of nonlinear least squares is tanatamount to solving the following optimization problem  
 \begin{equation}
 \label{eq:red_least_squares}
-\min_{\bz} \|\br\| = \min_{\bz} \|\bd - \bv(\bz)\|, 
+\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
 \end{equation}
-where $\bz = [\bg,\by]^T$. Eq.~\eqref{eq:red_least_squares} is a nonlinear least squares problem.
+where $\Lambda$ is known as the objective function, $\br$ is the residual vector, $\bd$ is the observed data vector, $\bv$ is the model data vector and $\bz$ is the solution which minimizes Eq.~\eqref{eq:red_least_squares}.
+The main objective of least squares is to find the model parameters which minimizes the squared difference between the observed data and the model. Moreover, $\|*\|_F$ denotes the 
+Frobenius norm.
 
-The most standard way of solving a general least squares problem is to use a gradient type of minimization algorithm whose main purpose is to find the model parameters that 
-minimizes the difference between the observed and model data. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt (cite LM here). For the redundant calibration problem in Eq.~\eqref{eq:red_least_squares} $\bd$, which is the corrupted observed visibilities, is the observed data,
-while $\bv$, which is the predicted visibilities, represents the model data.\footnote{In this paper we use the same symbol to denote predicted visibilities and true observed visibilities as it
-is trivial to distinguish which one is implied from the context.}   
+The most standard way of solving Eq.~\eqref{eq:red_least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
 
 The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bv$ to be differentiable
 towards each model parameter. When the least squares problem is complex, which is the case for Eq.~\eqref{eq:red_least_squares}, it becomes less straightforward to apply these gradient based minimization methods. The reason being,
@@ -551,7 +550,7 @@ classical definition of differentiation is used then $\frac{\partial z}{\partial
 The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bv$ becomes analytic in its argument.
 The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
 
-Recently Kreutz-Delgado and Sorber proposed an alternative strategy, which involves the use of Wirtinger calculus (Wirtinger 1927). The Wirtinger derivatives 
+Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
 are defined to be 
 \begin{align}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
@@ -561,8 +560,15 @@ Using the above definitions we can now easily compute the following:
 \frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
 \end{align}
 
+\subsection{Redundant Calibration}
 \citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
-that the Wirtinger framework can also be applied to redundant calibration. Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:red_least_squares} to 
+that the Wirtinger framework can also be applied to redundant calibration.
+
+For the redundant calibration problem in Eq.~\eqref{eq:red_least_squares} $\bd$, which is the corrupted observed visibilities, is the observed data,
+while $\bv$, which is the predicted visibilities, represents the model data.\footnote{In this paper we use the same symbol to denote predicted visibilities and true observed visibilities as it
+is trivial to distinguish which one is implied from the context.}   
+
+ Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:red_least_squares} to 
 \begin{equation}
 \label{eq:red_least_squares_complex}
 \min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
@@ -571,6 +577,8 @@ where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\
 If we use the Wirtinger derivative instead of the classic notion of a derivative to define the gradient operator then 
 $\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole. The fact that $\bv$ is now analytic in its argument has the immediate consequence that it becomes possible to use the Gauss-Newton
 and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex} \citep{Smirnov2015}.
+
+
 
 STILL NEEDS LOADS OF WORK. REFERENCES.
 
