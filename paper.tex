@@ -60,11 +60,15 @@
 \newcommand{\bH}{\bmath{H}}
 \newcommand{\bN}{\bmath{N}}
 \newcommand{\bM}{\bmath{M}}
+\newcommand{\bO}{\bmath{O}}
+\newcommand{\bP}{\bmath{P}}
+\newcommand{\bQ}{\bmath{Q}}
 \newcommand{\bI}{\bmath{I}}
 \newcommand{\ba}{\bmath{a}}
 \newcommand{\bb}{\bmath{b}}
 \newcommand{\bx}{\bmath{x}}
 \newcommand{\bp}{\bmath{p}}
+\newcommand{\bmJ}{\bmath{\mathcal{J}}}
 \newcommand{\bzero}{\bmath{0}}
 %\newcommand{\bvarrho}{\bmath{\varrho}}
 %\newcommand{\bnu}{\bmath{\nu}}
@@ -531,28 +535,31 @@ number instead. The general spectral condition number is very similar to the spe
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
 \section{Least Squares}
-The method of nonlinear least squares is tanatamount to solving the following optimization problem  
+The method of nonlinear least squares is tanatamount to solving the following optimization problem:  
 \begin{equation}
-\label{eq:red_least_squares}
-\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
+\label{eq:least_squares}
+\min_{\bzeta} \Lambda(\bzeta) = \min_{\bzeta} \|\brho\|_F^2 = \min_{\bzeta} \|\bdelta - \bnu(\bzeta)\|_F^2, 
 \end{equation}
-where $\Lambda$ is known as the objective function, $\br$ is the residual vector, $\bd$ is the observed data vector, $\bv$ is the model data vector and $\bz$ is the solution which minimizes Eq.~\eqref{eq:red_least_squares}.
-The main objective of least squares is to find the model parameters which minimizes the squared difference between the observed data and the model. Moreover, $\|*\|_F$ denotes the 
+where $\Lambda$ is known as the objective function, $\brho$ is the residual vector, $\bdelta$ is the observed data vector, $\bnu$ is the model data vector and $\bzeta$ is the solution which minimizes Eq.~\eqref{eq:least_squares}.
+The main objective of least squares is to find the model parameters which minimizes the squared difference between the observed data and the model predicted data. Moreover, $\|*\|_F$ denotes the 
 Frobenius norm.
 
-The most standard way of solving Eq.~\eqref{eq:red_least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
+The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
 
-The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bv$ to be differentiable
-towards each model parameter. When the least squares problem is complex, which is the case for Eq.~\eqref{eq:red_least_squares}, it becomes less straightforward to apply these gradient based minimization methods. The reason being,
+The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bnu$ to be differentiable
+towards each model parameter. When the least squares problem is complex it becomes less straightforward to apply these gradient based minimization methods. The reason being,
 many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance if the 
 classical definition of differentiation is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
 
-The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bv$ becomes analytic in its argument.
+Redundant calibration is achieved by solving the following optimization problem:
+
+The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
 The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
 
 Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
 are defined to be 
 \begin{align}
+\label{eq:wir}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
 \end{align}
 Using the above definitions we can now easily compute the following:
@@ -561,41 +568,42 @@ Using the above definitions we can now easily compute the following:
 \end{align}
 
 \subsection{Redundant Calibration}
-\citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal calibration. We will now show
+\citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal skymodel-based calibration. We will now show
 that the Wirtinger framework can also be applied to redundant calibration.
 
-For the redundant calibration problem in Eq.~\eqref{eq:red_least_squares} $\bd$, which is the corrupted observed visibilities, is the observed data,
-while $\bv$, which is the predicted visibilities, represents the model data.\footnote{In this paper we use the same symbol to denote predicted visibilities and true observed visibilities as it
-is trivial to distinguish which one is implied from the context.}   
-
- Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:red_least_squares} to 
+We can perform redundant calibration by solving the following optimization problem: 
 \begin{equation}
-\label{eq:red_least_squares_complex}
+\label{eq:least_squares_red}
+\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
+\end{equation}
+where $\bz = [\bg,\by]^T$. The other vectors in Eq.~\eqref{eq:least_squares_red} were defined in Section~\ref{} \footnote{In this paper we use the same symbol to denote corrupted predicted visibilities and true observed corrupted visibilities as it
+is trivial to distinguish which one is implied from the context. Using the same symbol for these two quantities improves the readability of the paper.}. Note the similarity between Eq.~\eqref{eq:least_squares} and Eq.~\eqref{eq:least_squares_red},
+i.e. redundant calibration can be cast as a non-linear least squares problem. 
+
+Analogous to \cite{Smirnov2015}, we now recast Eq.~\eqref{eq:least_squares_red} to 
+\begin{equation}
+\label{eq:least_squares_complex}
 \min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
-where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:red_least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:red_least_squares}.
-If we use the Wirtinger derivative instead of the classic notion of a derivative to define the gradient operator then 
-$\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole. The fact that $\bv$ is now analytic in its argument has the immediate consequence that it becomes possible to use the Gauss-Newton
-and the Levenberg-Marquardt algorithm to solve Eq.~\eqref{eq:red_least_squares_complex} \citep{Smirnov2015}.
-
-
-
-STILL NEEDS LOADS OF WORK. REFERENCES.
+where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:least_squares_red}.
+If we use the Wirtinger derivatives, Eq.~\eqref{eq:wir}, instead of the classic notion of a derivative to define the gradient operator then 
+$\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}. The fact that $\bv$ is now analytic in its argument has the immediate consequence: it becomes possible to apply complex GN
+and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
 
 \subsection{Complex GN and LM}
-In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:red_least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
+In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
 \begin{equation}
 \label{eq:Jacobian}
 \bJ = \begin{bmatrix}
-       \bJ & \bJ^*\\
-       \conj{\bJ}^* & \conj{\bJ} 
+       \bmJ & \bmJ^*\\
+       \conj{\bmJ}^* & \conj{\bmJ} 
       \end{bmatrix},
 \end{equation}
 where 
 \begin{align}
-\bJ &= \frac{\partial \bv}{\partial \bz}, & \bJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
+\bmJ &= \frac{\partial \bv}{\partial \bz}, & \bmJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
 \end{align}
-In Eq.~\eqref{eq:Jacobian}, $\frac{\partial}{\partial \bz}$ and $\frac{\partial}{\partial \conj{\bz}}$ respectively denote the cogradient operator and the conjugate cogradient operator (cite Sorber).
+In Eq.~\eqref{eq:Jacobian}, $\frac{\partial}{\partial \bz}$ and $\frac{\partial}{\partial \conj{\bz}}$ respectively denote the cogradient operator and the conjugate cogradient operator \citep{Sorber2012}.
 The GN update step is now defined as:
 \begin{equation}
 \label{eq:GN_update}
@@ -607,11 +615,18 @@ The LM update rule is very similar, the major difference being a damping factor 
 \Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
 where $\bD=\bI\odot\bJ^H\bJ$. 
-NEED TO MENTION THE SILENT INDEX $k$ AND HOW THE UPDATE RULE IS ITERATIVE. ALSO MENTION THAT $\lambda$ IMPROVES THE CONVERGENCE PROPERTIES. WE WILL REFER TO $\bJ^H\bJ$ AS THE 
-HESSIAN.
+
+We use Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} to iteratively update our 
+parameter vector as follows:
+\begin{equation}
+\label{eq:update}
+\breve{\bz}_{k+1} \gets \breve{\bz}_{k} + \Delta \breve{\bz}_{k}. 
+\end{equation}
+We update our parameter vector by using Eq.~\eqref{eq:update} until convergence is reached. To improve readability we do not explicitly denote the iteration subscript $k$ in 
+Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
 \subsection{Redundant Jacobian and Hessian}
-If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:red_least_squares_complex} we obtain the following analytic result:
+If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:least_squares_complex} we obtain the following analytic result:
 \begin{equation}
 \label{eq:Jacobian_red}
 \bJ = \begin{bmatrix}
@@ -622,13 +637,13 @@ If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:red_least
 where
 \begin{equation}
 \bM =\begin{bmatrix}
-      \bM_1 & \bM_2
+      \bO & \bP
      \end{bmatrix},
 \end{equation}
 and 
 \begin{equation}
 \bN = \begin{bmatrix}
-       \bN_1 & \bzero
+       \bQ & \bzero
       \end{bmatrix}.
 \end{equation}
 Moreover,
@@ -778,11 +793,11 @@ of dealing with the issue. We can split the problem in Eq into its phase and amp
 This can be achieved by first rewriting Eq. as
 
 \begin{equation}
-\label{eq:red_least_squares_lincal}
+\label{eq:least_squares_lincal}
 \min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
 \end{equation}
 where $\bmath{\varrho} = \left [\bmath{\eta},\bmath{\varphi},\widetilde{\bmath{\eta}}, \widetilde{\bmath{\varphi}}\right ]^T$. The Jacobian associated with 
-Eq.~\eqref{eq:red_least_squares_lincal} is equal to the Eq xxx in the LINCAL section.
+Eq.~\eqref{eq:least_squares_lincal} is equal to the Eq xxx in the LINCAL section.
 We have therefore shown that doing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in the Appendix from first principles.
 An easy why of improving the convergence properties of LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
 
