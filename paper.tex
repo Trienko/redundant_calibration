@@ -63,6 +63,7 @@
 \newcommand{\bO}{\bmath{O}}
 \newcommand{\bP}{\bmath{P}}
 \newcommand{\bQ}{\bmath{Q}}
+\newcommand{\bR}{\bmath{R}}
 \newcommand{\bI}{\bmath{I}}
 \newcommand{\ba}{\bmath{a}}
 \newcommand{\bb}{\bmath{b}}
@@ -912,127 +913,95 @@ We can rewrite Eq.~\eqref{eq:vis_red_vec} to
 \bd = \bv(\bvarrho) + \bn, 
 \end{equation}
 where 
+\begin{align}
+\left [ \bv(\bvarrho) \right ]_{\alpha_{pq}} &= e^{\eta_p - i \varphi_p} e^{\widetilde{\eta}_{\phi_{pq}}- i \widetilde{\varphi}_{\phi_{pq}}} e^{\eta_q + i \varphi_q}\\
+&= v_{pq},
+\end{align}
+and
 \begin{equation}
-\left [ \bv(\bvarrho) \right ]_{\alpha_{pq}} = e^{\eta_p - i \varphi_p} e^{\widetilde{\eta}_{\phi_{pq}}- i \widetilde{\varphi}_{\phi_{pq}}} e^{\eta_q + i \varphi_q},
-\end{equation}
-\begin{equation}
- \bvarrho = 
+\bvarrho = 
 \begin{bmatrix}
 \bmath{\eta} \\
 \bvarphi \\
 \widetilde{\bmath{\eta}} \\
 \widetilde{\bvarphi}
-\end{bmatrix},
+\end{bmatrix},\qquad
+\begin{aligned}
+\bmath{\eta} &= [\eta_1, \eta_2,\cdots \eta_N]^T\\
+ \bmath{\varphi} &= [\varphi_1, \varphi_2,\cdots \varphi_N]^T\\
+ \widetilde{\bmath{\eta}} &= [\widetilde{\eta_1}, \widetilde{\eta_2},\cdots \widetilde{\eta_L}]^T\\
+ \widetilde{\bmath{\varphi}} &= [\widetilde{\varphi_1}, \widetilde{\varphi_2},\cdots \widetilde{\varphi_L}]^T
+\end{aligned}.
+\label{eq:help}
 \end{equation}
-with
-\begin{align}
- \bmath{\eta} &= [\eta_1, \eta_2,\cdots \eta_N]^T\nonumber\\
- \bmath{\varphi} &= [\varphi_1, \varphi_2,\cdots \varphi_N]^T\nonumber\\
- \widetilde{\bmath{\eta}} &= [\widetilde{\eta_1}, \widetilde{\eta_2},\cdots \widetilde{\eta_L}]^T\nonumber\\
- \widetilde{\bmath{\varphi}} &= [\widetilde{\varphi_1}, \widetilde{\varphi_2},\cdots \widetilde{\varphi_L}]^T.
-\end{align}
-Moreover, $\bmath{\eta},~\bvarphi,~\widetilde{\bmath{\eta}}$ and $\widetilde{\bvarphi}$ are real valued vectors.
-If we Taylor expand Eq.~\eqref{eq:lincal_vec} we obtain
-\begin{align}
-\bd &= \bv + \Delta \bvarrho \bmJ + \bn\\
-\br &= \Delta \bvarrho \bmJ + \bn,
-\end{align}
-where
+Note that the vectors $\bmath{\eta},~\bvarphi,~\widetilde{\bmath{\eta}}$ and $\widetilde{\bvarphi}$ are real valued.
+
+The first oreder Taylor expansion of Eq.~\eqref{eq:lincal_vec} around the fiducial point $\bvarrho_0$ is equal to
+\begin{equation}
+\label{eq:d_lin}
+\bd = \bv_0 + \bmJ_0 \Delta \bvarrho  + \bn.
+\end{equation}
+Calculating the residual and dropping the reference to a specific fiducial point, we obtain 
+\begin{equation}
+\label{eq:r_lin}
+\br = \bd - \bv = \bmJ \Delta \bvarrho + \bn.
+\end{equation}
+Moreover,
 \begin{equation}
 \label{eq:jac_upper_lincal}
 \bmJ = \begin{bmatrix}
        \bN & \bM 
-       \end{bmatrix}
-\end{equation}
-
-\begin{align}
- \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q}\nonumber\\
- \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:lincal_definitions}
-\end{align}
-
-
-A possible approach one can use to solve the unknowns in Eq.~\eqref{eq:lincal} is to write down the Taylor expansion of the first term of the right hand side of Eq.~\eqref{eq:lincal} around some 
-initial fiducial guess of $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$, which we denote with 
-$\eta_p^0,\eta_q^0,\widetilde{\eta}_{\phi_{pq}}^0,\varphi_p^0,\varphi_q^0$ and $\widetilde{\varphi}_{\phi_{pq}}^0$, and then to solve the perturbations from this 
-initial guess that minimize the difference between the right and left hand side of Eq.~\eqref{eq:lincal}. Once the perturbation values 
-have been computed it is trivial to obtain an estimate of $g_i$, $g_j$ and $y_{\phi_{ij}}$. 
-
-If we Taylor expand the first term on the right hand side of Eq.~\eqref{eq:lincal} around a fiducial initial guess we obtain
-\begin{equation}
-\label{eq:taylor_expansion}
-d_{pq} = v_{pq}^0[1+\Delta \eta_p + \Delta \eta_q + i \varphi_p - i \Delta \varphi_q + \Delta \widetilde{\eta}_{\phi_{pq}} + i\Delta \widetilde{\eta}_{\phi_{pq}}] + n_{pq}, 
+       \end{bmatrix},
 \end{equation}
 where
+\begin{align}
+\bN &= \begin{bmatrix} \bO & \bP \end{bmatrix}, & \bM &= \begin{bmatrix} \bQ & \bR \end{bmatrix}, 
+\end{align}
+
 \begin{equation}
-v_{pq}^0 = e^{\eta_p^0 - i \varphi_p^0} e^{\widetilde{\eta}_{\phi_{pq}}^0 - i \widetilde{\varphi}_{\phi_{pq}}^0} e^{\eta_q^0 + i \varphi_q^0}, 
+ [\bO]_{\alpha_{pq},j} =  \frac{\partial v_{pq}}{\partial \eta_j} = \begin{cases} 
+    v_{pq} &\textrm{if}~(p=j)~\textrm{or}~(q=j)\\
+    0 & \textrm{otherwise}
+   \end{cases},
 \end{equation}
-and $\eta_p^0,\eta_q^0,\widetilde{\eta}_{\phi_{pq}}^0,\varphi_p^0,\varphi_q^0$ and $\widetilde{\varphi}_{\phi_{pq}}^0$ respectively denote the initial guess for $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$.
-Eq.~\eqref{eq:taylor_expansion} can be used to construct the following linear system
+
 \begin{equation}
-\breve{\br} = \bJ\Delta\widehat{\bz}, 
+ [\bP]_{\alpha_{pq},j} =  \frac{\partial v_{pq}}{\partial \varphi_j} = \begin{cases}
+                                                                        i v_{pq} &\textrm{if}~ p=j\\
+                                                                        -i v_{pq} &\textrm{if}~ q=j \\
+                                                                        0 & \textrm{otherwise} 
+                                                                       \end{cases}
 \end{equation}
-where 
+
 \begin{equation}
-\left [ \breve{\br} \right ]_{\alpha_{pq}} = d_{pq}-v_{pq}^0, 
+ [\bQ]_{\alpha_{pq},j} =  \frac{\partial v_{pq}}{\partial \widetilde{\eta}_j} = \begin{cases} 
+    v_{pq} &\textrm{if}~\phi_{pq}=j\\
+    0 & \textrm{otherwise}
+   \end{cases},
 \end{equation}
+
 \begin{equation}
-\label{eq:jac_lincal}
-\bJ = \begin{bmatrix}
-      \bN & \bM\\
-      \conj{\bN} & \conj{\bM}
-      \end{bmatrix}
+ [\bR]_{\alpha_{pq},j} =  \frac{\partial v_{pq}}{\partial \widetilde{\varphi}_j} = \begin{cases} 
+    i v_{pq} &\textrm{if}~\phi_{pq}=j\\
+    0 & \textrm{otherwise}
+   \end{cases}.
 \end{equation}
-and
+
+The augmented residual is equal to 
 \begin{equation}
-\Delta\widehat{\bz} = 
+\breve{\br} = \bJ \Delta \bvarrho + \bn, 
+\end{equation}
+
+where $\breve{\br} = [r,\conj{r}]^T$ and 
+\begin{equation}
+\bJ =
 \begin{bmatrix}
-\Delta \bmath{\eta} \\
-\Delta \bmath{\varphi} \\
-\Delta \widetilde{\bmath{\eta}} \\
-\Delta \widetilde{\bmath{\varphi}},
-\end{bmatrix}
+ \bmJ\\
+ \conj{\bmJ}
+\end{bmatrix}.
 \end{equation}
-with
-\begin{align}
- \Delta \bmath{\eta} &= [\Delta \eta_1,\Delta \eta_2,\cdots \Delta \eta_N]^T\nonumber\\
- \Delta \bmath{\varphi} &= [\Delta \varphi_1,\Delta \varphi_2,\cdots \Delta \varphi_N]^T\nonumber\\
- \Delta \widetilde{\bmath{\eta}} &= [\Delta \widetilde{\eta_1},\Delta \widetilde{\eta_2},\cdots \Delta \widetilde{\eta_N}]^T\nonumber\\
- \Delta \widetilde{\bmath{\varphi}} &= [\Delta \widetilde{\varphi_1},\Delta \widetilde{\varphi_2},\cdots \Delta \widetilde{\varphi_N}]^T.
-\end{align}
 
-Furthermore, 
-\begin{equation}
-\bN = \begin{bmatrix}
-      \bN_1 & \bN_2 
-      \end{bmatrix},
-\end{equation}
-with 
-\begin{align}
-[\bN_1]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \eta_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
-&= (\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq}^0,
-\end{align}
-and
-\begin{align}
- [\bN_2]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \varphi_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
- &= (-1)^{\delta_{q}^{j}}i(\delta_{p}^{j}\vee\delta_{q}^{j}) v_{pq}^0. 
-\end{align}
 
-Moreover,
-\begin{equation}
-\bM = \begin{bmatrix}
-      \bM_1 & \bM_2 
-      \end{bmatrix},
-\end{equation}
-with
-\begin{align}
-[\bM_1]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \widetilde{\eta}_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
-&=  \delta_{\phi_{pq}}^{j} v_{pq}^0,
-\end{align}
-and
-\begin{align}
-[\bM_2]_{\alpha_{pq},j} &= \frac{\partial v_{pq}}{\partial \widetilde{\varphi}_j} {\bigg |}_{\widehat{\bz}=\widehat{\bz}^0}\\
-&= i\delta_{\phi_{pq}}^{j} v_{pq}^0,
-\end{align}
 
 STILL NEEDS LOTS OF WORK.
 
