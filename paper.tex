@@ -169,7 +169,9 @@ Main contributions of the paper:
  
  We
  
- \section{Visibilities}
+\section{Preliminaries}
+
+\subsection{Measurement Equation}
 The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ can be described as
 
 \begin{equation}
@@ -187,7 +189,7 @@ The real and imaginary components of the thermal noise is normally distributed w
 where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
 efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-\subsection{Redundant Array Geometry Function}
+\subsection{Indexing Functions}
 If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
 therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
@@ -250,7 +252,7 @@ q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
 a similar result; the second antenna index of the composite antenna pair. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
-\subsection{Signal-to-noise Ratio}
+\subsection{Redundant Measurement Equation}
 If the array is redundant and the function $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
 \begin{equation}
 \label{eq:vis_red}
