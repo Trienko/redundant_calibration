@@ -188,25 +188,36 @@ The real and imaginary components of the thermal noise is normally distributed w
 where $T_{\textrm{sys}}$ is equal to the system temperature, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
 \subsection{Indexing Functions}
-In general there are two ways of indexing the visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
-or we can use a single unique baseline index which we assign in numerical order to each composite index; assuming the composite indexes are placed in standard baseline ordering.
-The composite indexes $pq$ are ordered using standard baseline ordering 
+In general there are two ways of indexing the true visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
+or we can use a single unique baseline index which we assign in numerical order to each composite index; assuming the composite indexes are arranged in standard baseline order.
+The composite indexes $pq$ are in standard baseline order when they are arranged as follow: $12, 13, 1N, 23\cdots$. We use $N$ to denote the number of antennas in the array. Let 
+\begin{equation}
+\alpha_{pq} =
+\begin{cases}
+(q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
+%B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
+%B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
+0 & \textrm{otherwise}
+\end{cases}.
+\end{equation}
+We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.e. 
+\begin{equation}
+12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B.
+\end{equation}
+Moreover, $B$ denotes the number of baselines in the array, i.e. $B = \frac{N^2-N}{2}$.
 
-If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
-therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
-
-Let $\phi_{ij}:\mathbb{N}^2\rightarrow\mathbb{N}^+$ be the function that maps composite antenna pairs to the unique redundant baseline indexes of an array. We refer to this function 
-as the redundant array geometry function in this paper. This mapping is not symmetric as 
-$\phi_{ij} = 0$ if $i>j$. We can also define the following symmetric variant of $\phi_{ij}$:
+If an array is redundant then its redundant baselines should sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. The 
+fact that redundant baselines should measure the exact same visibility implies that every baseline does not require a unique baselines index; instead we can use a separate index for each unique redundant baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the redundant baseline indexes of an array. Note that $\phi_{pq}$ is not symmetric as 
+$\phi_{pq} = 0$ if $p>q$. We can also define the following symmetric variant of $\phi_{pq}$:
 \begin{equation}
 \zeta_{ij} = 
 \begin{cases}
-\phi_{ij}~\textrm{if}~i\leq j\\
-\phi_{ji}~\textrm{if}~i>j
+\phi_{pq}~\textrm{if}~p \leq q\\
+\phi_{qp}~\textrm{if}~p>q
 \end{cases}.
 \end{equation} 
-It is possible to construct a simple analytic expression for $\zeta_{ij}$ when our array is in an east-west regular configuration, namely $\zeta_{ij} = |j-i|$. 
-It becomes increasingly more difficult to construct analytic expressions of $\zeta_{ij}$ for other more complicated array layouts. The empirically constructed symmetric geometry
+It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
+It becomes increasingly more difficult to construct analytic expressions of $\zeta_{pq}$ for other more complicated array layouts. The empirically constructed symmetric geometry
 functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{ij}$ with $\mathcal{R}(\zeta_{ij})$. The maximal element 
 that $\zeta_{ij}$ can ascertain is denoted by $L$ and can be construed as the maximal number of unique redundant baselines which can be formed for a given 
 array layout. Alternatively, we can interpret the symmetric geometry functions 
