@@ -171,25 +171,27 @@ Main contributions of the paper:
  
 \section{Preliminaries}
 
-\subsection{Measurement Equation}
-The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ can be described as
-
+\subsection{Unpolarized Measurement Equation}
+The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
 \begin{equation}
 \label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g_q}y_{pq} + n_{pq},
 \end{equation}
 where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
-and $n_{pq}$ is the thermal noise component. Conjugation is denoted by $\conj{(*)}$. During the course of an actual observation the true value of $g_p$, $g_q$ and $y_{pq}$ are unknown and are the quantities which infact have 
-to be estimated.
+and $n_{pq}$ is the thermal noise component. Eq.~\eqref{eq:vis_definition} is known as the unpolarized measurement equation. Conjugation is denoted by $\conj{(*)}$. The true value of $g_p$, $g_q$ and $y_{pq}$ are of course unknown and is what we try to estimate when we calibrate 
+and image.
 
-The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation that is equal to [NB - are the real and imaginary parts defined with same sigma?]  
+The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation proportional to   
 \begin{equation}
-\sigma = \frac{\sqrt{2}k_{B}T_{\textrm{sys}}}{A\eta\sqrt{\Delta \nu \tau}}, 
+\sigma \propto \frac{T_{\textrm{sys}}}{\sqrt{\Delta \nu \tau}}, 
 \end{equation}
-where $k_B$ is Boltzmann's constant, $T_{\textrm{sys}}$ is equal to the system temperature, $A$ is the effective collecting area of each element in the array, $\eta$ is a dimensionless
-efficiency factor, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
+where $T_{\textrm{sys}}$ is equal to the system temperature, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
 \subsection{Indexing Functions}
+In general there are two ways of indexing the visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
+or we can use a single unique baseline index which we assign in numerical order to each composite index; assuming the composite indexes are placed in standard baseline ordering.
+The composite indexes $pq$ are ordered using standard baseline ordering 
+
 If an array is redundant then its redundant baselines sample the exact same visibilites in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. We can
 therefore also use the following useful indexing strategy: we can use singular redundant baseline indexes instead of composite antenna pairs to label the true observed visibilities. 
 
