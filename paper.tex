@@ -41,8 +41,10 @@
 \usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage[noend]{algpseudocode}
+\usepackage{mathrsfs}
 
 \newcommand{\bz}{\bmath{z}}
+\newcommand{\bs}{\bmath{s}}
 \newcommand{\bA}{\bmath{A}}
 \newcommand{\bB}{\bmath{B}}
 \newcommand{\bC}{\bmath{C}}
@@ -284,58 +286,6 @@ We will be using the following SNR (signal-to-noise ratio) definition in this pa
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
 \end{equation}
 where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
-
-\subsection{LOGCAL}
-NEED BETTER INTRO\\
-One of the best known algorithms that is currently used to perform redundant calibration involves the use of logarithms. If we ignore the noise term then we can 
-rewrite Eq.~\eqref{eq:vis_red} as
-\begin{eqnarray}
-\ln |d_{pq}| &=& \ln |g_p| + \ln |g_q| + \ln |y_{\phi_{pq}}| \label{eq:logcal_amp}\\
-\angle d_{pq} &=& \angle g_p - \angle g_q + \angle \phi_{pq} \label{eq:logcal_phase}
-\end{eqnarray}
-
-We can easily express Eq.~\eqref{eq:logcal_amp} with the following linear system
-\begin{equation}
-\widetilde{\bd} = \bA\widetilde{\bz}, 
-\end{equation}
-where
-\begin{equation}
-\left [ \widetilde{\bd}\right ]_{\alpha_{pq}} = \ln |d_{pq}|,\nonumber\\ 
-\end{equation}
-\begin{equation}
-\widetilde{\bz} = \begin{bmatrix}
-                  \ln | \bg |\\
-                  \ln | \by |
-                  \end{bmatrix},
-\end{equation}
-with $\bg = [g_1,g_2,\cdots,g_N]^T$ and $\by = [y_1,y_2,\cdots,y_L]^T$.
-
-Furthermore,
-\begin{equation}
-\label{eq:A}
-\bA = \begin{bmatrix}
-       \bA_1 & \bA_2
-      \end{bmatrix}
-\end{equation}
-and
-\begin{equation}
-\left [ \bA_1 \right ]_{\alpha_{pq},j} = \delta^j_p\vee\delta^j_q,  ~~~ \left [ \bA_2 \right ]_{\alpha_{pq},j} = \delta_{\phi_{pq}}^j. 
-\end{equation}
-
-The dimensions of $\bA_1$ and $\bA_2$ are $B\times N$ and $B\times L$.
-Moreover, $\vee$ denotes the logical or operator and
-\begin{equation}
-\delta_y^x  = \begin{cases}
-          1 & \textrm{if}~x=y\\
-          0 & \textrm{otherwise}
-         \end{cases}.
-\end{equation}
-A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}.\\
-
-NEED TO ROUND OF HERE STILL 
-
-\subsection{LINCAL}
-
 
 \section{Conjugate Gradient Method}
 The Conjugate Gradient (CG) method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
@@ -724,19 +674,18 @@ where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
 FIX TRANSPOSE PROBLEM
 
 \subsection{GN and LINCAL}
-As we mentioned at the start of this section, the Wirtinger framework is not the only way in which we can ensure that $\bv$ is analytic in its argument. We could also 
-have divided the problem in Eq ... into its real and imaginary components and then solver for the real and imaginary parts of the parameters separately. There is a third way
-of dealing with the issue. We can split the problem in Eq into its phase and amplitude components and then solve for the amplitude and phase of the parameters separately.
-This can be achieved by first rewriting Eq. as
-
+As we mentioned in the beginning of this section, the Wirtinger framework is not the only way of ensuring that $\bv$ is analytic in its argument. We could also 
+have divided the problem in Eq.~\eqref{eq:least_squares_red} into its real and imaginary components after-which we solve for the real and imaginary parts of the parameters separately. There is a third way
+of dealing with the issue. We can split the problem in Eq.~\eqref{eq:least_squares_complex} into its phase and amplitude components and then solve for the amplitude and phase of the parameters separately.
+This can be achieved by first rewriting Eq.~\eqref{eq:least_squares_complex} to
 \begin{equation}
 \label{eq:least_squares_lincal}
 \min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
 \end{equation}
-where $\bmath{\varrho} = \left [\bmath{\eta},\bmath{\varphi},\widetilde{\bmath{\eta}}, \widetilde{\bmath{\varphi}}\right ]^T$. The Jacobian associated with 
-Eq.~\eqref{eq:least_squares_lincal} is equal to the Eq xxx in the LINCAL section.
-We have therefore shown that doing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in the Appendix from first principles.
-An easy why of improving the convergence properties of LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
+where $\bmath{\varrho}$ is the phase and amplitude parameter vector and is defined in Appendix~\ref{sec:lincal}. The Jacobian associated with 
+Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. It should therefore be obvious to the reader that 
+performing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in Appendix~\ref{sec:lincal} from first principles.
+Therefore, a straightforward way of improving the convergence properties of stock standard LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
 
 \subsection{Diagonalization and StEFCal}
 StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
@@ -905,7 +854,63 @@ of $2\frac{1}{3}$.
 
 \appendix
 
+\section{LOGCAL}
+\label{sec:logcal}
+We can rewrite Eq.~\eqref{eq:vis_red} to \citep{Liu2010}
+\begin{eqnarray}
+\ln |d_{pq}| &=& \ln |g_p| + \ln |g_q| + \ln |y_{\phi_{pq}}| + s_{pq} \label{eq:logcal_amp}\\
+\angle d_{pq} &=& \angle g_p - \angle g_q + \angle \phi_{pq} + t_{pq} \label{eq:logcal_phase}
+\end{eqnarray}
+where
+\begin{align}
+s_{pq} &= \mathscr{R} \left \{1 + \frac{n_{pq}}{g_p\conj{g_q}y_{\phi_{pq}}} \right \}, & t_{pq} &= \mathscr{I}\left \{1 + \frac{n_{pq}}{g_p\conj{g_q}y_{\phi_{pq}}} \right \}.
+\end{align}
+Moreover, $\mathscr{R}\{*\}$ and $\mathscr{I}\{*\}$ denote the real and imaginary operators. 
+
+With the aid of Eq.~\eqref{eq:logcal_amp} we can construct the following linear system:
+\begin{equation}
+\label{eq:log_system}
+\bdelta = \bJ\bzeta + \bs, 
+\end{equation}
+where
+\begin{align}
+\left [ \bdelta \right ]_{\alpha_{pq}} &= \ln |d_{pq}|, & \left [ \bs \right ]_{\alpha_{pq}} = s_{pq} 
+\end{align}
+and
+\begin{equation}
+\left [ \bzeta \right ]_{\alpha_{pq}} = \begin{cases} \ln |g_j| & \textrm{if}~i\leq N \\ \ln |y_{j-N}| & \textrm{otherwise} \end{cases}. 
+\end{equation}
+Furthermore,
+\begin{equation}
+\bJ = 
+\begin{bmatrix}
+\bN & \bM
+\end{bmatrix}
+\end{equation}
+with 
+\begin{equation}
+[\bN]_{\alpha_{pq},j} = \begin{cases}
+       1 & \textrm{if}~(p=j)~\textrm{or}~(q=j)\\
+       0 & \textrm{otherwise}
+      \end{cases}
+\end{equation}
+and
+\begin{equation}
+[\bM]_{\alpha_{pq},j} = \begin{cases}
+       1 & \textrm{if}~\phi_{pq}=j\\
+       0 & \textrm{otherwise}
+      \end{cases}
+\end{equation}
+
+The least squares solution to Eq.\eqref{eq:log_system}, under the incorrect assumption that $s_{pq}$ is normally distributed, is given by
+\begin{equation}
+\bzeta = (\bA^T\bA)^{-1} \bA^T\bdelta. 
+\end{equation}
+How to correctly deal with the fact that $s_{pq}$ is not normally distributed is discussed in \citep{Liu2010}. A similar linear system can be constructed for Eq.~\eqref{eq:logcal_phase}. 
+From the least squares solutions to the linear systems associated with Eq.~\eqref{eq:logcal_amp} and Eq.~\eqref{eq:logcal_phase} we can compute the antenna gains as well as the true visibilities.
+
 \section{LINCAL}
+\label{sec:lincal}
 In this section we derive LINCAL \citep{Liu2010} from first principles.
 %Assume that $\eta_p,\eta_q,\widetilde{\eta}_{\phi_{pq}},\varphi_p,\varphi_q$ and $\widetilde{\varphi}_{\phi_{pq}}$ are real valued variables.
 We can rewrite Eq.~\eqref{eq:vis_red_vec} to
@@ -930,8 +935,8 @@ and
 \begin{aligned}
 \bmath{\eta} &= [\eta_1, \eta_2,\cdots \eta_N]^T\\
  \bmath{\varphi} &= [\varphi_1, \varphi_2,\cdots \varphi_N]^T\\
- \widetilde{\bmath{\eta}} &= [\widetilde{\eta_1}, \widetilde{\eta_2},\cdots \widetilde{\eta_L}]^T\\
- \widetilde{\bmath{\varphi}} &= [\widetilde{\varphi_1}, \widetilde{\varphi_2},\cdots \widetilde{\varphi_L}]^T
+ \widetilde{\bmath{\eta}} &= [\widetilde{\eta}_1, \widetilde{\eta}_2,\cdots \widetilde{\eta}_L]^T\\
+ \widetilde{\bmath{\varphi}} &= [\widetilde{\varphi}_1, \widetilde{\varphi}_2,\cdots \widetilde{\varphi}_L]^T
 \end{aligned}.
 \label{eq:help}
 \end{equation}
@@ -989,6 +994,7 @@ Augmenting the residual by taking into account its conjugate results in
 \end{equation}
 where $\breve{\br} = \begin{bmatrix}\br^T & \conj{\br}^T \end{bmatrix}^T$ and 
 \begin{equation}
+\label{eq:Jac_lin}
 \bJ = 
 \begin{bmatrix}
  \bmJ\\  
