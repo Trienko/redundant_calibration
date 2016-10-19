@@ -301,11 +301,8 @@ class sim():
           plt.xlabel("W-E [m]",fontsize=label_size)
           plt.ylabel("S-N [m]",fontsize=label_size)
           plt.title(title+"-"+str(self.N),fontsize=label_size)
-    
-          plt.ylim(-1*m,1*m)
-          plt.xlim(-1*m,1*m)
-          plt.tight_layout()
           plt.axis("equal")
+          plt.axis([-1.1*m, 1.1*m,-1.1*m, 1.1*m])
           plt.show() 
 
       '''
