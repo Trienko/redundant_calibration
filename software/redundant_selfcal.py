@@ -64,9 +64,13 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
         #e = np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))
         #print "e = ",e
       
-        np.append(error_vector,np.array([np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))]))
+        
 
-        if (np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2)) <= tau):
+        err = np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))
+
+        error_vector = np.append(error_vector,np.array([err]))
+
+        if (err <= tau):
            converged = True 
            break
 
@@ -221,11 +225,12 @@ def main(argv):
     return snr,l,max_order,min_order,exp_number
 
 if __name__ == "__main__":
-   '''
+   
    snr,l,max_order,min_order,exp_number = main(sys.argv[1:])
    do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number)
-   '''
    
+   
+   '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
@@ -244,7 +249,7 @@ if __name__ == "__main__":
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
-  
+   '''
     
    
 

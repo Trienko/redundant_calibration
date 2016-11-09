@@ -204,7 +204,8 @@ class SPARC():
           converged = False
 
           d = self.vectorize_D(D)
-          
+          error_vector = np.array([])
+
           start = time.time()
 
           v = self.compute_v(z)
@@ -228,7 +229,10 @@ class SPARC():
                       converged = True 
                       break
 
-                if np.linalg.norm(dz)/np.linalg.norm(z) < tol2:
+                err = np.linalg.norm(dz)/np.linalg.norm(z)
+                error_vector = np.append(error_vector,np.array([err])) 
+
+                if err < tol2:
                    converged = True
                    break 
                 
@@ -243,7 +247,7 @@ class SPARC():
           G = np.dot(G,np.diag(z[:self.N].conj()))  
           M = convert_y_to_M(self.PQ,z[self.N:],self.N)  
                      
-          return z,converged,G,M,start,stop,counter
+          return z,converged,G,M,start,stop,counter,error_vector
 
       def levenberg_marquardt_time(self,D,psi_func_eval,xi_func_eval,convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-6,lam=2,max_itr=2000,method="PCG",time_var=False):
           z_temp = np.zeros((self.N+self.L,D.shape[2]),dtype=complex)
@@ -252,13 +256,14 @@ class SPARC():
           c_temp = np.zeros((D.shape[2],),dtype=bool)
           t_temp = np.zeros((2,D.shape[2]))
           count_temp = np.zeros((D.shape[2],),dtype=int)
+          error = {}
           for t in xrange(D.shape[2]):
               print "###########"
               print "t= ",t
               print "###########"
-              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method,time_var=time_var)
+              z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t],error[str(t)] = self.levenberg_marquardt(D[:,:,t],psi_func_eval,xi_func_eval,convert_y_to_M,tol1=tol1,tol2=tol2,tol3=tol3,lam=2,max_itr=max_itr,method=method,time_var=time_var)
               print "c_temp = ",c_temp[t]  
-          return z_temp,c_temp,G,M,t_temp,count_temp    
+          return z_temp,c_temp,G,M,t_temp,count_temp,error    
            
       '''
       INPUTS:
@@ -606,7 +611,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
             D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
             M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
             sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
-            z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop=sparc_object.levenberg_marquardt_time  (D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
+            z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop,error=sparc_object.levenberg_marquardt_time  (D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
        
             file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
@@ -626,6 +631,7 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
             pickle.dump(M_cal,output)
             pickle.dump(D,output)
             pickle.dump(M,output)
+            pickle.dump(error,output)
             output.close()
 
 def kde_scipy(x, x_grid, bandwidth=0.2, **kwargs):
@@ -750,11 +756,11 @@ def main(argv):
     return snr,l,m,max_order,min_order,time_var,exp_num
 
 if __name__ == "__main__":
-   #snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
-   #do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
+   snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
+   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
    #plot_kappa_itr()
 
-   compute_sparsity()
+   #compute_sparsity()
    '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
