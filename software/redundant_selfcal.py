@@ -20,6 +20,8 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
     y_temp = np.ones((L,),dtype=complex)
     z_temp = np.hstack([g_temp,y_temp])
 
+    error_vector = np.array([])
+
     #EXTRACT BASELINE INDICES FOR EACH REDUNDANT SPACING
     if PQ is not None:
        PQ = create_PQ(phi,L)
@@ -62,6 +64,8 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
         #e = np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))
         #print "e = ",e
       
+        np.append(error_vector,np.array([np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2))]))
+
         if (np.sqrt(np.sum(np.absolute(z_temp-z_old)**2))/np.sqrt(np.sum(np.absolute(z_temp)**2)) <= tau):
            converged = True 
            break
@@ -73,7 +77,7 @@ def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
     G = np.dot(G,np.diag(g_temp.conj()))  
     M = convert_y_to_M(PQ,y_temp,N)         
 
-    return z_temp,converged,G,M,start,stop,i
+    return z_temp,converged,G,M,start,stop,i,error_vector
 
 def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000):
     N = D.shape[0]
@@ -85,13 +89,14 @@ def redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000):
     c_temp = np.zeros((D.shape[2],),dtype=bool)
     t_temp = np.zeros((2,D.shape[2]))
     count_temp = np.zeros((D.shape[2],),dtype=int)
+    error = {}
     for t in xrange(D.shape[2]):
         print "*********"
         print "t = ",t
         print "*********"
-        z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t] = redundant_StEFCal(D=D[:,:,t],phi=phi,tau=tau,alpha=alpha,max_itr=max_itr,PQ=PQ)
+        z_temp[:,t],c_temp[t],G[:,:,t],M[:,:,t],t_temp[0,t],t_temp[1,t],count_temp[t],error[str(t)] = redundant_StEFCal(D=D[:,:,t],phi=phi,tau=tau,alpha=alpha,max_itr=max_itr,PQ=PQ)
         #print "c_temp = ",c_temp[t]  
-    return z_temp,c_temp,G,M,t_temp,count_temp
+    return z_temp,c_temp,G,M,t_temp,count_temp,error
              
 def create_PQ(phi,L):
 
@@ -143,7 +148,7 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
             g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
             D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
             M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
-            z_cal,c_cal,G_cal,M_cal,t,outer_loop = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
+            z_cal,c_cal,G_cal,M_cal,t,outer_loop,error = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
         
             #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
        
@@ -165,6 +170,7 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
             pickle.dump(M_cal,output)
             pickle.dump(D,output)
             pickle.dump(M,output)
+            pickle.dump(error,output)
             output.close()
 
 def main(argv):
