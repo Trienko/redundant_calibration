@@ -290,14 +290,14 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     plt.show()
 
 def plot_err_itr(SNR=1000,num=4,t=5,e=0):
-    N = np.array([7,19,37,61,91,108,169,217])
+    N = np.array([7,19,37,61,91,127,169,217])
     L = np.array([9,30,63,108,165,234,315,408])
 
     N_num = N[num]
     L_num = L[num]
     
     PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(e)
-    PCG_FILE = PCG_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+PCG_DIR[2:]
+    PCG_FILE = PCG_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+PCG_DIR[2:]+".p"
 
     file_p = open(PCG_FILE, 'rb')
     order = pickle.load(file_p)
@@ -315,11 +315,12 @@ def plot_err_itr(SNR=1000,num=4,t=5,e=0):
     M_cal = pickle.load(file_p)
     D = pickle.load(file_p)
     M = pickle.load(file_p)
-    error_pcg = pickle.load(error)
+    error_pcg = pickle.load(file_p)
+    file_p.close()
 
     STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(e)
-    STEF_FILE = STEF_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+STEF_DIR[2:]
-        file_p = open(PCG_FILE, 'rb')
+    STEF_FILE = STEF_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+STEF_DIR[2:]+".p"
+    file_p = open(STEF_FILE, 'rb')
     order = pickle.load(file_p)
     N_v = pickle.load(file_p)
     L_v = pickle.load(file_p)
@@ -332,16 +333,20 @@ def plot_err_itr(SNR=1000,num=4,t=5,e=0):
     M_cal = pickle.load(file_p)
     D = pickle.load(file_p)
     M = pickle.load(file_p)
-    error_stef = pickle.load(error) 
+    error_stef = pickle.load(file_p) 
+    file_p.close()
 
     e_pcg = error_pcg[str(t)] 
     e_stef = error_stef[str(t)]
 
+    #print "e_pcg = ",e_pcg
+    #print "e_stef = ",e_stef
+
     itr_pcg = np.cumsum(np.ones(e_pcg.shape))
     itr_stef = np.cumsum(np.ones(e_stef.shape))
  
-    plt.plot(itr_pcg,e_pcg,'r')
-    plt.plot(itr_stef,e_stef,'b')
+    plt.semilogy(itr_pcg,e_pcg,'r')
+    plt.semilogy(itr_stef,e_stef,'b')
     plt.show()
 
 '''
@@ -655,4 +660,4 @@ if __name__ == "__main__":
    #plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
-   plot_err_itr()
+   plot_err_itr(num=4,t=10)
