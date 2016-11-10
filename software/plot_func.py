@@ -289,6 +289,172 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
+def plot_err_itr(SNR=1000,num=4,t=5,e=0):
+    N = np.array([7,19,37,61,91,108,169,217])
+    L = np.array([9,30,63,108,165,234,315,408])
+
+    N_num = N[num]
+    L_num = L[num]
+    
+    PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(e)
+    PCG_FILE = PCG_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+PCG_DIR[2:]
+
+    file_p = open(PCG_FILE, 'rb')
+    order = pickle.load(file_p)
+    N_v = pickle.load(file_p)
+    L_v = pickle.load(file_p)
+    zeta = pickle.load(file_p)
+    PQ = pickle.load(file_p)
+    z_cal = pickle.load(file_p)
+    c_cal = pickle.load(file_p)
+    time_mat = pickle.load(file_p)
+    outer_loop = pickle.load(file_p)
+    itr_vec = pickle.load(file_p)
+    kappa_vec = pickle.load(file_p)
+    G_cal = pickle.load(file_p)
+    M_cal = pickle.load(file_p)
+    D = pickle.load(file_p)
+    M = pickle.load(file_p)
+    error_pcg = pickle.load(error)
+
+    STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(e)
+    STEF_FILE = STEF_DIR+"/"+str(num+1)+"_"+str(N_num)+"_"+str(L_num)+"_"+STEF_DIR[2:]
+        file_p = open(PCG_FILE, 'rb')
+    order = pickle.load(file_p)
+    N_v = pickle.load(file_p)
+    L_v = pickle.load(file_p)
+    zeta = pickle.load(file_p)
+    z_cal = pickle.load(file_p)
+    c_cal = pickle.load(file_p)
+    time_mat = pickle.load(file_p)
+    outer_loop = pickle.load(file_p)
+    G_cal = pickle.load(file_p)
+    M_cal = pickle.load(file_p)
+    D = pickle.load(file_p)
+    M = pickle.load(file_p)
+    error_stef = pickle.load(error) 
+
+    e_pcg = error_pcg[str(t)] 
+    e_stef = error_stef[str(t)]
+
+    itr_pcg = np.cumsum(np.ones(e_pcg.shape))
+    itr_stef = np.cumsum(np.ones(e_stef.shape))
+ 
+    plt.plot(itr_pcg,e_pcg,'r')
+    plt.plot(itr_stef,e_stef,'b')
+    plt.show()
+
+'''
+def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
+    
+    N = np.array([7,19,37,61,91,108,169,217])
+
+    outerloop_pcg_mean = np.zeros((len(N),),dtype=float)
+    outerloop_stef_mean = np.zeros((len(N),),dtype=float)
+
+    outerloop_pcg_std = np.zeros((len(N),),dtype=float)
+    outerloop_stef_std = np.zeros((len(N),),dtype=float)
+    
+    outerloop_pcg_dic = {}
+    outerloop_stef_dic = {}
+    
+    for j in xrange(len(N)):
+        outerloop_pcg_dic[str(N[j])]=np.array([],dtype=float)
+        outerloop_stef_dic[str(N[j])]=np.array([],dtype=float)
+
+    for k in xrange(k_upper1):
+        PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)
+        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
+        
+        for i in xrange(len(PCG_FILE_LIST)):
+            #LOAD PCG
+            print "PCG_FILE_LIST = ",PCG_FILE_LIST[i]
+            if not os.path.isfile(PCG_FILE_LIST[i]):
+               break
+            file_p = open(PCG_FILE_LIST[i], 'rb')
+            order = pickle.load(file_p)
+            N_v = pickle.load(file_p)
+            L = pickle.load(file_p)
+            zeta = pickle.load(file_p)
+            PQ = pickle.load(file_p)
+            z_cal = pickle.load(file_p)
+            c_cal = pickle.load(file_p)
+            time_mat = pickle.load(file_p)
+            outer_loop = pickle.load(file_p)
+            print "len(outer_loop) = ",len(outer_loop)
+            outerloop_pcg_dic[str(N[i])] = np.append(outerloop_pcg_dic[str(N[i])],outer_loop)
+            print "len(outerloop_pcg_dic[str(N[i])]) = ",len(outerloop_pcg_dic[str(N[i])])
+            file_p.close()
+    
+    for k in xrange(k_upper2):
+        STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(k)
+        STEF_FILE_LIST = np.array([STEF_DIR+"/1_7_9_"+STEF_DIR[2:]+".p",STEF_DIR+"/2_19_30_"+STEF_DIR[2:]+".p",STEF_DIR+"/3_37_63_"+STEF_DIR[2:]+".p",STEF_DIR+"/4_61_108_"+STEF_DIR[2:]+".p",STEF_DIR+"/5_91_165_"+STEF_DIR[2:]+".p",STEF_DIR+"/6_127_234_"+STEF_DIR[2:]+".p",STEF_DIR+"/7_169_315_"+STEF_DIR[2:]+".p",STEF_DIR+"/8_217_408_"+STEF_DIR[2:]+".p"])
+        for i in xrange(len(STEF_FILE_LIST)):
+            #LOAD STEF
+            print "STEF_FILE_LIST = ",STEF_FILE_LIST[i]
+            if not os.path.isfile(STEF_FILE_LIST[i]):
+               break
+            file_p = open(STEF_FILE_LIST[i], 'rb')
+            order = pickle.load(file_p)
+            N_v = pickle.load(file_p)
+            L = pickle.load(file_p)
+            zeta = pickle.load(file_p)
+            z_cal = pickle.load(file_p)
+            c_cal = pickle.load(file_p)
+            time_mat = pickle.load(file_p)
+            outer_loop = pickle.load(file_p)
+            print "len(outer_loop) = ",len(outer_loop) 
+            outerloop_stef_dic[str(N[i])] = np.append(outerloop_stef_dic[str(N[i])],outer_loop)
+            file_p.close()
+    
+    for n in xrange(len(N)):
+        outerloop_pcg_vec = outerloop_pcg_dic[str(N[n])]
+        
+        print "N = ",N[n]
+        print "len(outerloop_pcg_vec) = ",len(outerloop_pcg_vec)
+                  
+        if len(outerloop_pcg_vec) == 0:
+           break
+
+        outerloop_pcg_mean[n] = np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9998])
+        outerloop_stef_vec = outerloop_stef_dic[str(N[n])]
+
+        print "len(outerloop_stef_vec) = ",len(outerloop_stef_vec)
+        temp_v = outerloop_stef_vec[outerloop_stef_vec<=9998]
+        temp_v = outerloop_stef_vec[temp_v>9000]
+        print "len(temp_v) = ",len(temp_v)              
+   
+
+        if len(outerloop_stef_vec) == 0:
+           break
+        
+        outerloop_stef_mean[n] = np.median(outerloop_stef_vec[outerloop_stef_vec<=9998])
+
+        print "outerloop_stef_mean = ",outerloop_stef_mean
+                
+        outerloop_pcg_std[n] = np.median(np.absolute(outerloop_pcg_vec[outerloop_pcg_vec<=9998] - np.median(outerloop_pcg_vec[outerloop_pcg_vec<=9998])))
+        outerloop_stef_std[n] = np.median(np.absolute(outerloop_stef_vec[outerloop_stef_vec<=9998] - np.median(outerloop_stef_vec[outerloop_stef_vec<=9998])))
+        print "outerloop_stef_std = ",outerloop_stef_std 
+    
+
+    #print "kappa_cg_mad = ",kappa_cg_mad
+    #print "itr_cg_mad = ",itr_cg_mad
+
+    #print "N = ",N
+    matplotlib.rcParams.update({'font.size': 22})
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(N,outerloop_pcg_mean,"r",lw=2,label="SPARC")
+    ax.fill_between(N,outerloop_pcg_mean-outerloop_pcg_std, outerloop_pcg_mean+outerloop_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
+    ax.plot(N,outerloop_stef_mean,"b",lw=2,label="R-StEFCal")
+    ax.fill_between(N, outerloop_stef_mean-outerloop_stef_std, outerloop_stef_mean+outerloop_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
+    ax.set_yscale('log')
+    ax.set_xlabel(r'$N$')
+    ax.set_ylabel('Iterations required by R-StEFCal/SPARC')
+    ax.legend(loc=5)
+    plt.show()
+'''
+
 def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     
     N = np.array([7,19,37,61,91,108,169,217])
@@ -488,4 +654,5 @@ if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
    #plot_time()
-   plot_sparsity()
+   #plot_sparsity()
+   plot_err_itr()
