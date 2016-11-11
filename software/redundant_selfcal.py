@@ -226,11 +226,9 @@ def main(argv):
 
 if __name__ == "__main__":
    
-   snr,l,max_order,min_order,exp_number = main(sys.argv[1:])
-   do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number)
+   #snr,l,max_order,min_order,exp_number = main(sys.argv[1:])
+   #do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number)
    
-   
-   '''
    s = simulator.sim(nsteps=100,layout="HEX",order=1) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
@@ -238,18 +236,24 @@ if __name__ == "__main__":
    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
    s.plot_zeta(zeta,1,1,10,'cubehelix')
    s.uv_tracks() #GENERATE UV TRACKS
-   s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
-   point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
-   g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
-   D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
-   M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+   #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
+   #point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
+   #g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
+   s.create_uv_f() #GENERATE UV POINTS f (for one time-slot)
+   s.plot_uv_f()
+   g = s.generate_phase_slope_gains()
+   point_sources = np.array([(1,0,0)])
+   D,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
+   M,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=None,w_m=None) #PREDICTED VIS
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=True)    
-   z_cal,c_cal,G_cal,M_cal,t,count_temp = redundant_StEFCal_time(D,phi)
+   z_cal,c_cal,G_cal,M_cal,t,count_temp,_ = redundant_StEFCal_time(D,phi)
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
-   '''
+
+   
+   
     
    
 

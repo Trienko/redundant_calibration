@@ -55,6 +55,11 @@ class sim():
           self.u_m = None #The uvw composite index matrices
           self.v_m = None
           self.w_m = None
+
+          self.u_f = None #The uvw coordinates associated with a single frequency channel (NB --- Gianni's experiment)
+          self.v_f = None
+          self.w_f = None
+
           self.phi = np.array([])
           self.zeta = np.array([])
           if seed is not None:
@@ -409,6 +414,7 @@ class sim():
               self.w_m[p[i],q[i],:] = X[:,2]
               self.w_m[q[i],p[i],:] = -1*X[:,2]
       
+
       ''' 
       Plots the uv-tracks of an array layout
       RETURNS:
@@ -464,13 +470,15 @@ class sim():
       INPUTS:
       power - power of the noise to generate
       '''
-      def generate_noise(self,power):
+      def generate_noise(self,power,third_dim=None):
 	  sig = np.sqrt(power/2)
           #print "sig = ",sig
-	  mat = np.zeros((self.N,self.N,self.nsteps),dtype=complex)
+          if third_dim is None:
+             third_dim = self.nsteps  
+	  mat = np.zeros((self.N,self.N,third_dim),dtype=complex)
 	  for i in xrange(self.N):
               for j in xrange(i+1,self.N):
-	          mat[i,j,:] = sig*np.random.randn(self.nsteps)+sig*np.random.randn(self.nsteps)*1j
+	          mat[i,j,:] = sig*np.random.randn(third_dim)+sig*np.random.randn(third_dim)*1j
                   mat[j,i,:] = mat[i,j,:].conj()	  
 	  return mat
       '''	  
@@ -581,7 +589,7 @@ class sim():
              P_noise = self.power_needed_for_SNR(P_signal,SNR)
              #print "P_noise = ",P_noise
              #print "SNR = ",10*np.log10(P_signal/P_noise)
-             N = self.generate_noise(P_noise)
+             N = self.generate_noise(P_noise,third_dim=D.shape[2])
              D = D + N 
              sig = (np.sqrt(P_noise/2))
 
@@ -676,6 +684,93 @@ class sim():
 	  
 	  return point_sources    
 
+      '''
+      ##############################################################################################################################
+      GIANNI - Freq experiment       
+      ##############################################################################################################################
+      '''
+      
+      ''' 
+      Computes the uv-points of a single timeslot along the freq dimension
+      RETURNS:
+      None
+
+      INPUTS:
+      timeslot - timeslot for which to calculate freq dim
+      num_channels - number of channels to create
+      f0 - starting freq
+      f1 - ending freq
+      ''' 
+      def create_uv_f(self,timeslot=1,num_channels=1024,f0=100e6,f1=200e6):
+          u = self.u_m[:,:,timeslot]*self.wave 
+          v = self.v_m[:,:,timeslot]*self.wave
+          w = self.w_m[:,:,timeslot]*self.wave
+          
+          print "u = ",u
+          print "v = ",v
+
+          lam_vec = 3e8*(np.linspace(f0,f1,num=num_channels,endpoint=True,dtype=float)**(-1))
+          
+          print "lam_vec = ",lam_vec
+          
+
+          self.u_f = np.zeros((u.shape[0],u.shape[1],num_channels))
+          self.v_f = np.zeros((v.shape[0],v.shape[1],num_channels))
+          self.w_f = np.zeros((w.shape[0],w.shape[1],num_channels)) 
+
+          for l in xrange(num_channels):
+              self.u_f[:,:,l] = u/lam_vec[l]
+              self.v_f[:,:,l] = v/lam_vec[l]
+              self.w_f[:,:,l] = w/lam_vec[l]
+          print "u_f = ",self.u_f[:,:,0]
+       
+      '''
+      Plots the uv-coverage as a func of freq 
+      '''
+      def plot_uv_f(self):
+          print "u_f = ",self.u_f[:,:,0]
+          for p in xrange(self.u_f.shape[0]):
+              for q in xrange(p+1,self.u_f.shape[1]):
+                  plt.plot(self.u_f[p,q,:],self.v_f[p,q,:],'r.',ms=0.05)
+                  #plt.hold()
+                  #plt.plot(-1*self.u_f[p,q,:],-1*self.v_f[p,q,:],'b.',ms=0.1)
+                  
+          plt.show()
+
+
+      def generate_phase_slope_gains(self,num_channels=1024,f0=100e6,f1=200e6,l0=50,l1=200):
+          phase = np.zeros((self.N,num_channels),dtype=float)
+
+          f = np.linspace(f0,f1,num=num_channels,endpoint=True,dtype=float)
+
+          tau = np.random.uniform(l0,l1,self.N)/3e8
+
+          #print "tau = ",tau
+
+          phi = np.zeros((self.N,num_channels),dtype=float)
+          
+          for n in xrange(self.N):
+              #phi[n,:] = 2*np.pi*tau[n]*f
+              phi[n,:] = tau[n]*f
+
+          #for n in xrange(phi.shape[0]):
+          #    plt.plot(f,phi[n,:])
+
+          #plt.show()
+
+          g = np.exp(1j*phi)
+
+          #for n in xrange(g.shape[0]):
+          #    plt.plot(f,np.angle(g[n,:]))
+
+          #plt.show()  
+
+          #for n in xrange(g.shape[0]):
+          #    plt.plot(f,np.angle(np.conjugate(g[0,:])*g[n,:]))
+
+          #plt.show()
+
+          return g
 
       '''
       ##############################################################################################################################
@@ -977,9 +1072,22 @@ def plot_paper_layouts():
     print "s.L = ",s.L
     print "s.N = ",s.N
 
+def Gianni_freq_exp():
+    s = sim() #INSTANTIATE OBJECT
+    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
+    s.plot_ant(title="HEX") #PLOT THE LAYOUT
+    s.uv_tracks() #GENERATE UV TRACKS (time)
+    s.create_uv_f() #GENERATE UV POINTS f (for one time-slot)
+    s.plot_uv_f()
+    g = s.generate_phase_slope_gains()
+    point_sources = np.array([(1,0,0)])
+    D,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=1000,w_m=None) #CREATE VIS MATRIX
+    plt.plot(D[0,1,:].real) 
+    plt.show() 
+
 if __name__ == "__main__":
    #example_usage()
-   plot_paper_layouts()
-   
+   #plot_paper_layouts()
+   Gianni_freq_exp()
    
 
