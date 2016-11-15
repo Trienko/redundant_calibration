@@ -382,9 +382,13 @@ def plot_err_itr(SNR=1000,num=4,e_upper1=0,e_upper2=0):
     
     ax.semilogy(itr_pcg,mean_pcg_error,'r')
     ax.fill_between(itr_pcg,mean_pcg_error-std_stefcal_error, mean_pcg_error + std_stefcal_error, alpha=0.2, edgecolor='k', facecolor='r')
+    
 
     ax.semilogy(itr_stef,mean_stefcal_error,'b')
     ax.fill_between(itr_stef,mean_stefcal_error-std_stefcal_error, mean_stefcal_error + std_stefcal_error, alpha=0.2, edgecolor='k', facecolor='b')
+
+    print "std_stefcal_error = ",std_stefcal_error
+    print "mean_stefcal_error = ",mean_stefcal_error
 
     plt.show()
 
