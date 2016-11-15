@@ -289,7 +289,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
-def plot_err_itr(SNR=1000,num=4,e_upper1=0,e_upper2=0):
+def plot_err_itr(SNR=1000,num=4,e_upper1=2,e_upper2=2):
     N = np.array([7,19,37,61,91,127,169,217])
     L = np.array([9,30,63,108,165,234,315,408])
 
@@ -381,7 +381,7 @@ def plot_err_itr(SNR=1000,num=4,e_upper1=0,e_upper2=0):
     ax = fig.add_subplot(1,1,1)
     
     ax.semilogy(itr_pcg,mean_pcg_error,'r')
-    ax.fill_between(itr_pcg,mean_pcg_error-std_stefcal_error, mean_pcg_error + std_stefcal_error, alpha=0.2, edgecolor='k', facecolor='r')
+    ax.fill_between(itr_pcg,mean_pcg_error-std_pcg_error, mean_pcg_error + std_pcg_error, alpha=0.2, edgecolor='k', facecolor='r')
     
 
     ax.semilogy(itr_stef,mean_stefcal_error,'b')
