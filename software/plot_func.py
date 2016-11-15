@@ -289,7 +289,7 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
-def plot_err_itr(SNR=1000,num=4,e_upper1=2,e_upper2=2):
+def plot_err_itr(SNR=1000,num=4,e_upper1=5,e_upper2=5):
     N = np.array([7,19,37,61,91,127,169,217])
     L = np.array([9,30,63,108,165,234,315,408])
 
@@ -364,15 +364,15 @@ def plot_err_itr(SNR=1000,num=4,e_upper1=2,e_upper2=2):
     std_pcg_error = np.zeros((len(pcg_err_dic),))
 
     for i in xrange(len(pcg_err_dic)):
-        mean_pcg_error[i] = np.mean(pcg_err_dic[str(i)])
-        std_pcg_error[i] = np.std(pcg_err_dic[str(i)])  
+        mean_pcg_error[i] = np.median(pcg_err_dic[str(i)])
+        std_pcg_error[i] = mad(pcg_err_dic[str(i)])  
 
     mean_stefcal_error = np.zeros((len(stefcal_err_dic),))
     std_stefcal_error = np.zeros((len(stefcal_err_dic),))
 
     for i in xrange(len(stefcal_err_dic)):
-        mean_stefcal_error[i] = np.mean(stefcal_err_dic[str(i)])
-        std_stefcal_error[i] = np.std(stefcal_err_dic[str(i)])  
+        mean_stefcal_error[i] = np.median(stefcal_err_dic[str(i)])
+        std_stefcal_error[i] = mad(stefcal_err_dic[str(i)])  
 
     itr_pcg = np.cumsum(np.ones(mean_pcg_error.shape))
     itr_stef = np.cumsum(np.ones(mean_stefcal_error.shape))
@@ -387,11 +387,16 @@ def plot_err_itr(SNR=1000,num=4,e_upper1=2,e_upper2=2):
     ax.semilogy(itr_stef,mean_stefcal_error,'b')
     ax.fill_between(itr_stef,mean_stefcal_error-std_stefcal_error, mean_stefcal_error + std_stefcal_error, alpha=0.2, edgecolor='k', facecolor='b')
 
-    print "std_stefcal_error = ",std_stefcal_error
-    print "mean_stefcal_error = ",mean_stefcal_error
+    #print "std_stefcal_error = ",std_stefcal_error
+    #print "mean_stefcal_error = ",mean_stefcal_error
+
+    #print "mean_stefcal_error+std = ",mean_stefcal_error+std_stefcal_error
+    #print "std_stefcal_error-std = ",mean_stefcal_error-std_stefcal_error
 
     plt.show()
 
+def mad(x):
+    return np.median(np.absolute(x - np.median(x)))
 
 def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
     
