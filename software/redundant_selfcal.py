@@ -252,6 +252,35 @@ if __name__ == "__main__":
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
 
+   s.plot_visibilities([0,1],M_cal,"r",s=True)
+
+   for n in xrange(s.N):
+       plt.plot(np.angle(z_cal[n]))
+   plt.show() 
+
+   for n in xrange(s.N):
+       plt.plot(np.absolute(z_cal[n]))
+   plt.show() 
+
+   yv = z_cal[s.N:]
+
+   for n in xrange(len(yv)):
+       plt.plot(np.angle(yv[n]))
+   plt.show() 
+
+   for n in xrange(len(yv)):
+       plt.plot(np.absolute(yv[n]))
+   plt.show() 
+
+   avg_m = np.mean(np.absolute(yv),axis=0)
+
+   plt.plot(avg_m)
+   plt.show()
+
+   for n in xrange(s.N):
+       plt.plot(np.absolute(z_cal[n]/np.sqrt(avg_m)))
+   plt.show()
+   
    
    
     

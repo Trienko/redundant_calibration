@@ -745,7 +745,7 @@ class sim():
 
           tau = np.random.uniform(l0,l1,self.N)/3e8
 
-          #print "tau = ",tau
+          print "tau = ",tau
 
           phi = np.zeros((self.N,num_channels),dtype=float)
           
@@ -753,22 +753,22 @@ class sim():
               #phi[n,:] = 2*np.pi*tau[n]*f
               phi[n,:] = tau[n]*f
 
-          #for n in xrange(phi.shape[0]):
-          #    plt.plot(f,phi[n,:])
+          for n in xrange(phi.shape[0]):
+              plt.plot(f,phi[n,:])
 
-          #plt.show()
+          plt.show()
 
           g = np.exp(1j*phi)
 
-          #for n in xrange(g.shape[0]):
-          #    plt.plot(f,np.angle(g[n,:]))
+          for n in xrange(g.shape[0]):
+              plt.plot(f,np.angle(g[n,:]))
 
-          #plt.show()  
+          plt.show()  
 
-          #for n in xrange(g.shape[0]):
-          #    plt.plot(f,np.angle(np.conjugate(g[0,:])*g[n,:]))
+          for n in xrange(g.shape[0]):
+              plt.plot(f,np.angle(np.conjugate(g[0,:])*g[n,:]))
 
-          #plt.show()
+          plt.show()
 
           return g
 
