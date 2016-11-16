@@ -443,7 +443,7 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
 
             pcg_prec_error_t = np.zeros((M.shape[2],))
 
-            print "c_cal = ",c_cal
+            #print "c_cal = ",c_cal
  
             for t in xrange(M.shape[2]):
                 mask = np.ones(M[:,:,t].shape,dtype=float)-np.diag(np.ones((M[:,:,t].shape[0],),dtype=float))
@@ -493,22 +493,23 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
         if len(precentage_pcg_vec) == 0:
            break
 
-        precentage_pcg_mean[n] = np.mean(precentage_pcg_vec)
-        precentage_pcg_std[n] = np.std(precentage_pcg_vec)
+        precentage_pcg_mean[n] = np.median(precentage_pcg_vec)
+        precentage_pcg_std[n] = mad(precentage_pcg_vec)
         
         precentage_stef_vec = precentage_stef_dic[str(N[n])]
 
-        precentage_stef_mean[n] = np.mean(precentage_stef_vec)
-        precentage_stef_std[n] = np.std(precentage_stef_vec)
+        precentage_stef_mean[n] = np.median(precentage_stef_vec)
+        precentage_stef_std[n] = mad(precentage_stef_vec)
                      
    
     matplotlib.rcParams.update({'font.size': 22})
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
-    ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
-    ax.plot(N,precentage_stef_mean,"b",lw=2,label="R-StEFCal")
-    ax.fill_between(N, precentage_stef_mean-precentage_stef_std, precentage_stef_mean+precentage_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
+    #ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
+    #ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
+    ax.plot(N,precentage_stef_mean,"bo",lw=2,label="R-StEFCal")
+    ax.errorbar(N, precentage_stef_mean,yerr=precentage_stef_std)
+    #ax.fill_between(N, precentage_stef_mean-precentage_stef_std, precentage_stef_mean+precentage_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
     #ax.set_yscale('log')
     ax.set_xlabel(r'$N$')
     ax.set_ylabel('Precentage Error')
