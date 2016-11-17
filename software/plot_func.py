@@ -25,7 +25,7 @@ def kde_scipy(x, x_grid, bandwidth=0.2, **kwargs):
     kde = gaussian_kde(x)
     return kde.evaluate(x_grid)
 
-def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4):
+def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4,ex_dir="/olddata"):
     
     N = np.array([7,19,37,61,91,108,169,217])
 
@@ -53,8 +53,9 @@ def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4):
     print "k = ",kappa_pcg_dic[str(N[0])]    
 
     for k in xrange(k_upper1):
+        PCG_DIR1 = "."+ex_dir+"/HEX_PCG_"+str(SNR)+"_False_"+str(k)
         PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)
-        PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
+        PCG_FILE_LIST = np.array([PCG_DIR1+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR1+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR1+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR1+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR1+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR1+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR1+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR1+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
         
         for i in xrange(len(PCG_FILE_LIST)):
             #LOAD PCG
@@ -80,8 +81,9 @@ def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4):
         
 
     for k in xrange(k_upper2):
+        CG_DIR1 = "."+ex_dir+"/HEX_CG_"+str(SNR)+"_False_"+str(k)
         CG_DIR = "./HEX_CG_"+str(SNR)+"_False_"+str(k)
-        CG_FILE_LIST = np.array([CG_DIR+"/1_7_9_"+CG_DIR[2:]+".p",CG_DIR+"/2_19_30_"+CG_DIR[2:]+".p",CG_DIR+"/3_37_63_"+CG_DIR[2:]+".p",CG_DIR+"/4_61_108_"+CG_DIR[2:]+".p",CG_DIR+"/5_91_165_"+CG_DIR[2:]+".p",CG_DIR+"/6_127_234_"+CG_DIR[2:]+".p",CG_DIR+"/7_169_315_"+CG_DIR[2:]+".p",CG_DIR+"/8_217_408_"+CG_DIR[2:]+".p"])
+        CG_FILE_LIST = np.array([CG_DIR1+"/1_7_9_"+CG_DIR[2:]+".p",CG_DIR1+"/2_19_30_"+CG_DIR[2:]+".p",CG_DIR1+"/3_37_63_"+CG_DIR[2:]+".p",CG_DIR1+"/4_61_108_"+CG_DIR[2:]+".p",CG_DIR1+"/5_91_165_"+CG_DIR[2:]+".p",CG_DIR1+"/6_127_234_"+CG_DIR[2:]+".p",CG_DIR1+"/7_169_315_"+CG_DIR[2:]+".p",CG_DIR1+"/8_217_408_"+CG_DIR[2:]+".p"])
             #LOAD CG
 
         for i in xrange(len(CG_FILE_LIST)):
@@ -122,6 +124,13 @@ def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4):
         kappa_cg_mad[n] = np.median(np.absolute(kappa_cg_dic[str(N[n])] - np.median(kappa_cg_dic[str(N[n])])))
         itr_cg_mad[n] = np.median(np.absolute(itr_cg_dic[str(N[n])] - np.median(itr_cg_dic[str(N[n])])))
     
+    output = open("kappa_itr_"+str(SNR)+".p", 'wb')
+    pickle.dump(N,output)
+    pickle.dump(kappa_pcg_mean,output)
+    pickle.dump(kappa_pcg_std,output)
+    pickle.dump(kappa_cg_median,output)
+    pickle.dump(kappa_cg_mad,output)
+    output.close()
 
     #print "kappa_cg_mad = ",kappa_cg_mad
     #print "itr_cg_mad = ",itr_cg_mad
@@ -271,6 +280,13 @@ def plot_outer_loop(SNR=10,k_upper1=5,k_upper2=5):
         outerloop_stef_std[n] = np.median(np.absolute(outerloop_stef_vec[outerloop_stef_vec<=9998] - np.median(outerloop_stef_vec[outerloop_stef_vec<=9998])))
         print "outerloop_stef_std = ",outerloop_stef_std 
     
+    output = open("outerloop_"+str(SNR)+".p", 'wb')
+    pickle.dump(N,output)
+    pickle.dump(outerloop_pcg_mean,output)
+    pickle.dump(outerloop_pcg_std,output)
+    pickle.dump(outerloop_stef_mean,output)
+    pickle.dump(outerloop_stef_std,output)
+    output.close()
 
     #print "kappa_cg_mad = ",kappa_cg_mad
     #print "itr_cg_mad = ",itr_cg_mad
@@ -501,15 +517,22 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
         precentage_stef_mean[n] = np.median(precentage_stef_vec)
         precentage_stef_std[n] = mad(precentage_stef_vec)
                      
+    output = open("prec_error_"+str(SNR)+".p", 'wb')
+    pickle.dump(N,output)
+    pickle.dump(precentage_pcg_mean,output)
+    pickle.dump(precentage_pcg_std,output)
+    pickle.dump(precentage_stef_mean,output)
+    pickle.dump(precentage_stef_std,output)
+    output.close()
    
     matplotlib.rcParams.update({'font.size': 22})
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    #ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
-    #ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
+    ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
+    ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
     ax.plot(N,precentage_stef_mean,"bo",lw=2,label="R-StEFCal")
-    ax.errorbar(N, precentage_stef_mean,yerr=precentage_stef_std)
-    #ax.fill_between(N, precentage_stef_mean-precentage_stef_std, precentage_stef_mean+precentage_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
+    #ax.errorbar(N, precentage_stef_mean,yerr=precentage_stef_std)
+    ax.fill_between(N, precentage_stef_mean-precentage_stef_std, precentage_stef_mean+precentage_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
     #ax.set_yscale('log')
     ax.set_xlabel(r'$N$')
     ax.set_ylabel('Precentage Error')
@@ -713,9 +736,9 @@ def plot_sparsity():
     plt.show()
 
 if __name__ == "__main__":
-   #plot_kappa_itr(SNR=5)
+   #plot_kappa_itr(SNR=1000)
    #plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
-   plot_precentage_error(SNR=5,k_upper1=5,k_upper2=5)
+   plot_precentage_error(SNR=1000,k_upper1=5,k_upper2=5)
    #plot_err_itr(num=4)
