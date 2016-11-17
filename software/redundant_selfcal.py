@@ -7,7 +7,7 @@ import time
 import sys, getopt
 import os
 import pickle
-
+import matplotlib as mpl
 
 def redundant_StEFCal(D,phi,tau=1e-3,alpha=0.3,max_itr=1000,PQ=None):
     converged = False
@@ -177,6 +177,66 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
             pickle.dump(error,output)
             output.close()
 
+def find_color_marker(index_value):
+    color = np.array(['b','g','r','c','m','y','k'])
+    marker = np.array(['o','v','^','<','>','8','s','p','*','H','+','x','D'])
+    index_value = index_value-1
+    counter = 0
+    c_final = None
+    m_final = None
+    for k in xrange(len(marker)):
+        for l in xrange(len(color)):
+            if counter == index_value:
+               c_final = color[l]
+               m_final = marker[k]
+               break
+            counter = counter+1
+        else:
+            continue  # executed if the loop ended normally (no break)
+        break  # executed if loop ended through break
+    #print "c_final = ",c_final
+    #print "m_final = ",m_final
+
+    if c_final is None:
+       i_c = np.random.randint(low=0,high=len(color))
+       i_m = np.random.randint(low=0,high=len(marker)) 
+       c_final = color[i_c]
+       m_final = color[i_m]
+    return c_final,m_final 
+
+def plot_before_after_cal_per_t_f(D,G,phi,k):
+        mpl.rcParams['xtick.labelsize'] = 20 
+        mpl.rcParams['ytick.labelsize'] = 20 
+        #mpl.rcParams['ylabel.labelsize'] = 22  
+        #mpl.rcParams['xlabel.labelsize'] = 22 
+        #mpl.rcParams['title.labelsize'] = 22
+        D_new = D[:,:,k]
+        G_new = G[:,:,k]
+        D_cal = D_new*G_new**(-1)
+        for i in xrange(D_new.shape[0]):
+            for j in xrange(i+1,D_new.shape[1]):
+                ind = phi[i,j]
+                #print "ind = ",ind
+                c_final,m_final = find_color_marker(ind)
+                plt.plot(D_new[i,j].real,D_new[i,j].imag,c_final+m_final,ms=10)
+        plt.axis("equal")
+        plt.xlabel("real",fontsize=15)
+        plt.ylabel("imag",fontsize=15)
+        plt.title("Before Calibration",fontsize=15)
+        plt.show()        
+
+        for i in xrange(D_cal.shape[0]):
+            for j in xrange(i+1,D_cal.shape[1]):
+                ind = phi[i,j]
+                c_final,m_final = find_color_marker(ind)
+                plt.plot(D_cal[i,j].real,D_cal[i,j].imag,c_final+m_final,ms=10)
+        plt.axis("equal")
+        plt.ylabel("imag",fontsize=15)
+        plt.xlabel("real",fontsize=15)
+        plt.title("After Calibration",fontsize=15)
+        plt.show()
+                  
+
 def main(argv):
     snr = 1000
     l = "HEX"
@@ -234,21 +294,26 @@ if __name__ == "__main__":
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
    s.plot_ant(title="HEX") #PLOT THE LAYOUT
    phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
+   
    s.plot_zeta(zeta,1,1,10,'cubehelix')
    s.uv_tracks() #GENERATE UV TRACKS
    #s.plot_uv_coverage(title="HEX") #PLOT THE UV TRACKS
-   #point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
+   point_sources = s.create_point_sources(100,fov=3,a=2) #GENERATE RANDOM SKYMODEL
    #g=s.create_antenna_gains(s.N,0.9,0.1,50,1,5,s.nsteps,plot = True) #GENERATE GAINS
    s.create_uv_f() #GENERATE UV POINTS f (for one time-slot)
    s.plot_uv_f()
    g = s.generate_phase_slope_gains()
-   point_sources = np.array([(1,0,0)])
-   D,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=5,w_m=None) #CREATE VIS MATRIX
+   #point_sources = np.array([(1,0,0)])
+   D,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=15,w_m=None) #CREATE VIS MATRIX
    M,sig = s.create_vis_mat(point_sources,s.u_f,s.v_f,g=g,SNR=None,w_m=None) #PREDICTED VIS
-   s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
-   s.plot_visibilities([0,1],M,"r",s=True)    
+   
+   #s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
+   #s.plot_visibilities([0,1],M,"r",s=True)    
    z_cal,c_cal,G_cal,M_cal,t,count_temp,_ = redundant_StEFCal_time(D,phi)
 
+   plot_before_after_cal_per_t_f(D,G_cal,phi,0)
+
+   '''
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    
    s.plot_visibilities([0,1],G_cal*M_cal,"g",s=True)
@@ -264,7 +329,7 @@ if __name__ == "__main__":
    plt.plot(prec_error)
 
    plt.show()
-
+   '''
    '''
    for n in xrange(s.N):
        plt.plot(np.angle(z_cal[n]))
