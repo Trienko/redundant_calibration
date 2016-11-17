@@ -539,6 +539,87 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
     ax.legend(loc=5)
     plt.show()
 
+def plot_prec_err_presentation():
+    output = open("prec_error_5.p", 'rb')
+    
+    N1 = pickle.load(output)
+    precentage_pcg_mean1 = pickle.load(output)
+    precentage_pcg_std1 = pickle.load(output)
+    precentage_stef_mean1 = pickle.load(output)
+    precentage_stef_std1 = pickle.load(output)
+    output.close()
+
+    output = open("prec_error_1000.p", 'rb')
+    N2 = pickle.load(output)
+    precentage_pcg_mean2 = pickle.load(output)
+    precentage_pcg_std2 = pickle.load(output)
+    precentage_stef_mean2 = pickle.load(output)
+    precentage_stef_std2 = pickle.load(output)
+    output.close()
+
+    matplotlib.rcParams.update({'font.size': 22})
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(N2,precentage_stef_mean2*100,'r',lw=2,label="SNR=1000")
+    ax.plot(N1,precentage_stef_mean1*100,'b',lw=2,label="SNR=5")
+    ax.fill_between(N1, (precentage_stef_mean1-precentage_stef_std1)*100, (precentage_stef_mean1+precentage_stef_std1)*100,alpha=0.2, edgecolor='k', facecolor='b')
+    ax.legend(prop={'size': 18})
+    ax.set_ylim([-10,100])
+    ax.set_xlim([7,217])
+    ax.set_xlabel("$N$ [antennas]")
+    ax.set_ylabel("% Error")
+    plt.grid('on')
+    plt.show()
+
+def plot_outerloop_pres():
+    output = open("outerloop_1000.p", 'rb')
+    N1 = pickle.load(output)
+    outerloop_pcg_mean1 = pickle.load(output)
+    outerloop_pcg_std1 = pickle.load(output)
+    outerloop_stef_mean1 = pickle.load(output)
+    outerloop_stef_std1 = pickle.load(output)
+    output.close()
+
+    N1 = N1[2:]
+    outerloop_pcg_mean1 = outerloop_pcg_mean1[2:]
+    outerloop_pcg_std1 = outerloop_pcg_std1[2:]
+    outerloop_stef_mean1 = outerloop_stef_mean1[2:]
+    outerloop_stef_std1 = outerloop_stef_std1[2:]
+    
+    output = open("outerloop_5.p", 'rb')
+    N2 = pickle.load(output)
+    outerloop_pcg_mean2 = pickle.load(output)
+    outerloop_pcg_std2 = pickle.load(output)
+    outerloop_stef_mean2 = pickle.load(output)
+    outerloop_stef_std2 = pickle.load(output)
+    output.close()
+
+    N2 = N2[2:]
+    outerloop_pcg_mean2 = outerloop_pcg_mean2[2:]
+    outerloop_pcg_std2 = outerloop_pcg_std2[2:]
+    outerloop_stef_mean2 = outerloop_stef_mean2[2:]
+    outerloop_stef_std2 = outerloop_stef_std2[2:]
+
+    matplotlib.rcParams.update({'font.size': 22})
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(N1,outerloop_pcg_mean1,"r",lw=2,label="PCG (SNR=1000)")
+    ax.fill_between(N1,outerloop_pcg_mean1-outerloop_pcg_std1, outerloop_pcg_mean1+outerloop_pcg_std1,alpha=0.2, edgecolor='k', facecolor='r')
+    ax.plot(N1,outerloop_stef_mean1,"b",lw=2,label="StEf (SNR=1000)")
+    ax.fill_between(N1, outerloop_stef_mean1-outerloop_stef_std1, outerloop_stef_mean1+outerloop_stef_std1,alpha=0.2, edgecolor='k', facecolor='b')
+    ax.plot(N1,outerloop_pcg_mean2,"m",lw=2,label="PCG (SNR=5)")
+    ax.fill_between(N2,outerloop_pcg_mean2-outerloop_pcg_std2, outerloop_pcg_mean2+outerloop_pcg_std2,alpha=0.2, edgecolor='k', facecolor='m')
+    ax.plot(N1,outerloop_stef_mean2,"g",lw=2,label="StEf (SNR=5)")
+    ax.fill_between(N2, outerloop_stef_mean2-outerloop_stef_std2, outerloop_stef_mean2+outerloop_stef_std2,alpha=0.2, edgecolor='k', facecolor='g')
+    ax.set_xlim([37,217])
+    ax.set_xlabel("$N$ [antennas]")
+    ax.set_ylabel("# Iterations")
+    ax.legend(prop={'size': 18})
+    plt.grid('on')
+    plt.show()
+
+def plot_kappa_itr_pres()
+
 
 def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     
@@ -736,9 +817,13 @@ def plot_sparsity():
     plt.show()
 
 if __name__ == "__main__":
+   plot_prec_err_presentation()
+   plot_outerloop_pres()
+   plot_kappa_itr_pres()
+
    #plot_kappa_itr(SNR=1000)
    #plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
-   plot_precentage_error(SNR=1000,k_upper1=5,k_upper2=5)
+   #plot_precentage_error(SNR=1000,k_upper1=5,k_upper2=5)
    #plot_err_itr(num=4)
