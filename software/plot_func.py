@@ -130,6 +130,10 @@ def plot_kappa_itr(SNR=1000,k_upper1=4,k_upper2=4,ex_dir="/olddata"):
     pickle.dump(kappa_pcg_std,output)
     pickle.dump(kappa_cg_median,output)
     pickle.dump(kappa_cg_mad,output)
+    pickle.dump(itr_pcg_mean,output)
+    pickle.dump(itr_pcg_std,output)
+    pickle.dump(itr_cg_median,output)
+    pickle.dump(itr_cg_mad,output)
     output.close()
 
     #print "kappa_cg_mad = ",kappa_cg_mad
@@ -618,7 +622,8 @@ def plot_outerloop_pres():
     plt.grid('on')
     plt.show()
 
-def plot_kappa_itr_pres()
+def plot_kappa_itr_pres():
+    return None
 
 
 def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
@@ -817,11 +822,11 @@ def plot_sparsity():
     plt.show()
 
 if __name__ == "__main__":
-   plot_prec_err_presentation()
-   plot_outerloop_pres()
-   plot_kappa_itr_pres()
+   #plot_prec_err_presentation()
+   #plot_outerloop_pres()
+   #plot_kappa_itr_pres()
 
-   #plot_kappa_itr(SNR=1000)
+   plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
