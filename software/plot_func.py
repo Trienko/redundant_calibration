@@ -878,8 +878,8 @@ def plot_sparsity():
     plt.show()
 
 if __name__ == "__main__":
-   #plot_prec_err_presentation()
-   #plot_outerloop_pres()
+   plot_prec_err_presentation()
+   plot_outerloop_pres()
    plot_kappa_itr_pres()
 
    #plot_kappa_itr(SNR=5)
