@@ -844,6 +844,7 @@ def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     plt.show()
 
 def plot_sparsity():
+    matplotlib.rcParams.update({'font.size': 22})
     output = open('sparsity.p', 'rb')
     N = pickle.load(output)
     gamma = pickle.load(output) 
@@ -857,11 +858,15 @@ def plot_sparsity():
     gamma_HEX = pickle.load(output)
     output.close()   
 
-    plt.plot(N,gamma,'r--',lw=1.5)
-    plt.plot(N,5.0/8.0*np.ones(N.shape),'k:',lw=1.5)
-    plt.plot(N_REG,gamma_REG,'ro',ms=8.0,mfc="w",mec='r')
-    plt.plot(N_SQR,gamma_SQR,'gx',ms=8.0)
-    plt.plot(N_HEX,gamma_HEX,'bo',ms=8.0,mfc="w",mec='b')
+    plt.plot(N,gamma,'r--',lw=2.5,label="REG: Theory")
+    plt.plot(N,5.0/8.0*np.ones(N.shape),'k:',lw=2.5,label="REG: Limit")
+    plt.plot(N_REG,gamma_REG,'ro',ms=10.0,mfc="w",mec='r',label="REG")
+    plt.plot(N_SQR,gamma_SQR,'gx',ms=10.0,label="SQR")
+    plt.plot(N_HEX,gamma_HEX,'bo',ms=10.0,mfc="w",mec='b',label="HEX")
+    plt.xlabel('$N$ [antennas]')
+    plt.ylabel('$\gamma$ [sparsity ratio]')
+    plt.xlim([5,330])
+    plt.legend(loc=5,prop={'size': 18})
     plt.show()
 
     P = 4*N-2
@@ -871,20 +876,26 @@ def plot_sparsity():
 
     P_HEX = 2*(N_HEX+6*R_HEX**2 + 3*R_HEX)
   
-    plt.plot(N,np.log(1-gamma)/np.log(P) + 2,'r--',lw=1.5)
-    plt.plot(N_REG,np.log(1-gamma_REG)/np.log(P_REG)+2,'ro',ms=8.0)
-    plt.plot(N_SQR,np.log(1-gamma_SQR)/np.log(P_SQR)+2,'gx',ms=8.0)
-    plt.plot(N_HEX,np.log(1-gamma_HEX)/np.log(P_HEX)+2,'bo',ms=8.0)
+    plt.plot(N,np.log(1-gamma)/np.log(P) + 2,'r--',lw=2.5,label="REG: Theory")
+    plt.plot(N,2*np.ones(N.shape),'k:',lw=2.5,label="Limit")
+    plt.plot(N_REG,np.log(1-gamma_REG)/np.log(P_REG)+2,'ro',ms=10.0,label="REG")
+    plt.plot(N_SQR,np.log(1-gamma_SQR)/np.log(P_SQR)+2,'gx',ms=10.0,label="SQR")
+    plt.plot(N_HEX,np.log(1-gamma_HEX)/np.log(P_HEX)+2,'bo',ms=10.0,label="HEX")
+    plt.xlabel('$N$ [antennas]')
+    plt.ylabel('$c$ [comp cost order]')
+    plt.xlim([5,330])
+    plt.ylim([1.6,2.1])
+    plt.legend(loc=1,prop={'size': 18})
     plt.show()
 
 if __name__ == "__main__":
-   plot_prec_err_presentation()
-   plot_outerloop_pres()
-   plot_kappa_itr_pres()
+   #plot_prec_err_presentation()
+   #plot_outerloop_pres()
+   #plot_kappa_itr_pres()
 
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
    #plot_time()
-   #plot_sparsity()
+   plot_sparsity()
    #plot_precentage_error(SNR=1000,k_upper1=5,k_upper2=5)
    #plot_err_itr(num=4)
