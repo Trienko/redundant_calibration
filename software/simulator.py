@@ -738,6 +738,49 @@ class sim():
           plt.show()
 
 
+      '''
+      Generates the antenna gains via sinusoidal model (mean of real part one; mean of imag part zero)
+      
+      RETURNS:
+      g - N x t antenna gain values
+      
+      INPUTS:
+      N - Number of antennas
+      max_amp - Maximum gain amplitude
+      min_amp - Minimum gain amplitude
+      freq_scale - How many complete periods in timesteps
+      time_steps - Number of timesteps to simulate 
+      '''
+      def create_antenna_gains_old(self,N,max_amp,min_amp,freq_scale,time_steps,plot = False):
+          g = np.zeros((N,time_steps),dtype=complex)
+          
+          period = 1.0/time_steps
+          
+          freq = freq_scale*period
+          
+          t = np.cumsum(np.ones((time_steps,)))
+          
+          amp_real = np.random.uniform(low=max_amp, high=min_amp, size = N)
+          phase_real = np.random.uniform(low=0, high=2*np.pi, size = N)
+          
+          amp_imag = np.random.uniform(low=max_amp, high=min_amp, size = N)
+          phase_imag = np.random.uniform(low=0, high=2*np.pi, size = N)
+          
+          for t_v in xrange(time_steps):
+	      g[:,t_v] = amp_real*np.cos(2*np.pi*freq*t[t_v] + phase_real) + 2*amp_real + amp_imag*np.sin(2*np.pi*freq*t[t_v] + phase_imag)*1j
+          
+          if plot:
+	     for n in xrange(g.shape[0]):
+	         plt.plot(t,g[n,:].real)
+	         plt.plot(t,g[n,:].imag)
+	                 
+	     plt.xlabel("Time slot")
+	     plt.ylabel("$g$")
+	     plt.show()
+          
+          return g
+
+
       def generate_phase_slope_gains(self,num_channels=1024,f0=100e6,f1=200e6,l0=50,l1=200):
           phase = np.zeros((self.N,num_channels),dtype=float)
 
