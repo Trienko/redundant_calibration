@@ -128,7 +128,11 @@ def convert_y_to_M(PQ,y,N):
     #from IPython import embed; embed() 
     return M  
 
-def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5):
+#type_exp: G_OLD - old gain with real and imag sinusoids
+#type_exp: G - ant gain with amp and phase sinusoids
+#type_exp: F - phase slope
+
+def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5,type_exp="G_OLD"):
     order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_number):
         

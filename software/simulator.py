@@ -767,7 +767,7 @@ class sim():
           phase_imag = np.random.uniform(low=0, high=2*np.pi, size = N)
           
           for t_v in xrange(time_steps):
-	      g[:,t_v] = amp_real*np.cos(2*np.pi*freq*t[t_v] + phase_real) + 2*amp_real + amp_imag*np.sin(2*np.pi*freq*t[t_v] + phase_imag)*1j
+	      g[:,t_v] = amp_real*np.cos(2*np.pi*freq*t[t_v] + phase_real) + 1.5*amp_real + amp_imag*np.sin(2*np.pi*freq*t[t_v] + phase_imag)*1j
           
           if plot:
 	     for n in xrange(g.shape[0]):
@@ -781,7 +781,7 @@ class sim():
           return g
 
 
-      def generate_phase_slope_gains(self,num_channels=1024,f0=100e6,f1=200e6,l0=50,l1=200):
+      def generate_phase_slope_gains(self,num_channels=1024,f0=100e6,f1=200e6,l0=5,l1=50):
           phase = np.zeros((self.N,num_channels),dtype=float)
 
           f = np.linspace(f0,f1,num=num_channels,endpoint=True,dtype=float)
