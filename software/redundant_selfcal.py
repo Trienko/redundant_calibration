@@ -132,12 +132,15 @@ def convert_y_to_M(PQ,y,N):
 #type_exp: G - ant gain with amp and phase sinusoids
 #type_exp: F - phase slope
 
-def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5,type_exp="G_OLD"):
+def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=5,type_exp="G_OLD",freq_enabled=False):
     order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_number):
         
         method = "R_StEFCal"
-        dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)
+        if freq_enabled:
+           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+type_exp+"_f
+        else:
+           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+type_exp
     
         if not os.path.isdir("./"+dir_name): 
            os.system("mkdir "+dir_name)
@@ -147,15 +150,35 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
             print "e = ",e
             print "k = ",k
             print "*********"
-            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
+            nsteps = 50
+            s = simulator.sim(nsteps=nsteps,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
             phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
             s.uv_tracks()
             #PQ = s.create_PQ(phi,s.L)
             point_sources = s.create_point_sources(100,fov=3,a=2)
-            g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
-            D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
-            M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+            
+            if freq_enabled: #DO A FREQ_DOMAIN EXPERIMENT 
+               nsteps = 1024
+               s.create_uv_f(num_channels = nsteps)
+               u_temp = s.u_f
+               v_temp = s.v_f
+               w_temp = s.w_f
+            else: #DO A TIME_DOMAIN EXPERIMENT
+               u_temp = s.u_m
+               v_temp = s.v_m
+               w_temp = s.w_m
+                        
+            #CHOOSE THE TYPE OF GAIN ERROR TO ADD
+            if type_exp == "F":
+               g = s.generate_phase_slope_gains(num_channels=nsteps)
+            elif type_exp == "G":
+               g = s.create_antenna_gains(s.N,0.9,0.8,10,1,5,nsteps,plot=False)
+            else:
+               g = s.create_antenna_gains_old(s.N,10,0.5,5,nsteps,plot = False)
+
+            D,sig = s.create_vis_mat(point_sources,u_temp,v_temp,g=g,SNR=SNR,w_m=None)
+            M,sig = s.create_vis_mat(point_sources,u_temp,v_temp,g=g,SNR=None,w_m=None) #PREDICTED VIS
             z_cal,c_cal,G_cal,M_cal,t,outer_loop,error = redundant_StEFCal_time(D,phi,tau=1e-6,alpha=1./3,max_itr=10000)
         
             #z_cal,c_cal,G_cal,M_cal,t,outer_loop=sparc_object.levenberg_marquardt_time(D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=5000,method=method)
@@ -247,28 +270,35 @@ def main(argv):
     min_order = 1 
     max_order = 2 
     exp_number = 5
+    freq_enabled = False
 
     try:
-       opts, args = getopt.getopt(argv,"hl:s:e:",["minorder=","maxorder="])
+       opts, args = getopt.getopt(argv,"hfl:s:e:",["minorder=","maxorder=","type_exp="])
     except getopt.GetoptError:
-       print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
+       print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_number> --minorder <minorder> --maxorder <maxorder> --type_exp <typeexp>'
        print 'Does a redundant stefcal experiment'
+       print '-f : Enable frequency simulation'
        print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
        print '-e <exp_number> : the experiment number. 5 (default).'
-       print '-- min_order : minimum order of redundant array. 1 default.'
-       print '-- max_order : maximum order of redundant array. 3 default.'
+       print '--min_order : minimum order of redundant array. 1 default.'
+       print '--max_order : maximum order of redundant array. 3 default.'
+       print '--type_exp : G (phase, ampl sinusoids), G_OLD (real and imag sinusoids), F (phase_slope)'
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
           print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_num> --minorder <minorder> --maxorder <maxorder>'
           print 'Does a redundant stefcal experiment'
+          print '-f : Enable frequency simulation'
           print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
           print '-e <exp_number> : the experiment number. 5 (default).'
-          print '-- min_order : minimum order of redundant array. 1 default.'
-          print '-- max_order : maximum order of redundant array. 3 default.'
+          print '--min_order : minimum order of redundant array. 1 default.'
+          print '--max_order : maximum order of redundant array. 3 default.'
+          print '--type_exp : G (phase, ampl sinusoids), G_OLD (real and imag sinusoids), F (phase_slope)' 
           sys.exit()
+       elif opt in ("-f"):
+          freq_enabled = True     
        elif opt in ("-l"):
           l = arg
        elif opt in ("-s"):
@@ -279,20 +309,25 @@ def main(argv):
           min_order = int(arg)
        elif opt in ("--maxorder"):
           max_order = int(arg)
+       elif opt in ("--type_exp"):
+          type_exp = arg 
   
+    print "freq_enable: ", freq_enabled
     print 'layout: ', l
     print 'SNR: ', snr
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
-    print 'exp_number: ',exp_number    
+    print 'exp_number: ',exp_number
+    print 'type_exp: ',type_exp    
 
-    return snr,l,max_order,min_order,exp_number
+    return freq_enabled,snr,l,max_order,min_order,exp_number,type_exp
 
 if __name__ == "__main__":
    
-   #snr,l,max_order,min_order,exp_number = main(sys.argv[1:])
-   #do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number)
+   freq_enabled,snr,l,max_order,min_order,exp_number,type_exp = main(sys.argv[1:])
+   do_red_cal_experiment(SNR=snr,min_order=min_order,max_order=max_order,layout=l,exp_number=exp_number,type_exp=type_exp,freq_enabled=freq_enabled)
    
+   '''
    s = simulator.sim(nsteps=100,layout="HEX",order=2) #INSTANTIATE OBJECT
    #s.read_antenna_layout()
    s.generate_antenna_layout() #CREATE ANTENNA LAYOUT - DEFAULT IS HEXAGONAL
@@ -316,7 +351,7 @@ if __name__ == "__main__":
    z_cal,c_cal,G_cal,M_cal,t,count_temp,_ = redundant_StEFCal_time(D,phi)
 
    plot_before_after_cal_per_t_f(D,G_cal,phi,0)
-
+   '''
    '''
    s.plot_visibilities([0,1],D,"b",s=False) #PLOT VIS
    s.plot_visibilities([0,1],M,"r",s=False)    

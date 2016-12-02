@@ -35,7 +35,7 @@ class sim():
       order - Fundamental parameter which determines the layout size
       '''
       
-      def __init__(self,h_min=-1,h_max=1,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=1.4*10**9,layout="HEX",nsteps=600,bas_len=50,order=1,seed=1):
+      def __init__(self,h_min=-1,h_max=1,dec=(-74-39./60-37.481)*(np.pi/180),lat=(-30 - 43.0/60.0 - 17.34/3600)*(np.pi/180),freq=150*10**6,layout="HEX",nsteps=600,bas_len=50,order=1,seed=1):
           self.h_min = h_min
           self.h_max = h_max
           self.nsteps = nsteps

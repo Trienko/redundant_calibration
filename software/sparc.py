@@ -584,13 +584,16 @@ def compute_sparsity():
     plt.show()
     '''
 
-
-def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False,exp_num=5):
+def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",time_var=False,exp_num=5,type_exp="G_OLD",freq_enabled=False):
     order_vec = np.arange(min_order,max_order+1)
     for e in xrange(exp_num):
  
-    	
         dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(time_var)+"_"+str(e)
+
+        if freq_enabled:
+           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+str(time_var)+"_"+type_exp+"_f
+        else:
+           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+str(time_var)+"_"+type_exp
     
         if not os.path.isdir("./"+dir_name): 
            os.system("mkdir "+dir_name)
@@ -601,18 +604,38 @@ def do_sparc_experiment(SNR=5,method="PCG",min_order=1,max_order=3,layout="HEX",
             print "k = ",k
             print "order_vec = ",order_vec
             print "*********"
-            s = simulator.sim(nsteps=50,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
+            n_steps = 50 #IF TIME_DOMAIN EXPERIMENT
+            s = simulator.sim(nsteps=nsteps,layout=layout,order=order_vec[k],seed=e) #INSTANTIATE OBJECT
             s.generate_antenna_layout()
             phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
             PQ = s.create_PQ(phi,s.L)
             s.uv_tracks()
             point_sources = s.create_point_sources(100,fov=3,a=2)
-            g=s.create_antenna_gains(s.N,0.9,0.8,10,1,5,s.nsteps,plot = False)
-            D,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=SNR,w_m=None)
-            M,sig = s.create_vis_mat(point_sources,s.u_m,s.v_m,g=g,SNR=None,w_m=None) #PREDICTED VIS
+            
+            if freq_enabled: #DO A FREQ_DOMAIN EXPERIMENT 
+               nsteps = 1024 #IF FREQ DOMAIN EXPERIMENT
+               s.create_uv_f(num_channels = nsteps)
+               u_temp = s.u_f
+               v_temp = s.v_f
+               w_temp = s.w_f
+            else: #DO A TIME_DOMAIN EXPERIMENT
+               u_temp = s.u_m
+               v_temp = s.v_m
+               w_temp = s.w_m
+
+            #CHOOSE THE TYPE OF GAIN ERROR TO ADD
+            if type_exp == "F":
+               g = s.generate_phase_slope_gains(num_channels=nsteps)
+            elif type_exp == "G":
+               g = s.create_antenna_gains(s.N,0.9,0.8,10,1,5,nsteps,plot=False)
+            else:
+               g = s.create_antenna_gains_old(s.N,10,0.5,5,nsteps,plot = False)
+	    
+            D,sig = s.create_vis_mat(point_sources,u_temp,v_temp,g=g,SNR=SNR,w_m=None)
+            M,sig = s.create_vis_mat(point_sources,u_temp,v_temp,g=g,SNR=None,w_m=None) #PREDICTED VIS
             sparc_object = SPARC(s.N,s.L,phi,zeta,PQ)
             z_cal,c_cal,G_cal,M_cal,time_mat,outer_loop,error=sparc_object.levenberg_marquardt_time  (D,s.psi_func_eval,s.xi_func_eval,s.convert_y_to_M,tol1=1e-6,tol2=1e-6,tol3=1e-15,lam=2,max_itr=10000,method=method,time_var=time_var)
-       
+            #NB::: time_var deactivates the computation of kappa 
             file_name = "./"+dir_name+"/"+str(order_vec[k])+"_"+str(s.N)+"_"+str(s.L)+"_"+dir_name+".p"
 
             output = open(file_name, 'wb')
@@ -701,34 +724,42 @@ def main(argv):
     m = "PCG"
     time_var = False
     exp_num = 5
+    freq_enabled = False
+    type_exp = "G_OLD"
 
     try:
-       opts, args = getopt.getopt(argv,"htl:s:m:e:",["minorder=","maxorder="])
+       opts, args = getopt.getopt(argv,"htfl:s:m:e:",["minorder=","maxorder=","type_exp="])
     except getopt.GetoptError:
-       print 'sparc.py -t -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
+       print 'sparc.py -t -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder> --type_exp <type_exp>'
        print 'Does a sparc experiment'
        print '-t : set timing to True. False (default)'
+       print '-f : do freq experiment'
        print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
        print '-m <method> : i.e. PCG or CG. PCG (default)'
        print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
        print '-e <exp_num> : number of experiments to perform . 5 (default)'
        print '-- min_order : minimum order of redundant array. 1 default.'
        print '-- max_order : maximum order of redundant array. 3 default.'
+       print '--type_exp : G (phase, ampl sinusoids), G_OLD (real and imag sinusoids), F (phase_slope)'
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
-          print 'sparc.py -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder>'
+          print 'sparc.py -l <layout> -s <SNR> -m <method> -e <exp_number> --minorder <minorder> --maxorder <maxorder> --type_exp <type_exp>'
           print 'Does a sparc experiment'
           print '-t : set timing to True. False (default)'
+          print '-f : do freq experiment'
           print '-l <layout> : i.e. HEX, REG or SQR. HEX (default)'
           print '-m <method> : i.e. PCG or CG. PCG (default)'
           print '-s <SNR> : signal-to-noise ratio. 1000 (default).'
           print '-e <exp_num> : number of experiments to perform . 5 (default)'
           print '-- min_order : minimum order of redundant array. 1 default.'
           print '-- max_order : maximum order of redundant array. 3 default.'
+          print '--type_exp : G (phase, ampl sinusoids), G_OLD (real and imag sinusoids), F (phase_slope)'
           sys.exit()
        elif opt in ("-l"):
           l = arg
+       elif opt in ("-f"):
+          freq_enabled = True
        elif opt in ("-t"):
           time_var = True
        elif opt in ("-s"):
@@ -741,6 +772,8 @@ def main(argv):
           min_order = int(arg)
        elif opt in ("--maxorder"):
           max_order = int(arg)
+       elif opt in ("--type_exp"):
+          type_exp = arg
   
     print "OPTIONS SELECTED:"
     print "*****************"
@@ -750,14 +783,17 @@ def main(argv):
     print 'maxorder: ',max_order
     print 'minorder: ',min_order
     print 't: ',time_var
+    print 'f: ',freq_enabled
     print 'exp_num: ', exp_num
+    print 'exp_type: ', type_exp
     print "*****************"
 
-    return snr,l,m,max_order,min_order,time_var,exp_num
+    return freq_enabled,snr,l,m,max_order,min_order,time_var,exp_num,type_exp
 
 if __name__ == "__main__":
-   snr,l,m,max_order,min_order,time_var,exp_num = main(sys.argv[1:])
-   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num)
+   freq_enabled,snr,l,m,max_order,min_order,time_var,exp_num,type_exp = main(sys.argv[1:])
+   do_sparc_experiment(SNR=snr,method=m,min_order=min_order,max_order=max_order,layout=l,time_var=time_var,exp_num=exp_num,type_exp=type_exp,freq_enabled=freq_enabled)
+   
    #plot_kappa_itr()
 
    #compute_sparsity()
