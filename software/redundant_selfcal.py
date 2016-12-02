@@ -271,6 +271,7 @@ def main(argv):
     max_order = 2 
     exp_number = 5
     freq_enabled = False
+    type_exp = "G_OLD"
 
     try:
        opts, args = getopt.getopt(argv,"hfl:s:e:",["minorder=","maxorder=","type_exp="])
@@ -287,7 +288,7 @@ def main(argv):
        sys.exit(2)
     for opt, arg in opts:
        if opt == '-h':
-          print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_num> --minorder <minorder> --maxorder <maxorder>'
+          print 'redundant_selfcal.py -l <layout> -s <SNR> -e <exp_num> --minorder <minorder> --maxorder <maxorder> --type_exp <typeexp>'
           print 'Does a redundant stefcal experiment'
           print '-f : Enable frequency simulation'
           print '-l <layout> : i.e. HEX (default), REG or SQR. HEX (default)'
