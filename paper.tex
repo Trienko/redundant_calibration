@@ -103,13 +103,13 @@ $^{2}$Building, Institute, Street Address, City, Code, Country}
 Traditionally redundant calibration is implemented via a hierarchical algorithmic strategy, i.e. a basic firstcal is performed, followed by LOGCAL and LINCAL.  We first show
 that LINCAL is effectively the non-linear least-squares gradient-based Gauss-Newton algorithm. Therefore, an easy way to reduce the number of layers used in performing redundant calibration is to employ the Levenberg-Marquardt algorithm instead (which would improve the convergence properties of stock standard LINCAL). 
 We further show that instead of splitting our calibration problem into its phase and amplitude components,
-which is the approach taken by LINCAL, we can treat the complex unknown parameters and their complex conjugates as separate unknowns instead. In the latter approach 
-we make use of the gradient-based complex Levenberg-Marquardt algorithm and not complex Gauss-Newton for the same reason stated earlier. 
+which is the approach taken by LINCAL, we can treat the complex unknown model parameters and their complex conjugates as separate unknowns instead. In the latter framework
+we make use of the gradient-based complex Levenberg-Marquardt algorithm (not its real valued counterpart) to determine our fundamental update step. 
 Lastly, we compare two previously proposed methods to speedup redundant 
 calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating 
-direction implicit method outperforms the preconditioned conjugate gradient method, however the preconditioned conjugate gradient method is more robust as it is easier to adapt to other calibration use cases. 
-The reason we use the complex optimization framework, instead of the phase-amplitude approach, in this paper is: in this framework
-it becomes demonstrate that the alternating direction implicit method is in fact a special case of the complex Levenberg-Marquardt algorithm.
+direction implicit method outperforms the preconditioned conjugate gradient method, however the preconditioned conjugate gradient method is more robust as it would be easier to adapt to other calibration use cases. 
+The reason we exclusively use the complex optimization framework in this paper, instead of the phase-amplitude approach, is that in our opinion the complex framework makes it much easier to derive an analytical tractable update step. More importantly however, when we work in this complex framework it becomes trivial to show that the alternating direction implicit method is in actual fact just a 
+special case of the more general complex Levenberg-Marquardt algorithm.
 \end{abstract}
 
 \begin{keywords}
