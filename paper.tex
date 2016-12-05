@@ -101,8 +101,14 @@ $^{2}$Building, Institute, Street Address, City, Code, Country}
 
 \begin{abstract}
 Traditionally redundant calibration is implemented via a layered algorithmic pipeline, i.e. a basic firstcal is performed, followed by LOGCAL and LINCAL.  We first show
-that LINCAL is effectively the non-linear least-squares Gauss-Newton algorithm. An easy way to reduce the number of layers that are currently used would therefore be to employ the Levenberg-Marquardt algorithm instead. We further show that instead of splitting our calibration problem into its phase and amplitude components,
-which is the avenue taken by LINCAL, we can treat the complex unknown parameters and their complex conjugates as separate unknowns instead.    
+that LINCAL is effectively the non-linear least-squares Gauss-Newton algorithm. An easy way to reduce the number of layers that are currently used would therefore be to employ the Levenberg-Marquardt algorithm instead. 
+We further show that instead of splitting our calibration problem into its phase and amplitude components,
+which is the avenue taken by LINCAL, we can treat the complex unknown parameters and their complex conjugates as separate unknowns instead. In the latter approach 
+we use Wirtinger derivatives instead of the classical definition of differentiation. Lastly, we compare two previously proposed methods, to increase the speed of redundant 
+calibration, with each other. The two approaches we investigate is the alternating direction implicit method and the preconditioned conjugate gradient method. We specifically use 
+the Wirtinger framework in this paper, instead of the phase amplitude approach, as it is easy to show that the alternating direction implicit method is simply a special case
+
+
 
 In this paper we use complex least-squares to perform redundant calibration. Traditionally redundant calibration is performed by splitting the problem into its 
 phase and amplitude components, after-which these two components are solved for separately. During complex least-squares, we treat the complex
