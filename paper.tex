@@ -80,7 +80,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title[Unknown]{TBD}
+\title[Unknown]{Redundant calibration as a complex optimization problem}
 \author[A. V. Raveendran and A. N. Other]{A. V. Raveendran$^{1}$\thanks{E-mail:
 email@address (AVR); otheremail@otheraddress (ANO)} and A. N.
 Other$^{2}$\footnotemark[1]\thanks{This file has been amended to
@@ -100,7 +100,13 @@ $^{2}$Building, Institute, Street Address, City, Code, Country}
 \label{firstpage}
 
 \begin{abstract}
-TBD
+Traditionally redundant calibration is implemented via a layered algorithmic pipeline, i.e. a basic firstcal is performed, followed by LOGCAL and LINCAL.  We first show
+that LINCAL is effectively the non-linear least-squares Gauss-Newton algorithm. An easy way to reduce the number of layers that are currently used would therefore be to employ the Levenberg-Marquardt algorithm instead. We further show that instead of splitting our calibration problem into its phase and amplitude components,
+which is the avenue taken by LINCAL, we can treat the complex unknown parameters and their complex conjugates as separate unknowns instead.    
+
+In this paper we use complex least-squares to perform redundant calibration. Traditionally redundant calibration is performed by splitting the problem into its 
+phase and amplitude components, after-which these two components are solved for separately. During complex least-squares, we treat the complex
+parameters and their conjugates as independent quantities instead.     
 \end{abstract}
 
 \begin{keywords}
