@@ -138,7 +138,7 @@ def do_red_cal_experiment(SNR=5,min_order=1,max_order=2,layout="HEX",exp_number=
         
         method = "R_StEFCal"
         if freq_enabled:
-           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+type_exp+"_f
+           dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+type_exp+"_f"
         else:
            dir_name = layout+"_"+method+"_"+str(SNR)+"_"+str(e)+"_"+type_exp
     
