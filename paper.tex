@@ -471,7 +471,7 @@ In this alternative approach we treat the complex parameters and their conjugate
 \subsection{Historical Overview}
 
 
-[Redundant calibration has been in use for a long time. It was already being used in the 1980's. Noordam used redundant calibration to produce high-dynamic range images of 3C84 with the 
+[Redundant calibration has been in use for a long time. Noordam used redundant calibration to produce high-dynamic range images of 3C84 with the 
 WSRT array.] RW The first implementations of redundant calibration made use of the logarithm function, because when the logarithm is applied to the scalar measurement equation redundant 
 calibration is transformed into a linear problem cite Wieringa,camps and Lui. This approach is also generally referred to as LOGCAL.
 LOGCAL is reviewed in Appendix ??. The next improvement was to perform a firt-order taylor expansion (which is equivalent to the GN algorithm Kurien 2016) of the measurement equation an then to solve for the
@@ -850,6 +850,50 @@ PLUS IMAGE OF HESSIAN FOR THE DISCUSSION
 \subsubsection{Spectral Condition Number}
 kappa + itr plots
 \subsubsection{Sparsity}
+
+% \begin{enumerate}
+% \item $\boldsymbol{H}$: is a $(4N-2)\times(4N-2)$ or a $P \times P$ matrix. $N$ denotes the number of antennas and $P$ denotes the number of parameters. This matrix
+% contains $6N^2 - 2N - 2$ non-zero entries. It contains $16N^2 - 16N + 4$ entries. We can construct this matrix with $4N^2 -  4N$ or $\frac{1}{4} P^2 -1$ elementary operations.
+% \item $\boldsymbol{A}$: is a $(2N-1)\times(2N-1)$ matrix. This matrix has $N^2 + N - 1$ non-zero entries. We can construct this matrix with $2\frac{1}{2} (N^2 -  N)$ elementary operations.  
+% \item $\boldsymbol{B}$: is a $(2N-1)\times(2N-1)$ matrix. This matrix has $2N^2 - 2N$ non-zero entries. We can construct this matrix with $1\frac{1}{2} (N^2 -  N)$ elementary operations.
+% \item $\boldsymbol{C}$: is a $N\times N$ matrix. This matrix has $N$ non-zero entries. We can construct this matrix with $N^2-N$ elementary operations.
+% \item $\boldsymbol{D}$: is a $N \times (N-1)$ matrix. This matrix has $\frac{1}{2} (N^2 -  N)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations. 
+% \item $\boldsymbol{E}$: is a $(N-1) \times (N-1)$ matrix. This matrix has $(N-1)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.  
+% \item $\boldsymbol{F}$: is a $N \times N$ matrix. This matrix has $N^2 - N$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.
+% \item $\boldsymbol{G}$: is a $N \times (N-1)$ matrix. This matrix has $\frac{1}{2} (N^2 -  N)$ non-zero entries. We can construct this matrix with $\frac{1}{2} (N^2 -  N)$ elementary operations.
+% \item $\boldsymbol{0}$: is a $(N-1) \times (N-1)$ all zero matrix. 
+% \end{enumerate}
+
+%We can construct $\boldsymbol{C}-\boldsymbol{G}$ in $O(N^2)$ 
+
+As alluded to in section ..., the second factor that determines the computational complexity of the conjugate gradient method when used to perform redundant calibration is the amount of non-zero
+entries in the Hessian matrix $\bH$, which is the matrix we are trying to invert. We have also shown in section that the first factor, the spectral condition number of $\bH$, can be reduced 
+to a constant by employing preconditioning and can therefore be completely eliminated from the computational complexity equation. A useful matrix quantity
+which we will use in this section is the sparsity factor $\gamma$ of a matrix, which is the ratio between the amount of zero entries and the total amount of entries in a matrix. We 
+can therefore define $\gamma$ as follows:
+\begin{equation}
+ \gamma = \left (1 - \frac{m}{P^2} \right ) 
+\end{equation}
+It is trivial to determine an analytic expression for the sparsity ratio of $\bH$ when our redundant array is in a regular east-west geometric configuration
+The sparsity and the asymptotic sparsity ratio of $\boldsymbol{H}$ are equal to
+\begin{align}
+\gamma &= \frac{5N^2-7N+3}{8N^2-8N+2} & \gamma_{\infty} &= \lim_{N\rightarrow \infty}\gamma = \frac{5}{8}. 
+\end{align}
+However when our redundant array makes use of a more complicated geometric layout it becomes much more difficult to construct such expressions as $\bH$ itself 
+becomes much harder to express analytically. 
+
+In Fig... we plot the sparsity ratio of three different geometric layouts as a function of the number antennas in the array. Discuss the solid lines 
+and how they relate to the two equations from above.
+
+We can now use the sparsity factor to compute the order of the computational cost of inverting $\bH$ as follows:
+\begin{align}
+P^{c} &= (1 - \gamma)P^2\\
+c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2
+\end{align}
+
+Asymptotically the computational cost of inverting $\bH$ is $O(P^2)$. However, the computational cost converges 
+very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ if a Hexagonal geometric layout is employed.
+
 sparsity derivation
 sparsity + computational complexity plots
 
