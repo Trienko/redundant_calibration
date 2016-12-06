@@ -469,6 +469,18 @@ In this alternative approach we treat the complex parameters and their conjugate
 \section{Redundant Calibration}
 
 \subsection{Historical Overview}
+
+
+[Redundant calibration has been in use for a long time. In the early 1980's it was already used to produce high-dynamic range images of 3C84.] RW The first 
+implementations of redundant calibration made use of the logarithm function, because when the logarithm is applied to the scalar measurement equation redundant 
+calibration is transformed into a linear problem cite Wieringa,camps and Lui. This approach is also generally referred to as LOGCAL.
+LOGCAL is reviewed in Appendix ??. The next improvement was to perform a firt-order taylornomial expansion (which is equivalent to the GN algorithm Kurien 2016) of the measurement equation an then to solve for the
+perturbations of the model-parameters. This approach is commonly referred to as LINCAL. LINCAL is derived from first principals in Appendix . Two ways of speeding up redundant calibration has also been 
+proposed. The first technique makes use of the alternating direction implicit method, in which we alternate between solving the gains, their conjugates and 
+the true observed visibilities (wijnholds and marthi). Using the conjugate gradient method to exploit the sparsity inherent in the redundant calibration problem, 
+and in doing so speedup the algorithm itself was proposed in . A proper comparison of between these two approaches have not been done before.
+   
+
 Layered approach, LOGCAL, LINCAL, Stefan's conference paper, Noordam, other ASTRON paper, newest papers on redundant calibration, marthi paper etc...
 
 \subsection{Real-Imag Framework}
