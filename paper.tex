@@ -180,7 +180,7 @@ Main contributions of the paper:
  
 \section{Preliminaries}
 
-\subsection{Unpolarized Measurement Equation}
+\subsection{Scalar Measurement Equation}
 The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
 \begin{equation}
 \label{eq:vis_definition}
@@ -432,6 +432,8 @@ Frobenius norm.
 
 The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
 
+NB:: ADD GN AND LM UPDATE RULES HERE
+
 The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bnu$ to be differentiable
 towards each model parameter. When the least squares problem is complex it becomes less straightforward to apply these gradient based minimization methods. The reason being,
 many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance if the 
@@ -453,7 +455,32 @@ Using the above definitions we can now easily compute the following:
 \frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
 \end{align}
 
-\subsection{Redundant Calibration}
+\section{Redundant Calibration}
+
+\subsection{Historical Overview}
+Layered approach, LOGCAL, LINCAL, Stefan's conference paper, Noordam, other ASTRON paper, newest papers on redundant calibration, marthi paper etc...
+
+\subsection{Real-Imag Framework}
+Here we discuss the fact that LINCAL is just GN
+
+OLD COPIED TEXT
+
+As we mentioned in the beginning of this section, the Wirtinger framework is not the only way of ensuring that $\bv$ is analytic in its argument. We could also 
+have divided the problem in Eq.~\eqref{eq:least_squares_red} into its real and imaginary components after-which we solve for the real and imaginary parts of the parameters separately. There is a third way
+of dealing with the issue. We can split the problem in Eq.~\eqref{eq:least_squares_complex} into its phase and amplitude components and then solve for the amplitude and phase of the parameters separately.
+This can be achieved by first rewriting Eq.~\eqref{eq:least_squares_complex} to
+\begin{equation}
+\label{eq:least_squares_lincal}
+\min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
+\end{equation}
+where $\bmath{\varrho}$ is the phase and amplitude parameter vector and is defined in Appendix~\ref{sec:lincal}. The Jacobian associated with 
+Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. It should therefore be obvious to the reader that 
+performing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in Appendix~\ref{sec:lincal} from first principles.
+Therefore, a straightforward way of improving the convergence properties of stock standard LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
+
+
+\subsection{Complex Framework}
+
 \citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal skymodel-based calibration. We will now show
 that the Wirtinger framework can also be applied to redundant calibration.
 
@@ -476,7 +503,7 @@ If we use the Wirtinger derivatives, Eq.~\eqref{eq:wir}, instead of the classic 
 $\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}. The fact that $\bv$ is now analytic in its argument has the immediate consequence: it becomes possible to apply complex GN
 and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
 
-\subsection{Complex GN and LM}
+\subsubsection{Complex GN and LM}
 In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
 \begin{equation}
 \label{eq:Jacobian}
@@ -511,7 +538,7 @@ parameter vector as follows:
 We update our parameter vector by using Eq.~\eqref{eq:update} until convergence is reached. To improve readability we do not explicitly denote the iteration subscript $k$ in 
 Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
-\subsection{Analytic Expressions}
+\subsubsection{Analytic Expressions}
 If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:least_squares_complex} we obtain the following analytic result:
 \begin{equation}
 \label{eq:Jacobian_red}
@@ -662,7 +689,7 @@ DEFINED ALL OPERATORS AND SYMBOLS?
 
 
 
-\subsection{Simplifying GN}
+\subsubsection{Simplifying GN}
 
 The following identities,
 \begin{align}
@@ -697,21 +724,13 @@ where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
 
 FIX TRANSPOSE PROBLEM
 
-\subsection{GN and LINCAL}
-As we mentioned in the beginning of this section, the Wirtinger framework is not the only way of ensuring that $\bv$ is analytic in its argument. We could also 
-have divided the problem in Eq.~\eqref{eq:least_squares_red} into its real and imaginary components after-which we solve for the real and imaginary parts of the parameters separately. There is a third way
-of dealing with the issue. We can split the problem in Eq.~\eqref{eq:least_squares_complex} into its phase and amplitude components and then solve for the amplitude and phase of the parameters separately.
-This can be achieved by first rewriting Eq.~\eqref{eq:least_squares_complex} to
-\begin{equation}
-\label{eq:least_squares_lincal}
-\min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
-\end{equation}
-where $\bmath{\varrho}$ is the phase and amplitude parameter vector and is defined in Appendix~\ref{sec:lincal}. The Jacobian associated with 
-Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. It should therefore be obvious to the reader that 
-performing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in Appendix~\ref{sec:lincal} from first principles.
-Therefore, a straightforward way of improving the convergence properties of stock standard LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
+\section{Results}
 
-\subsection{Diagonalization and StEFCal}
+\subsection{Simulations}
+
+\subsection{Alternating Direction Implicit Method}
+
+%\subsection{Diagonalization and StEFCal}
 StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
 that their conjugates are unknown (REMEMBER TO CITE ALL THE STEFCAL PAPERS MITCHELL ETC...). Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
 is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative update step [MUST IMPROVE HERE]. \cite{Salvini2014} also show that
@@ -795,6 +814,20 @@ relationship between Stefcal and the approach derived by I will use the label Re
 
 with $\alpha = \frac{1}{1+\lambda}$. Moreover $\lambda = \frac{1-\alpha}{\alpha}$. So in Marthi and Chengular (2014) they use an $\alpha$ of 0.3, which corresponds to an LM damping factor $\lambda$
 of $2\frac{1}{3}$.
+
+NB:: NEED TO ADD SNR PLOTS HERE
+PLUS IMAGE OF HESSIAN FOR THE DISCUSSION
+
+\subsection{Conjugate Gradient Method}
+
+\subsubsection{Spectral Condition Number}
+kappa + itr plots
+\subsubsection{Sparsity}
+sparsity derivation
+sparsity + computational complexity plots
+
+\subsection{Comparison}
+itr numbers plot and graph of $kP = P^{1.7}$.
 
 
 
