@@ -426,22 +426,32 @@ The method of nonlinear least squares is tanatamount to solving the following op
 \label{eq:least_squares}
 \min_{\bzeta} \Lambda(\bzeta) = \min_{\bzeta} \|\brho\|_F^2 = \min_{\bzeta} \|\bdelta - \bnu(\bzeta)\|_F^2, 
 \end{equation}
-where $\Lambda$ is known as the objective function, $\brho$ is the residual vector, $\bdelta$ is the observed data vector, $\bnu$ is the model data vector and $\bzeta$ is the solution which minimizes Eq.~\eqref{eq:least_squares}.
+where $\Lambda$ is known as the objective function, $\brho$ is the residual vector, $\bdelta$ is the observed data vector, $\bnu$ is the model data vector and $\bzeta$ is the model parameter vector that minimizes Eq.~\eqref{eq:least_squares}.
+In Eq.~\eqref{eq:least_squares}, we assume that the optimization problem is real valued.
 The main objective of least squares is to find the model parameters which minimizes the squared difference between the observed data and the model predicted data. Moreover, $\|*\|_F$ denotes the 
 Frobenius norm.
 
 The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
+The GN update step is defined as
+\begin{equation}
+ \Delta \bzeta = (\bJ^T\bJ)^{-1} \bJ^T\brho,
+\end{equation}
+while the LM update takes the following form
+\begin{equation}
+ \Delta \bzeta = (\bJ^T\bJ+\lambda_{\textrm{LM}}\bD)^{-1} \bJ^T\brho,
+\end{equation}
+where $\bJ$ is the Jacobian matrix (i.e. the derivative of the model $\bnu$ with respect to the parameter vector $\bzeta$), $\lambda_{\textrm{LM}}$ denotes the 
+damping factor, while $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. These update rules are used in an iterative manner to 
+determine new estimates of $\bzeta$.
 
-NB:: ADD GN AND LM UPDATE RULES HERE
-
-The gradient based minimization algorithms that are generally used to solve least squares problems generally require the model $\bnu$ to be differentiable
+The gradient based minimization algorithms that are generally used to solve least squares problems (i.e. GN and LM) generally require the model $\bnu$ to be differentiable
 towards each model parameter. When the least squares problem is complex it becomes less straightforward to apply these gradient based minimization methods. The reason being,
 many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance if the 
 classical definition of differentiation is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
 
 Redundant calibration is achieved by solving the following optimization problem:
 
-The only way to circumvent the differentiability conundrum that plaques complex least square problems is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
+The only way to circumvent the differentiability conundrum, associated with complex least square problems, is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
 The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
 
 Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
@@ -454,6 +464,7 @@ Using the above definitions we can now easily compute the following:
 \begin{align}
 \frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
 \end{align}
+In this alternative approach we treat the complex parameters and their conjugates as separate parameters.
 
 \section{Redundant Calibration}
 
