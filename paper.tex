@@ -885,12 +885,14 @@ becomes much harder to express analytically.
 In Fig... we plot the sparsity ratio of three different geometric layouts as a function of the number antennas in the array. Discuss the solid lines 
 and how they relate to the two equations from above.
 
-We can now use the sparsity factor to compute the order of the computational cost of inverting $\bH$ as follows:
+We can now use the sparsity factor to compute the order of the computational cost of inverting $\bH$ with
+\begin{equation}
+P^{c} = (1 - \gamma)P^2.
+\end{equation}
+Solving for $c$ we obtain
 \begin{align}
-P^{c} &= (1 - \gamma)P^2\\
-c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2
+c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2.
 \end{align}
-
 Asymptotically the computational cost of inverting $\bH$ is $O(P^2)$. However, the computational cost converges 
 very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ if a Hexagonal geometric layout is employed.
 
