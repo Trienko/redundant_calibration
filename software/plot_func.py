@@ -418,7 +418,7 @@ def plot_err_itr(SNR=1000,num=4,e_upper1=5,e_upper2=5):
 def mad(x):
     return np.median(np.absolute(x - np.median(x)))
 
-def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
+def plot_precentage_error(SNR=10,k_upper1=0,k_upper2=3,extra_string="_G_OLD_f"):
     
     N = np.array([7,19,37,61,91,108,169,217])
 
@@ -436,7 +436,7 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
         precentage_stef_dic[str(N[j])]=np.array([],dtype=float)
 
     for k in xrange(k_upper1):
-        PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)
+        PCG_DIR = "./HEX_PCG_"+str(SNR)+"_False_"+str(k)+extra_string
         PCG_FILE_LIST = np.array([PCG_DIR+"/1_7_9_"+PCG_DIR[2:]+".p",PCG_DIR+"/2_19_30_"+PCG_DIR[2:]+".p",PCG_DIR+"/3_37_63_"+PCG_DIR[2:]+".p",PCG_DIR+"/4_61_108_"+PCG_DIR[2:]+".p",PCG_DIR+"/5_91_165_"+PCG_DIR[2:]+".p",PCG_DIR+"/6_127_234_"+PCG_DIR[2:]+".p",PCG_DIR+"/7_169_315_"+PCG_DIR[2:]+".p",PCG_DIR+"/8_217_408_"+PCG_DIR[2:]+".p"]) 
         
         for i in xrange(len(PCG_FILE_LIST)):
@@ -476,7 +476,7 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
             file_p.close()
     
     for k in xrange(k_upper2):
-        STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(k)
+        STEF_DIR = "./HEX_R_StEFCal_"+str(SNR)+"_"+str(k)+extra_string
         STEF_FILE_LIST = np.array([STEF_DIR+"/1_7_9_"+STEF_DIR[2:]+".p",STEF_DIR+"/2_19_30_"+STEF_DIR[2:]+".p",STEF_DIR+"/3_37_63_"+STEF_DIR[2:]+".p",STEF_DIR+"/4_61_108_"+STEF_DIR[2:]+".p",STEF_DIR+"/5_91_165_"+STEF_DIR[2:]+".p",STEF_DIR+"/6_127_234_"+STEF_DIR[2:]+".p",STEF_DIR+"/7_169_315_"+STEF_DIR[2:]+".p",STEF_DIR+"/8_217_408_"+STEF_DIR[2:]+".p"])
         for i in xrange(len(STEF_FILE_LIST)):
             #LOAD STEF
@@ -508,13 +508,14 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
             file_p.close()
     
     for n in xrange(len(N)):
-        precentage_pcg_vec = precentage_pcg_dic[str(N[n])]
+        if k_upper1 <> 0:
+           precentage_pcg_vec = precentage_pcg_dic[str(N[n])]
         
-        if len(precentage_pcg_vec) == 0:
-           break
+           if len(precentage_pcg_vec) == 0:
+              break
 
-        precentage_pcg_mean[n] = np.median(precentage_pcg_vec)
-        precentage_pcg_std[n] = mad(precentage_pcg_vec)
+           precentage_pcg_mean[n] = np.median(precentage_pcg_vec)
+           precentage_pcg_std[n] = mad(precentage_pcg_vec)
         
         precentage_stef_vec = precentage_stef_dic[str(N[n])]
 
@@ -523,8 +524,9 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
                      
     output = open("prec_error_"+str(SNR)+".p", 'wb')
     pickle.dump(N,output)
-    pickle.dump(precentage_pcg_mean,output)
-    pickle.dump(precentage_pcg_std,output)
+    if k_upper1 <> 0:
+       pickle.dump(precentage_pcg_mean,output)
+       pickle.dump(precentage_pcg_std,output)
     pickle.dump(precentage_stef_mean,output)
     pickle.dump(precentage_stef_std,output)
     output.close()
@@ -532,8 +534,9 @@ def plot_precentage_error(SNR=10,k_upper1=5,k_upper2=5):
     matplotlib.rcParams.update({'font.size': 22})
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
-    ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
-    ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
+    if k_upper1 <> 0:
+       ax.plot(N,precentage_pcg_mean,"r",lw=2,label="SPARC")
+       ax.fill_between(N,precentage_pcg_mean-precentage_pcg_std, precentage_pcg_mean+precentage_pcg_std,alpha=0.2, edgecolor='k', facecolor='r')
     ax.plot(N,precentage_stef_mean,"bo",lw=2,label="R-StEFCal")
     #ax.errorbar(N, precentage_stef_mean,yerr=precentage_stef_std)
     ax.fill_between(N, precentage_stef_mean-precentage_stef_std, precentage_stef_mean+precentage_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
@@ -896,6 +899,6 @@ if __name__ == "__main__":
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
    #plot_time()
-   plot_sparsity()
-   #plot_precentage_error(SNR=1000,k_upper1=5,k_upper2=5)
+   #plot_sparsity()
+   plot_precentage_error(SNR=1000,k_upper1=0,k_upper2=3)
    #plot_err_itr(num=4)
