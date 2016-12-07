@@ -555,6 +555,38 @@ def plot_precentage_error(SNR=10,k_upper1=0,k_upper2=3,extra_string="_G_OLD_f"):
     ax.legend(loc=5)
     plt.show()
 
+def plot_prec_err_paper():
+    
+    SNR = np.array([-1,1,3,5,10,20,1000])
+    color = ['r','b','g','y','m','c','k'] 
+    matplotlib.rcParams.update({'font.size': 15})
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+
+    for k in xrange(len(SNR)):
+        p_file = "prec_error_"+str(SNR[k])+".p"
+        output = open(p_file, 'rb')
+        N1 = pickle.load(output)
+        precentage_stef_mean1 = pickle.load(output)
+        precentage_stef_std1 = pickle.load(output)
+        N1 = N1[2:] 
+        precentage_stef_mean1 = precentage_stef_mean1[2:]
+        precentage_stef_std1 = precentage_stef_std1[2:]
+        output.close()
+          
+        ax.plot(N1,precentage_stef_mean1*100,color[k],lw=2,label="SNR="+str(SNR[k]))
+        if SNR[k] <> 1000:
+           ax.fill_between(N1, (precentage_stef_mean1-precentage_stef_std1)*100, (precentage_stef_mean1+precentage_stef_std1)*100,alpha=0.2, edgecolor='k', facecolor=color[k])
+
+    ax.legend(prop={'size': 14})
+    ax.set_ylim([-5,30])
+    ax.set_xlim([37,217])
+    ax.set_xlabel("$N$ [antennas]")
+    ax.set_ylabel("% Error")
+    plt.grid('on')
+    plt.show()
+
+
 def plot_prec_err_presentation():
     output = open("prec_error_5.p", 'rb')
     
@@ -915,5 +947,6 @@ if __name__ == "__main__":
    #plot_precentage_error(SNR=5,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=3,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=1,k_upper1=0,k_upper2=3)
-   plot_precentage_error(SNR=-1,k_upper1=0,k_upper2=2)
+   #plot_precentage_error(SNR=-1,k_upper1=0,k_upper2=2)
+   plot_prec_err_paper()
    #plot_err_itr(num=4)
