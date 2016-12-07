@@ -914,6 +914,6 @@ if __name__ == "__main__":
    #plot_precentage_error(SNR=10,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=5,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=3,k_upper1=0,k_upper2=3)
-   plot_precentage_error(SNR=1,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=1,k_upper1=0,k_upper2=3)
    plot_precentage_error(SNR=-1,k_upper1=0,k_upper2=2)
    #plot_err_itr(num=4)
