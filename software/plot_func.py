@@ -483,6 +483,15 @@ def plot_precentage_error(SNR=10,k_upper1=0,k_upper2=3,extra_string="_G_OLD_f"):
             print "STEF_FILE_LIST = ",STEF_FILE_LIST[i]
             if not os.path.isfile(STEF_FILE_LIST[i]):
                break
+            if STEF_FILE_LIST[i] == "./HEX_R_StEFCal_5_2_G_OLD_f/8_217_408_HEX_R_StEFCal_5_2_G_OLD_f.p":#corrupted file
+               break            
+            if STEF_FILE_LIST[i] == "./HEX_R_StEFCal_3_2_G_OLD_f/7_169_315_HEX_R_StEFCal_3_2_G_OLD_f.p":#corrupted file
+               break
+            if  STEF_FILE_LIST[i] == "./HEX_R_StEFCal_1_2_G_OLD_f/5_91_165_HEX_R_StEFCal_1_2_G_OLD_f.p":#corrupted file
+               break
+            if STEF_FILE_LIST[i] ==  "./HEX_R_StEFCal_-1_1_G_OLD_f/7_169_315_HEX_R_StEFCal_-1_1_G_OLD_f.p":#corrupted file
+            
+
             file_p = open(STEF_FILE_LIST[i], 'rb')
             order = pickle.load(file_p)
             N_v = pickle.load(file_p)
@@ -900,5 +909,11 @@ if __name__ == "__main__":
    #plot_outer_loop(SNR=5)
    #plot_time()
    #plot_sparsity()
-   plot_precentage_error(SNR=1000,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=1000,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=20,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=10,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=5,k_upper1=0,k_upper2=3)
+   #plot_precentage_error(SNR=3,k_upper1=0,k_upper2=3)
+   plot_precentage_error(SNR=1,k_upper1=0,k_upper2=3)
+   plot_precentage_error(SNR=-1,k_upper1=0,k_upper2=2)
    #plot_err_itr(num=4)
