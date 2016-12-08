@@ -757,15 +757,33 @@ FIX TRANSPOSE PROBLEM
 
 \begin{table*}
 \centering
-\caption{The following fixed simulation parameters were used to generate the results of this paper. The units of the last column are in degrees.}
+\caption{The following fixed simulation parameters were used to generate the results of this paper.}
 \begin{tabular}{|c c c c c c c|} 
 \hline
 Declination & Latitude & Minimum baseline & Geometry& Sources & Flux & Spatial \\
 \hline 
 \hline
-$-30^{\circ}43'17.34''$ & $-74^{\circ}39'37.481''$ & 20 & Hexagonal &100 & Pareto (shape param. of 2) & $U[-3,3]$ 
+ $-74^{\circ}39'37.481''$ & $-30^{\circ}43'17.34''$ & 20 & Hexagonal &100 & Pareto (shape param. of 2) & $U[-3,3]$ (deg.) 
 \end{tabular}
 \end{table*}
+
+\begin{table}
+\centering
+\caption{We generated results using two major simulation setups. We either used one frequency channel and multiple time-slots, or one time-slot and many frequency 
+channels. The most important parameters used in realizing these two major setups are presented here.}
+\begin{tabular}{|c c c|} 
+\hline
+ & Setup 1 & Setup 2\\
+\hline
+\hline
+ Num. channels & 1024 & 1\\
+$\nu$-range & 100-200 MHz & 1.4 GHz\\
+Num. timeslots & 1 & 50\\
+%Hour angle &-1^h & [-1^h,1^h]\\
+Gain error model & 2 & 1\\
+\hline
+\end{tabular}
+\end{table}
 
 \begin{table*}
 \centering
@@ -775,19 +793,20 @@ a uniform distribution. Moreover, $c$ in the left most column denotes the speed 
 \begin{tabular}{|c c c c|} 
 \hline
 Number tag & 1 & 2 & 3\\
-Model & Sinusoidal amplitude and phase & Sinusoidal real and imaginary parts & Phase slope \\ [0.5ex] 
+Model & Sinusoidal: amplitude and phase & Sinusoidal: real and imaginary parts & Linear phase slope \\ [0.5ex] 
 \hline\hline
 Function & $(A+1)e^{jP}$ & $A\cos(2\pi fx+B)+1.5A+jC\sin(2\pi fx+D)$ & $e^{jP}$ \\ 
 \hline
 Parameters & $A=a\cos(2\pi fx +b)$  & $f=5$ & $P=\tau x$ \\
  & $P =c \cos(2\pi fx +d)$ & $A,C\sim U[0.5,10]$ & $\tau = \frac{l}{c}$ \\
- & $f=5$ & $B,D\sim U[0,2\pi]$ &  $l\sim U[5,50]$\\
+ & $f=5$ & $B,D\sim U[0,2\pi]$ &  $l\sim U[5,50]$ (m)\\
  & $a\sim U[0.8,0.9]$ &  & \\ 
  & $c\sim U[0.5,5]$ &  &  \\ 
  & $b,d\sim U[0,2\pi]$ &  &  \\ 
 \hline
 \end{tabular}
 \end{table*}
+
 
 
 
