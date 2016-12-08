@@ -755,6 +755,28 @@ FIX TRANSPOSE PROBLEM
 
 \subsection{Simulations}
 
+\begin{table*}
+\centering
+\caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to $t$ or $\nu$. We either
+performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequencey channels. We use $U$ to represent 
+a uniform distribution. Moreover, $c$ in the left most column denotes the speed of light.}
+\begin{tabular}{|c c c c|} 
+\hline
+Number tag & 1 & 2 & 3\\
+Model & Sinusoidal amplitude and phase & Sinusoidal real and imaginary parts & Phase slope \\ [0.5ex] 
+\hline\hline
+Function & $(A+1)e^{jP}$ & $A\cos(2\pi fx+B)+1.5A+jC\sin(2\pi fx+D)$ & $e^{jP}$ \\ 
+\hline
+Parameters & $A=a\cos(2\pi fx +b)$  & $f=5$ & $P=\tau x$ \\
+ & $P =c \cos(2\pi fx +d)$ & $A,C\sim U[0.5,10]$ & $\tau = \frac{l}{c}$ \\
+ & $f=5$ & $B,D\sim U[0,2\pi]$ &  $l\sim U[5,50]$\\
+ & $a\sim U[0.8,0.9]$ &  & \\ 
+ & $c\sim U[0.5,5]$ &  &  \\ 
+ & $b,d\sim U[0,2\pi]$ &  &  \\ 
+\hline
+\end{tabular}
+\end{table*}
+
 \subsection{Alternating Direction Implicit Method}
 
 %\subsection{Diagonalization and StEFCal}
