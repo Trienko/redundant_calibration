@@ -755,6 +755,13 @@ FIX TRANSPOSE PROBLEM
 
 \subsection{Simulations}
 
+The results reported in this paper were generated using two major experimental setups, namely a single time-slot and multiple frequency channels setup or 
+a single frquency channel and multiple time-slots setup. The simulation parameters which where kept fixed in both these setups can be found in 
+Table~\ref{tab:fixed_parm}. The sky-model we used to simulate the visibilities were the same for both setups. We generated 100 sources, each source had random 
+flux and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
+distributed in a 3 by 3 degree square grid around the field center. We used a hexagonal redundant layout for our antenna positions. We produced 
+results for different 
+
 \begin{table*}
 \centering
 \caption{The following fixed simulation parameters were used to generate the results of this paper.}
@@ -765,11 +772,12 @@ Declination & Latitude & Minimum baseline & Geometry& Sources & Flux & Spatial \
 \hline
  $-74^{\circ}39'37.481''$ & $-30^{\circ}43'17.34''$ & 20 & Hexagonal &100 & Pareto (shape param. of 2) & $U[-3,3]$ (deg.) 
 \end{tabular}
+\label{tab:fixed_parm}
 \end{table*}
 
 \begin{table}
 \centering
-\caption{We generated results using two major simulation setups. We either used one frequency channel and multiple time-slots, or one time-slot and many frequency 
+\caption{We generated results using two major simulation setups. We either used one frequency channel and multiple time-slots, or one time-slot and multiple frequency 
 channels. The most important parameters used in realizing these two major setups are presented here.}
 \begin{tabular}{|c c c|} 
 \hline
@@ -780,14 +788,15 @@ channels. The most important parameters used in realizing these two major setups
 $\nu$-range & 100-200 MHz & 1.4 GHz\\
 Num. timeslots & 1 & 50\\
 %Hour angle &-1^h & [-1^h,1^h]\\
-Gain error model & 2 & 1\\
+Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \hline
 \end{tabular}
+\label{tab:ch_parm}
 \end{table}
 
 \begin{table*}
 \centering
-\caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to $t$ or $\nu$. We either
+\caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to time-slots or channels. We either
 performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequencey channels. We use $U$ to represent 
 a uniform distribution. Moreover, $c$ in the left most column denotes the speed of light.}
 \begin{tabular}{|c c c c|} 
@@ -805,11 +814,8 @@ Parameters & $A=a\cos(2\pi fx +b)$  & $f=5$ & $P=\tau x$ \\
  & $b,d\sim U[0,2\pi]$ &  &  \\ 
 \hline
 \end{tabular}
+\label{tab:gain_parm}
 \end{table*}
-
-
-
-
 
 \subsection{Alternating Direction Implicit Method}
 
