@@ -754,13 +754,25 @@ FIX TRANSPOSE PROBLEM
 \section{Results}
 
 \subsection{Simulations}
+The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
+simulations. For the skymodel we generated 100 sources, each source had a random flux value and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
+distributed in a 3 by 3 degree square grid around the field center. The remaining fixed simulation parameters can all be found in Table~\ref{tab:fixed_parm}. 
+We also employed three different gain error models which we summarize in Table~\ref{tab:gain_parm}. We found that it did not matter which gain error model we used during
+our simulations, as the model we used did not have an impact on the results. Moreover, we had two major experimental setups, we either made use of simulated observations consisting of one frequency channel and multiple time-slots or one time-slot and multiple channels.
+We describe these two experimental setups in more detail in Table~\ref{tab:ch_parm}. As was the case for the gain error models, the experimental setup 
+that was used did not alter the simulation results. 
 
-The results reported in this paper were generated using two major experimental setups, namely a single time-slot and multiple frequency channels setup or 
-a single frquency channel and multiple time-slots setup. The simulation parameters which where kept fixed in both these setups can be found in 
-Table~\ref{tab:fixed_parm}. The sky-model we used to simulate the visibilities were the same for both setups. We generated 100 sources, each source had random 
-flux and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
-distributed in a 3 by 3 degree square grid around the field center. We used a hexagonal redundant layout for our antenna positions. We produced 
-results for different 
+The main flow of a single simulation is as follow. We created corrupted visibilities, using either one of the experimental setups summarized in Table~\ref{tab:ch_parm} and
+the fixed simulation parameters presented in Table~\ref{tab:fixed_parm}. We then used per time-slot and channel redundant calibration, i.e. we either used the ADI or PCG algorithm, to 
+estimate the gains and the true observed visibilities. To obtain statistically significant results we performed, for both the ADI and PCG algorithms, multiple statistical independent simulations. 
+
+%We compare ADI with PCG in Section \textbf{??}, by using the results generated from the simulations we performed using 
+%these two methods.
+
+%The results reported in this paper were generated using two major experimental setups, namely a single time-slot and multiple frequency channels setup or 
+%a single frquency channel and multiple time-slots setup. The simulation parameters which where kept fixed in both these setups can be found in 
+%Table~\ref{tab:fixed_parm}. The sky-model we used to simulate the visibilities were the same for both setups.   We used a hexagonal redundant layout for our antenna positions. We produced 
+%results for different 
 
 \begin{table*}
 \centering
@@ -775,29 +787,10 @@ Declination & Latitude & Minimum baseline & Geometry& Sources & Flux & Spatial \
 \label{tab:fixed_parm}
 \end{table*}
 
-\begin{table}
-\centering
-\caption{We generated results using two major simulation setups. We either used one frequency channel and multiple time-slots, or one time-slot and multiple frequency 
-channels. The most important parameters used in realizing these two major setups are presented here.}
-\begin{tabular}{|c c c|} 
-\hline
- & Setup 1 & Setup 2\\
-\hline
-\hline
- Num. channels & 1024 & 1\\
-$\nu$-range & 100-200 MHz & 1.4 GHz\\
-Num. timeslots & 1 & 50\\
-%Hour angle &-1^h & [-1^h,1^h]\\
-Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
-\hline
-\end{tabular}
-\label{tab:ch_parm}
-\end{table}
-
 \begin{table*}
 \centering
 \caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to time-slots or channels. We either
-performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequencey channels. We use $U$ to represent 
+performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequencey channels (see Table~\ref{tab:ch_parm}). We use $U$ to represent 
 a uniform distribution. Moreover, $c$ in the left most column denotes the speed of light.}
 \begin{tabular}{|c c c c|} 
 \hline
@@ -816,6 +809,26 @@ Parameters & $A=a\cos(2\pi fx +b)$  & $f=5$ & $P=\tau x$ \\
 \end{tabular}
 \label{tab:gain_parm}
 \end{table*}
+
+\begin{table}
+\centering
+\caption{We generated results using two major experimental setups. We either used one frequency channel and multiple time-slots, or one time-slot and multiple frequency 
+channels. The most important parameters used in realizing these two major setups are presented here. Note that we refer to the gain error models in Table~\ref{tab:gain_parm} in the 
+last row of this table.}
+\begin{tabular}{|c c c|} 
+\hline
+ & Setup 1 & Setup 2\\
+\hline
+\hline
+ Num. channels & 1024 & 1\\
+$\nu$-range & 100-200 MHz & 1.4 GHz\\
+Num. timeslots & 1 & 50\\
+%Hour angle &-1^h & [-1^h,1^h]\\
+Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
+\hline
+\end{tabular}
+\label{tab:ch_parm}
+\end{table}
 
 \subsection{Alternating Direction Implicit Method}
 
