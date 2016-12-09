@@ -936,7 +936,7 @@ of Eq.~\eqref{eq:cg_bound}. The right hand panel confirms this result. In the ri
 gradient method to invert $\bH$, before (magenta and red curves) and after preconditioning (blue and green curves), at different SNR values as a function of the number of antennas $N$ in the array.  
 The right hand panel therefore shows us that the number of major iterations needed by the preconditioned conjugate gradient method to invert $\bH$ is independent of the number of antennas in the array
 and is much smaller than the dimension of $\bH$. 
-\label{fig:sup_anti}} 
+\label{fig:kappa_itr}} 
 \end{figure*}
 
 \subsubsection{Sparsity}
@@ -967,7 +967,7 @@ can therefore define $\gamma$ as follows:
 It is trivial to determine an analytic expression for the sparsity ratio of $\bH$ when our redundant array is in a regular east-west geometric configuration
 The sparsity and the asymptotic sparsity ratio of $\boldsymbol{H}$ are equal to
 \begin{align}
-\gamma &= \frac{5N^2-7N+3}{8N^2-8N+2} & \gamma_{\infty} &= \lim_{N\rightarrow \infty}\gamma = \frac{5}{8}. 
+\gamma &= \frac{5N^2-7N+3}{8N^2-8N+2} & \gamma_{\infty} &= \lim_{N\rightarrow \infty}\gamma = \frac{5}{8} \label{eq:gamma}. 
 \end{align}
 However when our redundant array makes use of a more complicated geometric layout it becomes much more difficult to construct such expressions as $\bH$ itself 
 becomes much harder to express analytically. 
@@ -981,7 +981,7 @@ P^{c} = (1 - \gamma)P^2.
 \end{equation}
 Solving for $c$ we obtain
 \begin{align}
-c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2.
+c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2. \label{eq:c}
 \end{align}
 Asymptotically the computational cost of inverting $\bH$ is $O(P^2)$. However, the computational cost converges 
 very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ if a Hexagonal geometric layout is employed.
@@ -989,15 +989,23 @@ very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, wher
 sparsity derivation
 sparsity + computational complexity plots
 
+
+
 \subsection{Comparison}
 itr numbers plot and graph of $kP = P^{1.7}$.
 
-
-
-
-
-
-
+\begin{figure*}
+\centering
+\subfigure[$\gamma$]{\includegraphics[width=0.47\textwidth]{./sparsity.pdf}\label{fig:kappa}}
+% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
+\subfigure[$c$]{\includegraphics[width=0.46\textwidth]{./comp_order.pdf}\label{fig:cg_itr}}
+\caption{In the left panel we plot the sparsity ratio $\gamma$ (the number of zero entries relative to the total number of entries in a matrix) of the Hessian $\bH$ as a function of the number 
+of antennas $N$ in the array for different geometries, namely an hexagonal grid (blue circles), a square grid (green crosses) and a regular east-west grid (red circles). For the regular east-west grid we are able to construct an analytical expression for $\gamma$ (the dashed red line). Taking the limit 
+of this expression, Eq.~\eqref{eq:gamma}, as $N\rightarrow \infty$ produces the black dotted line. In the right panel we plot the order of the computational cost $c$ for inverting $\bH$ as a function of the number 
+of antennas in the array for different geometries. We use the same color scheme in the right and left panels. We compute $c$ using Eq.~\eqref{eq:c}. We can again compute 
+an analytic expression (dashed red line) for the east-west grid using Eq.~\eqref{eq:c} and Eq.~\eqref{eq:gamma}.  
+\label{fig:sup_anti}} 
+\end{figure*}
 
 
 
