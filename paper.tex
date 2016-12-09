@@ -931,11 +931,11 @@ kappa + itr plots
 \subfigure[Iterations required before and after Preconditioning]{\includegraphics[width=0.47\textwidth]{./cg_itr.pdf}\label{fig:cg_itr}}
 \caption{The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}. In the left panel we have plotted the spectral condition number $\kappa$ of the Hessian $\bH$, before (magenta and red curves) and after preconditioning (blue curve), at different SNR values as a function of the
 number of antennas $N$ in the array. This plot shows us that we can drastically reduce the condition number of $\bH$ by preconditioning. Moreover, $\kappa$ is also
-independent of the problem size (the number of antennas in the array). The fact that $\kappa$ is small and independent of problem size implies that it simply drops out 
-of Eq.~\eqref{eq:cg_bound}. The right hand panel confirms this result. In the right hand panel we have plotted the number of major iterations (line 6 of Algorithm \ref{algo:CG})) required by the conjugate 
+independent of the problem size (the number of antennas in the array). The fact that $\kappa$ is small and independent of problem size (effectively constant) implies that it simply drops out 
+of Eq.~\eqref{eq:cg_bound}. The right hand panel confirms this result. In the right hand panel we have plotted the number of major iterations (line 6 of Algorithm \ref{algo:CG}) required by the conjugate 
 gradient method to invert $\bH$, before (magenta and red curves) and after preconditioning (blue and green curves), at different SNR values as a function of the number of antennas $N$ in the array.  
-method. The right hand panel shows us that the number of major iterations needed by the preconditioned conjugate gradient method to invert $\bH$ is much smaller than the 
-dimension of $\bH$ and is independent of the problem size (the number of antennas in the array). 
+The right hand panel therefore shows us that the number of major iterations needed by the preconditioned conjugate gradient method to invert $\bH$ is independent of the number of antennas in the array
+and is much smaller than the dimension of $\bH$. 
 \label{fig:sup_anti}} 
 \end{figure*}
 
