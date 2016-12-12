@@ -165,6 +165,32 @@ class term():
 
 
       '''
+      The input term is the one we are copying to, the host term is the one we are copying
+      '''
+      def deepcopy_term(self,new_term):
+          if len(self.g_array) <> 0:
+             new_term.g_array = deepcopy(self.g_array) 
+          if len(self.y_array) <> 0:
+             new_term.y_array = deepcopy(self.y_array) 
+          if len(self.yc_array) <> 0:
+             new_term.yc_array = deepcopy(self.yc_array)
+          if len(self.gc_array) <> 0:
+             new_term.gc_array = deepcopy(self.gc_array)  
+          if len(self.ga_array) <> 0:
+             new_term.ga_array = deepcopy(self.ga_array)
+          if len(self.ya_array) <> 0:
+             new_term.ya_array = deepcopy(self.ya_array)
+          if len(self.constant_array) <> 0:
+             new_term.constant_array = deepcopy(self.constant_array)
+          if len(self.a_array) <> 0:
+             new_term.a_array = deepcopy(self.a_array)	
+          if len(self.b_array) <> 0:
+             new_term.b_array = deepcopy(self.b_array)	 
+          new_term.zero = deepcopy(self.zero)
+          new_term.const = deepcopy(self.const) 
+          return new_term
+                    
+      '''
       Substitutes real values of g and y into term to obtain result
 
       RETURNS:
@@ -329,9 +355,18 @@ class term():
       ''' 
       def conjugate(self):
           #print "self.g_array[0].to_string = ",self.g_array[0].to_string()
-          g_t = deepcopy(self.g_array)
-          self.g_array = deepcopy(self.gc_array)
+          if len(self.g_array) <> 0:
+             g_t = deepcopy(self.g_array)
+          else:
+             g_t = np.array([],dtype=object)
+          
+          if len(self.gc_array) <> 0:
+             self.g_array = deepcopy(self.gc_array)
+          else:
+             self.g_array = np.array([],dtype=object)            
+
           self.gc_array = g_t
+          
           #print "self.g_array[0].to_string = ",self.g_array[0].to_string()
 
           for k in xrange(len(self.g_array)):
@@ -340,8 +375,21 @@ class term():
           for k in xrange(len(self.gc_array)):
               self.gc_array[k].conjugate() 
 
-          y_t = deepcopy(self.y_array)
-          self.y_array = deepcopy(self.yc_array)
+          #OLD CODE
+          #y_t = deepcopy(self.y_array)
+          #self.y_array = deepcopy(self.yc_array)
+          #self.yc_array = y_t
+
+          if len(self.y_array) <> 0:
+             y_t = deepcopy(self.y_array)
+          else:
+             y_t = np.array([],dtype=object)
+          
+          if len(self.yc_array) <> 0:
+             self.y_array = deepcopy(self.yc_array)
+          else:
+             self.y_array = np.array([],dtype=object)            
+
           self.yc_array = y_t
 
           for k in xrange(len(self.y_array)):
@@ -430,7 +478,10 @@ class term():
       ind2 - the indices of the items in a2
       '''
       def multiply_arrays(self,a1,ind1,a2,ind2):
-          product = deepcopy(a1)
+          if len(a1) <> 0:
+             product = deepcopy(a1)
+          else:
+             product = np.array([],dtype=object)
 
           #if len(ind1) == 0:
           #   product = deepcopy(a2)
@@ -707,7 +758,17 @@ class expression():
       None
       ''' 
       def __init__(self,terms):
-          self.terms = deepcopy(terms)
+          self.terms = np.array([],dtype=object)
+          for t in terms:
+              t_temp = term()  
+              self.terms = np.append(self.terms,t.deepcopy_term(t_temp))   #DEEPCOPY IS BROKEN SINCE TERM HAS ZERO ARRAYS, MANUALLY NEED TO COPY THE TERMS  
+
+      def deepcopy_exp(self,exp_temp):
+          exp_temp.terms = np.array([],dtype=object)
+          for t in self.terms:
+              t_temp = term()  
+              exp_temp.terms = np.append(exp_temp.terms,t.deepcopy_term(t_temp)) 
+          return exp_temp  
 
       '''
       Takes the dot product of two equal length expressions
@@ -878,7 +939,7 @@ class redundant():
                   t_temp.append_factor(y_fact)
                   t_temp.append_factor(gc_fact)
                   self.v = np.append(self.v,t_temp)
-          v_copy = deepcopy(self.v)
+          v_copy = self.self.deepcopy_array(self.v)
 
           for k in xrange(len(v_copy)):
               v_copy[k].conjugate() 
@@ -889,6 +950,30 @@ class redundant():
           #for k in xrange(len(self.v)):
           #    print "k = ",k
           #    print "v[k] = ",self.v[k].to_string()
+
+      def deepcopy_array(self,v):
+          v_out = np.array([],dtype=object)
+          for k in xrange(len(v)):
+             t_temp = term()
+             v_out = np.append(v_out,v[k].deepcopy_term(t_temp))
+          return v_out  
+
+      def deepcopy_matrix(self,A):
+          A_out = np.empty(A.shape,dtype=object)
+          for r in xrange(A.shape[0]):
+              for c in xrange(A.shape[1]):
+                  t_temp = term()
+                  A_out[r,c] = A[r,c].deepcopy_term(t_temp)
+          return A_out  
+
+      def deepcopy_matrix_exp(self,A):
+          A_out = np.empty(A.shape,dtype=object)
+          for r in xrange(A.shape[0]):
+              for c in xrange(A.shape[1]):
+                  t_temp = term()
+                  e_temp = expression(np.array([t_temp]))
+                  A_out[r,c] = A[r,c].deepcopy_exp(e_temp)
+          return A_out  
 
       '''
       Creates the observed visibility vector d - will use it to compute J^Hd
@@ -915,7 +1000,7 @@ class redundant():
                   t_temp = term()
                   t_temp.append_factor(b_fact)
                   self.d = np.append(self.d,t_temp)
-          d_copy = deepcopy(self.d)
+          d_copy = self.deepcopy_array(self.d)
 
           for k in xrange(len(d_copy)):
               d_copy[k].conjugate() 
@@ -960,7 +1045,7 @@ class redundant():
               t_temp.append_factor(y_fact)
               self.z = np.append(self.z,t_temp)               
 
-          z_copy = deepcopy(self.z)
+          z_copy = self.deepcopy_array(self.z)
 
           for k in xrange(len(z_copy)):
               z_copy[k].conjugate() 
@@ -1072,22 +1157,25 @@ class redundant():
                      f = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=False,value=1)
                      t = term()
                      t.append_factor(f)
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif c == q:
                      f = factor("c",q,1,False,ant_p=0,ant_q=0,print_f=False,value=1)
                      t = term()
                      t.append_factor(f)
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif (c == (self.N-1 + phi_v)):
                      f = factor("c",phi_v,1,False,ant_p=p,ant_q=q,print_f=print_f,value=1)
                      t = term()
                      t.append_factor(f)
-                     
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   else:
                      t = term()
                      t.setZero()
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                      #print "Hallo_zero"
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
@@ -1143,7 +1231,8 @@ class redundant():
                      t.append_factor(f1)
                      t.append_factor(f2)
                      t.append_factor(f3) 
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif c == q:
                      f1 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
                      f2 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
@@ -1152,7 +1241,8 @@ class redundant():
                      t.append_factor(f1)
                      t.append_factor(f2)
                      t.append_factor(f3) 
-                     self.J[r,c] = deepcopy(t)
+		     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif (c == (self.N + p)):
                      f1 = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=print_f,value=1j)
                      f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
@@ -1163,7 +1253,8 @@ class redundant():
                      t.append_factor(f2)
                      t.append_factor(f3) 
                      t.append_factor(f4)
-                     self.J[r,c] = deepcopy(t) 
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif (c == (self.N + q)):
                      f1 = factor("c",q,1,False,ant_p=0,ant_q=0,print_f=print_f,value=-1j)
                      f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
@@ -1174,7 +1265,8 @@ class redundant():
                      t.append_factor(f2)
                      t.append_factor(f3) 
                      t.append_factor(f4)
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif (c == (2*(self.N) - 1 + phi_v)):
                      f1 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
                      f2 = factor("g",q,1,True,ant_p=0,ant_q=0,print_f=False,value=0)
@@ -1183,7 +1275,8 @@ class redundant():
                      t.append_factor(f1)
                      t.append_factor(f2)
                      t.append_factor(f3) 
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   elif (c == (2*(self.N) + self.L - 1 + phi_v)):
                      f1 = factor("c",p,1,False,ant_p=0,ant_q=0,print_f=print_f,value=1j) 
                      f2 = factor("g",p,1,False,ant_p=0,ant_q=0,print_f=False,value=0)
@@ -1194,17 +1287,19 @@ class redundant():
                      t.append_factor(f2)
                      t.append_factor(f3) 
                      t.append_factor(f4)
-                     self.J[r,c] = deepcopy(t)  
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                   else:
                      t = term()
                      t.setZero()
-                     self.J[r,c] = deepcopy(t)
+                     t_temp = term()
+                     self.J[r,c] = t.deepcopy_term(t_temp)
                      #print "Hallo_zero"
                      #print "t.zero = ",t.zero
                   self.J[r,c].to_string()
           
           
-          J_temp = deepcopy(self.J)
+          J_temp = self.deepcopy_matrix(self.J)
           '''
           NB CODE BELOW CALCULATES THE LOWER PART OF JACOBIAN; DO NOT KNOW IF THIS IS THE CORRECT STRATEGY
           OR IF IT IS EVEN DOING WHAT I THINK. WANTED TO JUST REPEAT THE CONJUGATE OF THE MODEL AND DIFFERENTIATE TOWARDS 
@@ -1214,7 +1309,7 @@ class redundant():
               for c in xrange(J_temp.shape[1]): 
                   J_temp[r,c].conjugate()
           
-          self.J = np.vstack([deepcopy(self.J),J_temp])  
+          self.J = np.vstack([self.deepcopy_matrix(self.J),J_temp])  
           #print "self.J[r,c] = ",self.J[r,c]
 
       '''
@@ -1252,14 +1347,17 @@ class redundant():
               #print "column J1: ",c
               #print "###############"
               for r in xrange(rows):
-                  
-                  t_temp = deepcopy(self.regular_array[r])
+                  print "regular_array = ",self.regular_array[r].to_string()
+                  t_temp = term()
+                  t_temp = self.regular_array[r].deepcopy_term(t_temp)
+                  print "t_temp = ",t_temp.to_string()
                   #print "*********************"
                   #print "t_temp = ",t_temp.to_string()
                   #print "column_vector = ",column_vector[c].to_string()
                   t_temp.diffirentiate_factor(column_vector[c])
                   #print "t_temp_d = ",t_temp.to_string()
-                  self.J1[r,c] = deepcopy(t_temp)
+                  t_temp2 = term()
+                  self.J1[r,c] = t_temp.deepcopy_term(t_temp2)
                   #print self.J1[r,c].to_string()
                   #print "*********************"   
                    
@@ -1301,13 +1399,16 @@ class redundant():
               #print "###############"
               for r in xrange(rows):
                   
-                  t_temp = deepcopy(self.regular_array[r])
+                  t_temp = term()
+                  t_temp = self.regular_array[r].deepcopy_term(t_temp)
                   #print "*********************"
                   #print "t_temp = ",t_temp.to_string()
                   #print "column_vector = ",column_vector[c].to_string()
                   t_temp.diffirentiate_factor(column_vector[c])
                   #print "t_temp_d = ",t_temp.to_string()
-                  self.J2[r,c] = deepcopy(t_temp)
+                  t_temp2 = term()
+                  self.J2[r,c] = t_temp.deepcopy_term(t_temp2)
+                  #self.J2[r,c] = deepcopy(t_temp) OLD CODE
                   #print self.J2[r,c].to_string()
                   #print "*********************"   
                    
@@ -1373,8 +1474,8 @@ class redundant():
       None 
       ''' 
       def conjugate_J1_J2(self):
-          self.Jc1 = deepcopy(self.J1)
-          self.Jc2 = deepcopy(self.J2)
+          self.Jc1 = self.deepcopy_matrix(self.J1)
+          self.Jc2 = self.deepcopy_matrix(self.J2)
           for r in xrange(self.Jc1.shape[0]):
               for c in xrange(self.Jc1.shape[1]): 
                   self.Jc1[r,c].conjugate()
@@ -1393,7 +1494,7 @@ class redundant():
       None 
       ''' 
       def hermitian_transpose_J(self):
-          J_temp = deepcopy(self.J)
+          J_temp = self.deepcopy_matrix(self.J)
           
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]): 
@@ -1415,7 +1516,10 @@ class redundant():
           for r in xrange(parameters):
               for c in xrange(parameters):
                   row = expression(self.JH[r,:])
-                  row_temp = deepcopy(row)
+                  term_temp = term()
+                  row_temp = expression(np.array([term_temp]))
+                  row_temp = row.deepcopy_exp(row_temp)
+                  #row_temp = deepcopy(row)
                   column = expression(self.J[:,c])
                   row_temp.dot(column)
                   self.H[r,c] = row_temp
@@ -1436,7 +1540,9 @@ class redundant():
           self.JHv = np.empty((parameters,),dtype=object)  
           for r in xrange(parameters):
                 row = expression(self.JH[r,:])
-                row_temp = deepcopy(row)
+                term_temp = term()
+                row_temp = expression(np.array([term_temp]))
+                row_temp = row.deepcopy_exp(row_temp)
                 row_temp.dot(column)
                 self.JHv[r] = row_temp
 
@@ -1456,7 +1562,9 @@ class redundant():
           self.JHd = np.empty((parameters,),dtype=object)  
           for r in xrange(parameters):
                 row = expression(self.JH[r,:])
-                row_temp = deepcopy(row)
+                term_temp = term()
+                row_temp = expression(np.array([term_temp]))
+                row_temp = row.deepcopy_exp(row_temp)
                 row_temp.dot(column)
                 self.JHd[r] = row_temp
 
@@ -1476,7 +1584,9 @@ class redundant():
           self.Jz = np.empty((eqns,),dtype=object)  
           for r in xrange(eqns):
                 row = expression(self.J[r,:])
-                row_temp = deepcopy(row)
+                term_temp = term()
+                row_temp = expression(np.array([term_temp]))
+                row_temp = row.deepcopy_exp(row_temp)
                 row_temp.dot(column)
                 self.Jz[r] = row_temp
 
@@ -1788,7 +1898,7 @@ class redundant():
       string_out - output string 
       '''      
       def to_string_H(self,simplify=False,simplify_const=False):
-          H_temp = deepcopy(self.H)
+          H_temp = self.deepcopy_matrix_exp(self.H)
           string_out = " H = ["
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
@@ -1939,7 +2049,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_1 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[:self.N,:self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[:self.N,:self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -1967,7 +2077,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_2 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[:self.N,self.N:2*self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[:self.N,self.N:2*self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -1995,7 +2105,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_3 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[self.N:2*self.N,:self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[self.N:2*self.N,:self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2024,7 +2134,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_4 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[self.N:2*self.N,self.N:2*self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[self.N:2*self.N,self.N:2*self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2052,7 +2162,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_5 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[:self.N,2*self.N:2*self.N+self.L])
+          H_temp = self.deepcopy_matrix_exp(self.H[:self.N,2*self.N:2*self.N+self.L])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2072,7 +2182,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_6 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[:self.N,2*self.N+self.L:])
+          H_temp = self.deepcopy_matrix_exp(self.H[:self.N,2*self.N+self.L:])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2092,7 +2202,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_7 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[self.N:2*self.N,2*self.N:2*self.N+self.L])
+          H_temp = self.deepcopy_matrix_exp(self.H[self.N:2*self.N,2*self.N:2*self.N+self.L])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2112,7 +2222,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_8 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[self.N:2*self.N,2*self.N+self.L:])
+          H_temp = self.deepcopy_matrix_exp(self.H[self.N:2*self.N,2*self.N+self.L:])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2132,7 +2242,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_9 = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,:self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N:2*self.N+self.L,:self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2152,7 +2262,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{10} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,self.N:2*self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N:2*self.N+self.L,self.N:2*self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2172,7 +2282,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{11} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N+self.L:,:self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N+self.L:,:self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2192,7 +2302,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{12} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N+self.L:,self.N:2*self.N])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N+self.L:,self.N:2*self.N])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2212,7 +2322,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{13} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,2*self.N:2*self.N+self.L])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N:2*self.N+self.L,2*self.N:2*self.N+self.L])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2240,7 +2350,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{14} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N:2*self.N+self.L,2*self.N+self.L:])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N:2*self.N+self.L,2*self.N+self.L:])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2268,7 +2378,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{15} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N+self.L:,2*self.N:2*self.N+self.L])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N+self.L:,2*self.N:2*self.N+self.L])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2296,7 +2406,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{H}_{16} = \n\\begin{bmatrix}\n")
           string_out = ""
-          H_temp = deepcopy(self.H[2*self.N+self.L:,2*self.N+self.L:])
+          H_temp = self.deepcopy_matrix_exp(self.H[2*self.N+self.L:,2*self.N+self.L:])
           for r in xrange(H_temp.shape[0]):
               for c in xrange(H_temp.shape[1]):
                   #print "r = ",r
@@ -2337,7 +2447,7 @@ class redundant():
           file = open("JHv_"+str(self.N)+".txt", "w")
           file.write("\\boldsymbol{J}^Hv = \n\\begin{eqnarray}\n")
           string_out = ""
-          JHv_temp = deepcopy(self.JHv)
+          JHv_temp = self.deepcopy_matrix(self.JHv)
           for r in xrange(len(JHv_temp)):
               string_out = string_out + JHv_temp[r].to_string(simplify,simplify_const)
               string_out = string_out+"\\\\\n" 
@@ -2362,7 +2472,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_1^H = \n\\begin{bmatrix}\n")
           string_out = ""
-          JH_temp = deepcopy(self.JH[:2*self.N-1,:((self.N)**2-(self.N))/2])
+          JH_temp = self.deepcopy_matrix(self.JH[:2*self.N-1,:((self.N)**2-(self.N))/2])
           for r in xrange(JH_temp.shape[0]):
               for c in xrange(JH_temp.shape[1]):
                   string_out = string_out + JH_temp[r,c].to_string(simplify) + "&"
@@ -2376,7 +2486,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_2^H = \n\\begin{bmatrix}\n")
           string_out = ""
-          JH_temp = deepcopy(self.JH[:2*self.N-1,((self.N)**2-(self.N))/2:])
+          JH_temp = self.deepcopy_matrix(self.JH[:2*self.N-1,((self.N)**2-(self.N))/2:])
           for r in xrange(JH_temp.shape[0]):
               for c in xrange(JH_temp.shape[1]):
                   string_out = string_out + JH_temp[r,c].to_string(simplify) + "&"
@@ -2398,7 +2508,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_3^H = \n\\begin{bmatrix}\n")
           string_out = ""
-          JH_temp = deepcopy(self.JH[2*self.N-1:,((self.N)**2-(self.N))/2:])
+          JH_temp = self.deepcopy_matrix(self.JH[2*self.N-1:,((self.N)**2-(self.N))/2:])
           for r in xrange(JH_temp.shape[0]):
               for c in xrange(JH_temp.shape[1]):
                   string_out = string_out + JH_temp[r,c].to_string(simplify) + "&"
@@ -2412,7 +2522,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_4^H = \n\\begin{bmatrix}\n")
           string_out = ""
-          JH_temp = deepcopy(self.JH[2*self.N-1:,:((self.N)**2-(self.N))/2])
+          JH_temp = self.deepcopy_matrix(self.JH[2*self.N-1:,:((self.N)**2-(self.N))/2])
           for r in xrange(JH_temp.shape[0]):
               for c in xrange(JH_temp.shape[1]):
                   string_out = string_out + JH_temp[r,c].to_string(simplify) + "&"
@@ -2440,7 +2550,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_1 = \n\\begin{bmatrix}\n")
           string_out = ""
-          J_temp = deepcopy(self.J1)
+          J_temp = self.deepcopy_matrix(self.J1)
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]):
                   string_out = string_out + J_temp[r,c].to_string() + "&"
@@ -2454,7 +2564,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_2 = \n\\begin{bmatrix}\n")
           string_out = ""
-          J_temp = deepcopy(self.J2)
+          J_temp = self.deepcopy_matrix(self.J2)
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]):
                   string_out = string_out + J_temp[r,c].to_string() + "&"
@@ -2468,7 +2578,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_3 = \n\\begin{bmatrix}\n")
           string_out = ""
-          J_temp = deepcopy(self.Jc2)
+          J_temp = self.deepcopy_matrix(self.Jc2)
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]):
                   string_out = string_out + J_temp[r,c].to_string() + "&"
@@ -2482,7 +2592,7 @@ class redundant():
           file.write("\\begin{equation}\n")
           file.write("\\boldsymbol{J}_4 = \n\\begin{bmatrix}\n")
           string_out = ""
-          J_temp = deepcopy(self.Jc1)
+          J_temp = self.deepcopy_matrix(self.Jc1)
           for r in xrange(J_temp.shape[0]):
               for c in xrange(J_temp.shape[1]):
                   string_out = string_out + J_temp[r,c].to_string() + "&"
@@ -2661,9 +2771,9 @@ def Simple_example():
              
 if __name__ == "__main__":
    #LINCAL_example()
-   #Complex_example()
+   Complex_example()
    #JHv_example()
-   JHd_example()
+   #JHd_example()
    #Jz_example()
    #Simple_example()
 
