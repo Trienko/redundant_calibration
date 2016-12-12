@@ -2687,7 +2687,7 @@ EXAMPLE OF HOW TO USE THE CODE TO CREATE ANALYTIC EXPRESSION OF COMPLEX HESSIAN
 def Complex_example():
     r = redundant()
     #r.create_regular()
-    r.create_redundant(layout="HEX",order=1,print_pq=False) 
+    r.create_redundant(layout="REG",order=5,print_pq=False) 
     r.create_J1()
     r.create_J2()
     r.conjugate_J1_J2()
@@ -2767,11 +2767,57 @@ def Simple_example():
  
     print "e1 = ",e1.to_string(simplify_const=True)
 
+'''
+PLOT HESSIANS FOR PAPER
+'''
+def plot_hessian_paper(layout="REG",order=5,print_pq=False,label_size=20,cs="jet",step2=4):
+    r = redundant()
+    #r.create_regular()
+    r.create_redundant(layout=layout,order=order,print_pq=print_pq) 
+    r.create_J1()
+    r.create_J2()
+    r.conjugate_J1_J2()
+    r.create_J()
+    r.hermitian_transpose_J()
+    r.compute_H()          
+    H_int = r.to_int_H()
+    mpl.rcParams['xtick.labelsize'] = label_size 
+    mpl.rcParams['ytick.labelsize'] = label_size 
+    data = H_int
+    # get discrete colormap
+    cmap = plt.get_cmap(cs, np.max(data)-np.min(data)+1)
+    # set limits .5 outside true range
+    mat = plt.matshow(data,cmap=cmap,vmin = np.min(data)-.5, vmax = np.max(data)+.5)
+    #tell the colorbar to tick at integers
+    ticks = ticks=np.arange(np.min(data),np.max(data)+1,1)
+    cax = plt.colorbar(mat, ticks=ticks)
+    x = np.arange(data.shape[0],step=step2,dtype=int)
+    if x[-1] <> data.shape[0]-1:
+       x = np.append(x,np.array([data.shape[0]-1]))
+    plt.xticks(x, x+1)
+    y = np.arange(data.shape[0],step=step2,dtype=int)
+    if y[-1] <> data.shape[0]-1:
+       y = np.append(y,np.array([data.shape[0]-1]))
+    plt.yticks(y, y+1)
+    plt.xlabel("$j$",fontsize=label_size+5)
+    plt.ylabel("$i$",fontsize=label_size+5)
+    #plt.title("$\zeta_{pq}$",fontsize=label_size+5)
+    cax.set_label("Number of terms in entry", size=label_size+5)
+    plt.show()
+      
+
+    #plt.imshow(H_int,interpolation="nearest")
+    #plt.show()
+    #print "H = ",r.to_string_H(simplify=True,simplify_const=True)
+    #print "H_int = ",H_int
+    #r.to_latex_H(simplify=True,simplify_const=True)  
 
              
 if __name__ == "__main__":
    #LINCAL_example()
-   Complex_example()
+   #Complex_example()
+   plot_hessian_paper(layout="REG",order=5,print_pq=False,label_size=20,cs="jet",step2=3)
+   plot_hessian_paper(layout="HEX",order=1,print_pq=False,label_size=20,cs="jet",step2=4)
    #JHv_example()
    #JHd_example()
    #Jz_example()
