@@ -782,6 +782,40 @@ def plot_k():
     
     plt.show() 
 
+def plot_P():
+    matplotlib.rcParams.update({'font.size': 22})
+    N = np.arange(7,218)
+
+    P_reg = 4*N-2
+    P_hex = 6*N - np.sqrt(12*N-3) - 1
+    P_sqr = 6*N - 4*np.sqrt(N)
+
+    plt.plot(N,P_reg,label="REG",lw=2)
+    plt.plot(N,P_hex,label="HEX",lw=2)
+
+    plt.xlabel(r'$N$ [antennas]')
+    plt.ylabel(r'$P$')
+    plt.legend(loc=5,prop={'size': 18})
+    plt.xlim([37,217])
+    
+    plt.grid('on')
+
+    plt.show()
+
+    L_reg = N-1
+    L_hex = 2*N - 0.5*np.sqrt(12*N-3) - 0.5 
+    plt.plot(N,L_reg,label="REG",lw=2)
+    plt.plot(N,L_hex,label="HEX",lw=2)
+    #plt.plot(N,P_sqr)
+    plt.xlabel(r'$N$ [antennas]')
+    plt.ylabel(r'$L$')
+    plt.legend(loc=5,prop={'size': 18})
+    plt.xlim([7,217])
+    
+    plt.grid('on')
+
+    plt.show()   
+
 
 def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     
@@ -995,7 +1029,8 @@ if __name__ == "__main__":
    #plot_kappa_itr_pres()
    #plot_prec_err_paper()
    #plot_sparsity()
-   plot_k()
+   #plot_k()
+   plot_P()
 
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
