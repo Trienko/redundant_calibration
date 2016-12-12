@@ -832,6 +832,15 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 
 \subsection{Alternating Direction Implicit Method}
 
+\begin{figure*}
+\centering
+\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./reg_hessian.pdf}\label{fig:hessian_reg}}
+% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
+\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./hex_hessian.pdf}\label{fig:hessian_hex}}
+\caption{Hallo
+\label{fig:hessian}} 
+\end{figure*}
+
 %\subsection{Diagonalization and StEFCal}
 StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
 that their conjugates are unknown (REMEMBER TO CITE ALL THE STEFCAL PAPERS MITCHELL ETC...). Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
@@ -988,12 +997,6 @@ very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, wher
 
 sparsity derivation
 sparsity + computational complexity plots
-
-
-
-\subsection{Comparison}
-itr numbers plot and graph of $kP = P^{1.7}$.
-
 \begin{figure*}
 \centering
 \subfigure[$\gamma$]{\includegraphics[width=0.47\textwidth]{./sparsity.pdf}\label{fig:kappa}}
@@ -1007,6 +1010,20 @@ in the righ panel is associated with the theoretical curve of $c$ we computed fo
 have plotted with a black dotted line.
 \label{fig:sup_anti}} 
 \end{figure*}
+
+
+\subsection{Comparison}
+itr numbers plot and graph of $kP = P^{1.7}$.
+
+\begin{figure*}
+\centering
+\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./outerloop.pdf}\label{fig:outerloop}}
+% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
+\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./diff.pdf}\label{fig:diff}}
+\caption{Hallo
+\label{fig:out_diff}} 
+\end{figure*}
+
 
 
 

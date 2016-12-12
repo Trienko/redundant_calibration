@@ -559,7 +559,7 @@ def plot_prec_err_paper():
     
     SNR = np.array([-1,1,3,5,10,20,1000])
     color = ['r','b','g','y','m','c','k'] 
-    matplotlib.rcParams.update({'font.size': 15})
+    matplotlib.rcParams.update({'font.size': 22})
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
 
@@ -578,7 +578,7 @@ def plot_prec_err_paper():
         if SNR[k] <> 1000:
            ax.fill_between(N1, (precentage_stef_mean1-precentage_stef_std1)*100, (precentage_stef_mean1+precentage_stef_std1)*100,alpha=0.2, edgecolor='k', facecolor=color[k])
 
-    ax.legend(prop={'size': 14})
+    ax.legend(prop={'size': 18})
     ax.set_ylim([-5,30])
     ax.set_xlim([37,217])
     ax.set_xlabel("$N$ [antennas]")
@@ -653,11 +653,11 @@ def plot_outerloop_pres():
     ax = fig.add_subplot(1,1,1)
     ax.plot(N1,outerloop_pcg_mean1,"r",lw=2,label="PCG (SNR=1000)")
     ax.fill_between(N1,outerloop_pcg_mean1-outerloop_pcg_std1, outerloop_pcg_mean1+outerloop_pcg_std1,alpha=0.2, edgecolor='k', facecolor='r')
-    ax.plot(N1,outerloop_stef_mean1,"b",lw=2,label="StEf (SNR=1000)")
+    ax.plot(N1,outerloop_stef_mean1,"b",lw=2,label="ADI (SNR=1000)")
     ax.fill_between(N1, outerloop_stef_mean1-outerloop_stef_std1, outerloop_stef_mean1+outerloop_stef_std1,alpha=0.2, edgecolor='k', facecolor='b')
     ax.plot(N1,outerloop_pcg_mean2,"m",lw=2,label="PCG (SNR=5)")
     ax.fill_between(N2,outerloop_pcg_mean2-outerloop_pcg_std2, outerloop_pcg_mean2+outerloop_pcg_std2,alpha=0.2, edgecolor='k', facecolor='m')
-    ax.plot(N1,outerloop_stef_mean2,"g",lw=2,label="StEf (SNR=5)")
+    ax.plot(N1,outerloop_stef_mean2,"g",lw=2,label="ADI (SNR=5)")
     ax.fill_between(N2, outerloop_stef_mean2-outerloop_stef_std2, outerloop_stef_mean2+outerloop_stef_std2,alpha=0.2, edgecolor='k', facecolor='g')
     ax.set_xlim([37,217])
     ax.set_xlabel("$N$ [antennas]")
@@ -717,14 +717,71 @@ def plot_kappa_itr_pres():
     ax.plot(N2,kappa_cg_median2,"m",lw=2,label="CG (SNR=5)")
     ax.fill_between(N2, kappa_cg_median2-kappa_cg_mad2, kappa_cg_median2+kappa_cg_mad2,alpha=0.2, edgecolor='k', facecolor='m')
     ax.plot(N1,kappa_pcg_mean1,"b",lw=2,label="PCG (SNR=5,1000)")
+    print "kappa_pcg_mean1 = ",kappa_pcg_mean1
     #ax.plot(N2,kappa_pcg_mean2,"g",lw=2,label="PCG (SNR=5)")
     ax.set_yscale('log')
     ax.set_xlabel(r'$N$ [antennas]')
     ax.set_ylabel(r'$\kappa$')
     ax.legend(loc=5,prop={'size': 18})
     ax.set_xlim([7,217])
+    ax.set_ylim([1,2e6])
     plt.grid('on')
     plt.show()
+
+def plot_k():
+    
+    #N = np.array([7,19,37,61,91,108,169,217])
+    matplotlib.rcParams.update({'font.size': 22})
+
+    N = np.arange(37,218)
+    
+    P = 6*N - np.sqrt(12*N - 3) -1
+
+    k = P**(0.7)
+
+    output = open("outerloop_1000.p", 'rb')
+    N1 = pickle.load(output)
+    outerloop_pcg_mean1 = pickle.load(output)
+    outerloop_pcg_std1 = pickle.load(output)
+    outerloop_stef_mean1 = pickle.load(output)
+    outerloop_stef_std1 = pickle.load(output)
+    
+    output.close()
+
+    N1 = N1[2:]
+    outerloop_pcg_mean1 = outerloop_pcg_mean1[2:]
+    outerloop_pcg_std1 = outerloop_pcg_std1[2:]
+    outerloop_stef_mean1 = outerloop_stef_mean1[2:]
+    outerloop_stef_std1 = outerloop_stef_std1[2:]
+    diff1 = outerloop_stef_mean1 - outerloop_pcg_mean1
+    
+    output = open("outerloop_5.p", 'rb')
+    N2 = pickle.load(output)
+    outerloop_pcg_mean2 = pickle.load(output)
+    outerloop_pcg_std2 = pickle.load(output)
+    outerloop_stef_mean2 = pickle.load(output)
+    outerloop_stef_std2 = pickle.load(output)
+    output.close()
+
+    N2 = N2[2:]
+    outerloop_pcg_mean2 = outerloop_pcg_mean2[2:]
+    outerloop_pcg_std2 = outerloop_pcg_std2[2:]
+    outerloop_stef_mean2 = outerloop_stef_mean2[2:]
+    outerloop_stef_std2 = outerloop_stef_std2[2:]
+    diff2 = outerloop_stef_mean2 - outerloop_pcg_mean2
+
+    plt.plot(N,k,lw=2.0,label='Theory',c='k')
+    plt.plot(N1,diff1,lw=2.0,label='SNR=1000',c='b')
+    plt.plot(N2,diff2,lw=2.0,label='SNR=5',c='g')
+    plt.xlabel(r'$N$ [antennas]')
+    plt.ylabel(r'# Iterations')
+    plt.legend(loc=5,prop={'size': 18})
+    plt.xlim([37,217])
+    
+    plt.grid('on')
+    
+    plt.show() 
+
 
 def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     
@@ -847,7 +904,7 @@ def plot_time(SNR=1000,k_upper1=5,k_upper2=5,k_upper3=5):
     #z = np.polyfit(N, time_pcg_mean, 2)
     #ax.plot(N,z[0]*N**2+z[1]*N+z[0],"r--")
     #print "z = ",z
-    ax.plot(N,time_stef_mean,"b",lw=2,label="R-StEFCal")
+    ax.plot(N,time_stef_mean,"b",lw=2,label="ADI")
     ax.fill_between(N, time_stef_mean-time_stef_std, time_stef_mean+time_stef_std,alpha=0.2, edgecolor='k', facecolor='b')
     #z = np.polyfit(N, time_stef_mean, 2)
     #ax.plot(N,z[0]*N**2,"b--")
@@ -922,9 +979,9 @@ def plot_sparsity():
   
     plt.plot(N,np.log(1-gamma)/np.log(P) + 2,'r--',lw=2.5,label="REG: Theory")
     plt.plot(N,2*np.ones(N.shape),'k:',lw=2.5,label="Limit")
-    plt.plot(N_REG,np.log(1-gamma_REG)/np.log(P_REG)+2,'ro',ms=10.0,label="REG")
+    plt.plot(N_REG,np.log(1-gamma_REG)/np.log(P_REG)+2,'ro',mfc='w',ms=10.0,label="REG")
     plt.plot(N_SQR,np.log(1-gamma_SQR)/np.log(P_SQR)+2,'gx',ms=10.0,label="SQR")
-    plt.plot(N_HEX,np.log(1-gamma_HEX)/np.log(P_HEX)+2,'bo',ms=10.0,label="HEX")
+    plt.plot(N_HEX,np.log(1-gamma_HEX)/np.log(P_HEX)+2,'bo',mfc='w',ms=10.0,label="HEX")
     plt.xlabel('$N$ [antennas]')
     plt.ylabel('$c$ [comp cost order]')
     plt.xlim([5,330])
@@ -936,6 +993,9 @@ if __name__ == "__main__":
    #plot_prec_err_presentation()
    #plot_outerloop_pres()
    #plot_kappa_itr_pres()
+   #plot_prec_err_paper()
+   #plot_sparsity()
+   plot_k()
 
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
@@ -948,5 +1008,5 @@ if __name__ == "__main__":
    #plot_precentage_error(SNR=3,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=1,k_upper1=0,k_upper2=3)
    #plot_precentage_error(SNR=-1,k_upper1=0,k_upper2=2)
-   plot_prec_err_paper()
+   
    #plot_err_itr(num=4)
