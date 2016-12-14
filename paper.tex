@@ -117,10 +117,19 @@ circumstellar matter -- infrared: stars.
 \end{keywords}
 
 \section{Introduction}
-Calibration is the procedure by which we remove the instrumental and environmental iduced errors from our intereferometric data. We normally model 
-the propogation effects This is normally accomplished using a 
-least-squares solver, i.e. we find the propogation effects (antenna gains) that minimizes the difference betweem our observed and predicted visibilities \citep{RIME1}. There are two recent developments
-in Calibration approaches that are worth 
+The propogation effects (i.e. the ionosphere, antenna gains, etc.) a celestial signal experiences along its propogation path is modelled with the radio interforemetric measurement equation (RIME). %\citep{ME1,RRIME1}.
+Calibration is the procedure by which we remove the errors that these propogation effects induce onto our intereferometric data and is normally accomplished using a 
+least-squares solver. In the case where we only model the antenna gains, which is the most basic form of the RIME, we can define calibration as finding the antenna gains that minimizes the difference betweem our observed and predicted visibilities. There are two recent developments
+in calibration which should be explicitly mentioned, since they form the foundation this paper builds on. The first is the discovery of StEfCal \citep{salvini2014}, which 
+is an alternating direction implicit (ADI) skymodel-based calibration algorithm. It works by assuming the gains are known while solving for their conjugates. Now we do the reverse,
+assume the conugates are known and solve for the gains. This procedure results in the linearization of the calibration algorithm and reduces the computational complexity 
+of calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^3)$, where $N$ denotes the number of antennas in the array. The second is to not break the calibration problem 
+into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters seperately, but to rather treat the antenna gains and their 
+conjugates as seperate parameters to estimate \citep{smirnov2015}. \citet{smirnov2015} also showed that the StEfCal algorithm itself is merely a special case of this
+gain-and-conjugate framework. 
+
+Redundant calibration differs from normal calibration in that it does not require a skymodel. With redundant calibration we do not only solve for the antenna gains, but also 
+for the true observed visibilities. We are able to do so, because we have less unkonws than baseline equations. Since we  
 
 
 \subsection{Historical Overview}
