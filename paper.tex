@@ -850,6 +850,12 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \label{fig:hessian}} 
 \end{figure*}
 
+\begin{figure}
+\includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
+\caption{Precentage Error}
+\label{fig:prec_error}
+\end{figure} 
+
 %\subsection{Diagonalization and StEFCal}
 StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
 that their conjugates are unknown (REMEMBER TO CITE ALL THE STEFCAL PAPERS MITCHELL ETC...). Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
