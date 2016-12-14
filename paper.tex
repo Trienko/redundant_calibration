@@ -118,6 +118,25 @@ circumstellar matter -- infrared: stars.
 
 \section{Introduction}
 
+\subsection{Historical Overview}
+
+
+[Redundant calibration has been in use for a long time. Noordam used redundant calibration to produce high-dynamic range images of 3C84 with the 
+WSRT array.] RW The first implementations of redundant calibration made use of the logarithm function, because when the logarithm is applied to the scalar measurement equation redundant 
+calibration is transformed into a linear problem cite Wieringa,camps and Lui. This approach is also generally referred to as LOGCAL.
+LOGCAL is reviewed in Appendix ??. The next improvement was to perform a firt-order taylor expansion (which is equivalent to the GN algorithm Kurien 2016) of the measurement equation an then to solve for the
+perturbations of the model-parameters. This approach is commonly referred to as LINCAL. LINCAL is derived from first principals in Appendix . Two ways of speeding up redundant calibration has also been 
+proposed. The first technique makes use of the alternating direction implicit method, in which we alternate between solving the gains, their conjugates and 
+the true observed visibilities (wijnholds and marthi). Using the conjugate gradient method to exploit the sparsity inherent in the redundant calibration problem, 
+and in doing so speedup the algorithm itself was proposed in . A proper comparison between these two approaches has not been done before.
+
+Newly built instruments like LOFAR, ..... has also sparked a renewed interest in redundant calibration. Redundancy is also advantageous for detecting the EoR,
+which explains why some of the previsously mentioned instruments have redundant layouts.
+
+   
+
+Layered approach, LOGCAL, LINCAL, Stefan's conference paper, Noordam, other ASTRON paper, newest papers on redundant calibration, marthi paper etc...
+
 Main contributions of the paper:
 
 \begin{enumerate}
@@ -476,25 +495,14 @@ Using the above definitions we can now easily compute the following:
 In this alternative approach we treat the complex parameters and their conjugates as separate parameters.
 
 \section{Redundant Calibration}
-
-\subsection{Historical Overview}
-
-
-[Redundant calibration has been in use for a long time. Noordam used redundant calibration to produce high-dynamic range images of 3C84 with the 
-WSRT array.] RW The first implementations of redundant calibration made use of the logarithm function, because when the logarithm is applied to the scalar measurement equation redundant 
-calibration is transformed into a linear problem cite Wieringa,camps and Lui. This approach is also generally referred to as LOGCAL.
-LOGCAL is reviewed in Appendix ??. The next improvement was to perform a firt-order taylor expansion (which is equivalent to the GN algorithm Kurien 2016) of the measurement equation an then to solve for the
-perturbations of the model-parameters. This approach is commonly referred to as LINCAL. LINCAL is derived from first principals in Appendix . Two ways of speeding up redundant calibration has also been 
-proposed. The first technique makes use of the alternating direction implicit method, in which we alternate between solving the gains, their conjugates and 
-the true observed visibilities (wijnholds and marthi). Using the conjugate gradient method to exploit the sparsity inherent in the redundant calibration problem, 
-and in doing so speedup the algorithm itself was proposed in . A proper comparison between these two approaches has not been done before.
-
-Newly built instruments like LOFAR, ..... has also sparked a renewed interest in redundant calibration. Redundancy is also advantageous for detecting the EoR,
-which explains why some of the previsously mentioned instruments have redundant layouts.
-
-   
-
-Layered approach, LOGCAL, LINCAL, Stefan's conference paper, Noordam, other ASTRON paper, newest papers on redundant calibration, marthi paper etc...
+Redundant calibration can be formulated as a least-squares problem:
+\begin{equation}
+\label{eq:least_squares_red}
+\min_{\bz} \|\br\| = \min_{\bz} \|\bd - \bv(\bz)\|, 
+\end{equation}
+where $\bz = [\bg^T,\by^T]^T$. As discussed in Section~\ref{}, we can solve the above minimization problem in one of two ways. We can split the problem into its real and
+imaginary parts and then solve for the real and imaginary parts of the parameters seperately or we can employ the notion of Wirtinger derivatives. The former 
+approach is discussed in detail in Section~\ref{}, while the latter approach is described in Section~\ref{}.
 
 \subsection{Real-Imag Framework}
 Here we discuss the fact that LINCAL is just GN
