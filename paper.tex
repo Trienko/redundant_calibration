@@ -786,6 +786,12 @@ where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
 FIX TRANSPOSE PROBLEM
 
 \section{Results}
+In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. In our comparison we focus on the most 
+expensive operation of the two algorithms, which is the inverse of the Hessian (or modified Hessian in the case of LM). We restrict ourselves to comparing the most expensive operation of the two methods, namely the computing the inverse which is the inverse of the Hessian (or modified Hessian in the case of LM), as
+it becomes trivial to rate these two algorithms relative to each other.
+
+outperforms the PCG method in this regard it will certainly outperform it on other  
+
 
 \subsection{Simulations}
 The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
