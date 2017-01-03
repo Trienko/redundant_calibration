@@ -788,15 +788,27 @@ FIX TRANSPOSE PROBLEM
 \section{Results}
 In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
 expensive operation of the two methods namely, computing the inverse of the Hessian (or modified Hessian in the case of LM). It becomes trivial to rate these two 
-algorithms relative to each other once the computational complexity of the inverse operation is known.
+algorithms relative to each other once the computational complexity of the inverse operation is known. The simulations we performed to compare these two 
+methods are summarized in Section~\ref{sec:simulations}.
 
 In Section~\ref{sec:adi} we re-derive the ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
 objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
-We use a similar approach to the diagonal approximate method proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in fact redundant 
-StEfCal.
+We use the diagonal approximate method proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
+StEfCal \citep{Salvini2014}. Since we approximate the Hessian in the ADI method with its diagonal the computational complexity of its inverse becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
+the diagonal is not included in this estimate.}. 
+
+\citet{Liu2010} proposed the PCG method to compute the inverse of the Hessian, however the computational complexity of this approach was not analyzed therein. In 
+Section~\ref{sec:pcg}, we do a proper computational cost analysis of PCG. We find that the computational complexity of PCG is bounded by $\mathbb{O}(P^2)$, which is 
+a lot better than straightforward inversion which takes $\mathbb{O}(P^3)$. 
+
+Even though the PCG method is computationally more expensive than the ADI method we can not arrive at a final conclusion at this point. With the ADI method 
+we only approximate the inverse of the Hessian, while in the case of the PCG method we compute the exact inverse. So the question arises whether the PCG method 
+will converge much faster than the ADI method even though each iteration (which includes an inversion) is more expensive. We investigate this question in Section~\ref{sec:comparison}.
+
     
 
 \subsection{Simulations}
+\label{sec:simulations}
 The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
 simulations. For the skymodel we generated 100 sources, each source had a random flux value and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
 distributed in a 3 by 3 degree square grid around the field center. The remaining fixed simulation parameters can all be found in Table~\ref{tab:fixed_parm}. 
@@ -980,6 +992,7 @@ NB:: NEED TO ADD SNR PLOTS HERE
 PLUS IMAGE OF HESSIAN FOR THE DISCUSSION
 
 \subsection{Conjugate Gradient Method}
+\label{sec:pcg}
 
 \subsubsection{Spectral Condition Number}
 kappa + itr plots
@@ -1063,6 +1076,7 @@ have plotted with a black dotted line.
 
 
 \subsection{Comparison}
+\label{sec:comparison}
 itr numbers plot and graph of $kP = P^{1.7}$.
 
 \begin{figure*}
