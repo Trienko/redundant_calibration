@@ -120,12 +120,12 @@ circumstellar matter -- infrared: stars.
 The propogation effects (i.e. the ionosphere, antenna gains, etc.) a celestial signal experiences along its propogation path is modelled with the radio interforemetric measurement equation (RIME). %\citep{ME1,RRIME1}.
 Calibration is the procedure by which we remove the errors that these propogation effects induce onto our intereferometric data and is normally accomplished using a 
 least-squares solver. In the case where we only model the antenna gains, which is the most basic form of the RIME, we can define calibration as finding the antenna gains that minimizes the difference betweem our observed and predicted visibilities. There are two recent developments
-in calibration which should be explicitly mentioned, since they form the foundation this paper builds on. The first is the discovery of StEfCal \citep{salvini2014}, which 
+in calibration which should be explicitly mentioned, since they form the foundation this paper builds on. The first is the discovery of StEfCal \citep{Salvini2014}, which 
 is an alternating direction implicit (ADI) skymodel-based calibration algorithm. It works by assuming the gains are known while solving for their conjugates. Now we do the reverse,
 assume the conugates are known and solve for the gains. This procedure results in the linearization of the calibration algorithm and reduces the computational complexity 
 of calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^3)$, where $N$ denotes the number of antennas in the array. The second development is the idea; to not break the calibration problem 
 into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters seperately, but to rather treat the antenna gains and their 
-conjugates as seperate parameters to estimate \citep{smirnov2015}. \citet{smirnov2015} also showed that the StEfCal algorithm itself is merely a special case of this
+conjugates as seperate parameters to estimate \citep{Smirnov2015}. \citet{smirnov2015} also showed that the StEfCal algorithm itself is merely a special case of this
 gain-and-conjugate approach. 
 
 Two baselines are redundant if their beaseline difference vector have the same lenght and orientation, which imply that they measure the same $uv$-modes. When we use a redundant array layout we dramatically 
@@ -332,6 +332,9 @@ where
  \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q}\nonumber\\
  \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
 \end{align}
+
+NB COLUMN VECTORS NEED TO ADD THIS...
+
 In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$ (i.e. $p<q$), which denotes the number of baselines in the array. Moreover,
 \begin{equation}
 \alpha_{pq} =
@@ -463,6 +466,7 @@ number instead. The general spectral condition number is very similar to the spe
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
 \section{Least Squares}
+\label{sec:ls}
 The method of nonlinear least squares is tanatamount to solving the following optimization problem:  
 \begin{equation}
 \label{eq:least_squares}
@@ -491,8 +495,6 @@ towards each model parameter. When the least squares problem is complex it becom
 many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance if the 
 classical definition of differentiation is used then $\frac{\partial z}{\partial \conj{z}}$, where $z \in \mathbb{C}$, does not exist.
 
-Redundant calibration is achieved by solving the following optimization problem:
-
 The only way to circumvent the differentiability conundrum, associated with complex least square problems, is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
 The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
 
@@ -512,51 +514,52 @@ In this alternative approach we treat the complex parameters and their conjugate
 Redundant calibration can be formulated as a least-squares problem:
 \begin{equation}
 \label{eq:least_squares_red}
-\min_{\bz} \|\br\| = \min_{\bz} \|\bd - \bv(\bz)\|, 
+\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
 \end{equation}
-where $\bz = [\bg^T,\by^T]^T$. As discussed in Section~\ref{}, we can solve the above minimization problem in one of two ways. We can split the problem into its real and
+where $\bz = [\bg^T,\by^T]^T$\footnote{In this paper we use the same symbol to denote corrupted predicted visibilities and true observed corrupted visibilities as it
+is trivial to distinguish which one is implied from the context.}. As discussed in Section~\ref{sec:ls}, we can solve the above minimization problem in one of two ways. We can split the problem into its real and
 imaginary parts and then solve for the real and imaginary parts of the parameters seperately or we can employ the notion of Wirtinger derivatives. The former 
-approach is discussed in detail in Section~\ref{}, while the latter approach is described in Section~\ref{}.
+approach is discussed in detail in Section~\ref{sec:ri}, while the latter approach is described in Section~\ref{sec:w}. 
 
 \subsection{Real-Imag Framework}
-Here we discuss the fact that LINCAL is just GN
+\label{sec:ri}
+As we mentioned in Section~\ref{sec:ls} using least-squares to solve complex problems can be problematic as $\bv$ needs to be analytic in its argument. In the case 
+of Eq.~\eqref{eq:least_squares_red}, \citet{Liu2010} circumvents this difficulty by 
+splitting the problem into its phase and amplitude components. 
 
-OLD COPIED TEXT
-
-As we mentioned in the beginning of this section, the Wirtinger framework is not the only way of ensuring that $\bv$ is analytic in its argument. We could also 
-have divided the problem in Eq.~\eqref{eq:least_squares_red} into its real and imaginary components after-which we solve for the real and imaginary parts of the parameters separately. There is a third way
-of dealing with the issue. We can split the problem in Eq.~\eqref{eq:least_squares_complex} into its phase and amplitude components and then solve for the amplitude and phase of the parameters separately.
-This can be achieved by first rewriting Eq.~\eqref{eq:least_squares_complex} to
+The aforementioned is achieved by first rewriting Eq.~\eqref{eq:least_squares_red} to
 \begin{equation}
 \label{eq:least_squares_lincal}
 \min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
 \end{equation}
-where $\bmath{\varrho}$ is the phase and amplitude parameter vector and is defined in Appendix~\ref{sec:lincal}. The Jacobian associated with 
-Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. It should therefore be obvious to the reader that 
-performing one iteration of LINCAL is equivalent to a basic GN update step; the GN update step was just re-derived in Appendix~\ref{sec:lincal} from first principles.
+where $\breve{\bd} = [\bd^T,\conj{\bd}^T]^T$, $\breve{\bv} = [\bv^T,\conj{\bv}^T]$ and $\bmath{\varrho}$ is the phase and amplitude parameter vector which we define in Appendix~\ref{sec:lincal}. 
+With the aid of Eq.~\eqref{eq:least_squares_lincal} we can derive the LINCAL algorithm (see Appendix~\ref{sec:lincal}).
+The Jacobian associated with Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. 
+At the hand of Appendix~\ref{sec:lincal} it becomes evident that LINCAL is equivalent to a basic GN update step \citep{Kurien2016}. 
 Therefore, a straightforward way of improving the convergence properties of stock standard LINCAL would be to simply add the LM damping factor to the basic LINCAL update step. 
 
 
 \subsection{Complex Framework}
+\label{sec:w}
 
-\citet{Smirnov2015} recently proposed to use this Wirtinger framework instead of the classic real and imaginary approach to perform normal skymodel-based calibration. We will now show
-that the Wirtinger framework can also be applied to redundant calibration.
+\citet{Smirnov2015} recently proposed to use the Wirtinger derivative instead of the classic real and imaginary approach to perform normal skymodel-based calibration. We will now show
+that the Wirtinger derivative can also be applied to redundant calibration.
 
-We can perform redundant calibration by solving the following optimization problem: 
-\begin{equation}
-\label{eq:least_squares_red}
-\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
-\end{equation}
-where $\bz = [\bg,\by]^T$. The other vectors in Eq.~\eqref{eq:least_squares_red} were defined in Section~\ref{} \footnote{In this paper we use the same symbol to denote corrupted predicted visibilities and true observed corrupted visibilities as it
-is trivial to distinguish which one is implied from the context. Using the same symbol for these two quantities improves the readability of the paper.}. Note the similarity between Eq.~\eqref{eq:least_squares} and Eq.~\eqref{eq:least_squares_red},
-i.e. redundant calibration can be cast as a non-linear least squares problem. 
+%We can perform redundant calibration by solving the following optimization problem: 
+%\begin{equation}
+%\label{eq:least_squares_red}
+%\min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
+%\end{equation}
+%where $\bz = [\bg,\by]^T$. The other vectors in Eq.~\eqref{eq:least_squares_red} were defined in Section~\ref{} \footnote{In this paper we use the same symbol to denote corrupted predicted visibilities and true observed corrupted visibilities as it
+%is trivial to distinguish which one is implied from the context. Using the same symbol for these two quantities improves the readability of the paper.}. Note the similarity between Eq.~\eqref{eq:least_squares} and Eq.~\eqref{eq:least_squares_red},
+%i.e. redundant calibration can be cast as a non-linear least squares problem. 
 
 Analogous to \cite{Smirnov2015}, we now recast Eq.~\eqref{eq:least_squares_red} to 
 \begin{equation}
 \label{eq:least_squares_complex}
 \min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
-where $\breve{\bz} = [\bz,\conj{\bz}]^T$, $\breve{\bd} = [\bd,\conj{\bd}]^T$, $\breve{\bv} = [\bv,\conj{\bv}]$. Eq.~\eqref{eq:least_squares_complex} is the augmented counterpart of Eq.~\eqref{eq:least_squares_red}.
+where $\breve{\bz} = [\bz^T,\conj{\bz}^T]^T$. Eq.~\eqref{eq:least_squares_complex} is the complex conjugate augmented counterpart of Eq.~\eqref{eq:least_squares_red}.
 If we use the Wirtinger derivatives, Eq.~\eqref{eq:wir}, instead of the classic notion of a derivative to define the gradient operator then 
 $\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}. The fact that $\bv$ is now analytic in its argument has the immediate consequence: it becomes possible to apply complex GN
 and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
@@ -580,10 +583,10 @@ The GN update step is now defined as:
 \label{eq:GN_update}
  \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br}.
 \end{equation}
-The LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
+The LM update rule is very similar, the major difference being a damping factor $\lambda_{\textrm{LM}}$ is introduced:
 \begin{equation}
 \label{eq:LM_update}
-\Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
+\Delta \breve{\bz} = (\bJ^H\bJ + \lambda_{\textrm{LM}}\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
 where $\bD=\bI\odot\bJ^H\bJ$. 
 
