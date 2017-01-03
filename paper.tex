@@ -786,12 +786,15 @@ where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
 FIX TRANSPOSE PROBLEM
 
 \section{Results}
-In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. In our comparison we focus on the most 
-expensive operation of the two algorithms, which is the inverse of the Hessian (or modified Hessian in the case of LM). We restrict ourselves to comparing the most expensive operation of the two methods, namely the computing the inverse which is the inverse of the Hessian (or modified Hessian in the case of LM), as
-it becomes trivial to rate these two algorithms relative to each other.
+In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
+expensive operation of the two methods namely, computing the inverse of the Hessian (or modified Hessian in the case of LM). It becomes trivial to rate these two 
+algorithms relative to each other once the computational complexity of the inverse operation is known.
 
-outperforms the PCG method in this regard it will certainly outperform it on other  
-
+In Section~\ref{sec:adi} we re-derive the ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
+objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
+We use a similar approach to the diagonal approximate method proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in fact redundant 
+StEfCal.
+    
 
 \subsection{Simulations}
 The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
@@ -871,6 +874,7 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \end{table}
 
 \subsection{Alternating Direction Implicit Method}
+\label{sec:adi}
 
 \begin{figure*}
 \centering
