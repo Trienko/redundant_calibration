@@ -72,6 +72,7 @@
 \newcommand{\bx}{\bmath{x}}
 \newcommand{\bp}{\bmath{p}}
 \newcommand{\bmJ}{\bmath{\mathcal{J}}}
+\newcommand{\bmH}{\bmath{\mathcal{H}}}
 \newcommand{\bzero}{\bmath{0}}
 %\newcommand{\bvarrho}{\bmath{\varrho}}
 %\newcommand{\bnu}{\bmath{\nu}}
@@ -357,6 +358,7 @@ We will be using the following SNR (signal-to-noise ratio) definition in this pa
 where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
 
 \section{Conjugate Gradient Method}
+\label{sec:conj_grad}
 The Conjugate Gradient (CG) method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
 reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear system. The CG method is generally used to solve
 \begin{equation}
@@ -430,6 +432,7 @@ Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner i
 where $\bI$ is the identity matrix. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
 
 \subsection{Normal Equation}
+\label{sec:normal}
 Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
 \begin{equation}
  \bb = \bB\bx,
@@ -583,12 +586,12 @@ The GN update step is now defined as:
 \label{eq:GN_update}
  \Delta \breve{\bz} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br}.
 \end{equation}
-The LM update rule is very similar, the major difference being a damping factor $\lambda_{\textrm{LM}}$ is introduced:
+The LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
 \begin{equation}
 \label{eq:LM_update}
-\Delta \breve{\bz} = (\bJ^H\bJ + \lambda_{\textrm{LM}}\bD)^{-1}\bJ^H\breve{\br},
+\Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
-where $\bD=\bI\odot\bJ^H\bJ$. 
+where $\bD=\bI\odot\bJ^H\bJ$. We refer to $\bJ^H\bJ$ as the Hessian matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$. 
 
 We use Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} to iteratively update our 
 parameter vector as follows:
@@ -775,15 +778,16 @@ It now trivially follows that:
 \label{eq:two_thrids}
 \breve{\bz}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{2}{3}\breve{\bz}_{k}. 
 \end{equation}
-Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we can calculate the GN update step without calculating the residual. The 
-normal skymodel-based equivalent of Eq.~\eqref{eq:two_thrids} is equal to \citep{Smirnov2015}:
-\begin{equation}
-\label{eq:one_half}
-\breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}, 
-\end{equation}
-where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
-
-FIX TRANSPOSE PROBLEM
+Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we can calculate the GN update step without calculating the residual. 
+% The 
+% normal skymodel-based equivalent of Eq.~\eqref{eq:two_thrids} is equal to \citep{Smirnov2015}:
+% \begin{equation}
+% \label{eq:one_half}
+% \breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}, 
+% \end{equation}
+% where $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$
+% 
+% FIX TRANSPOSE PROBLEM
 
 \section{Results}
 In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
@@ -804,8 +808,6 @@ a lot better than straightforward inversion which takes $\mathbb{O}(P^3)$.
 Even though the PCG method is computationally more expensive than the ADI method we can not arrive at a final conclusion at this point. With the ADI method 
 we only approximate the inverse of the Hessian, while in the case of the PCG method we compute the exact inverse. So the question arises whether the PCG method 
 will converge much faster than the ADI method even though each iteration (which includes an inversion) is more expensive. We investigate this question in Section~\ref{sec:comparison}.
-
-    
 
 \subsection{Simulations}
 \label{sec:simulations}
@@ -938,7 +940,7 @@ where $\widetilde{\bH}$ denotes the diagonal approximation of $\bJ^H\bJ$, $\alph
 
 On the odd iterations $\lambda$ is chosen to be zero, which corresponds to an $\alpha$ equal to one. On the even iteration $\lambda$ is chosen to be equal to one, which corresponds
 to an $\alpha$ equal to a half. Note that, on the odd iteration the influence that the estimate of the parameters of the previous iteration has on the current estimate is scaled
-by a half. Note the similarity between the last terms of Eq.~\eqref{eq:stef_alpha} and Eq.~\eqref{eq:one_half} when $\alpha$ is an half.
+by a half. Note the similarity between the last terms of Eq.~\eqref{eq:stef_alpha} and Eq.~\eqref{eq:one_half} when $\alpha$ is a half.
 
 \subsubsection{Redundant Calibration}
 \label{sec:red}
@@ -963,9 +965,9 @@ We obtain a similar result if we repeat the above procedure, only in this case w
 namely
 \begin{align}
 \breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k, \label{eq:alpha}  
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k. \label{eq:alpha}  
 \end{align}
-where $\alpha = \frac{1}{1+\lambda}$. Moreover, $\lambda = \frac{1-\alpha}{\alpha}$. The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
+The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
 expression of $\bJ^H\breve{\br}$, the only difference being that in Eq.~\eqref{eq:ab} the letter $r$ would be replaced by a $d$. If we substitute the analytic expression
 of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which is easily computed as the matrix is a diagonal matrix) into Eq.~\eqref{eq:alpha} we obtain the following two update rules:
 \begin{equation}
@@ -977,43 +979,60 @@ and
 \label{eq:y_update}
 y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq}}{\sum_{pq \in \mathcal{PQ}_i}|g_p^k|^2|g_q^k|^2} + (1-\alpha) y_i^k. 
 \end{equation}
+The computational complexity of inverting $\widetilde{\bH}$ is $\mathbb{O}(P)$.
 
-The question now arises what value should we use for $\alpha$? Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
-venture a clever guess by studying what the choice of $\alpha$ is in the case of StEFCal.   
+Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Als note that Eq.~\eqref{eq:g_update} is the fundamental
+iterative StEfCal new parameter estimator. We have therefore successfully used the diagonal approximation approach suggested by \citet{Smirnov2015} to re-derive the ADI method presented in 
+\citet{Marthi2014} and in doing so we have shown that the algorithm in \citet{Marthi2014} is actually redundant StEfCal. We could also have shown this by using a similar approach 
+to the one presented in \citet{Salvini2014}.
 
-If we wish to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
+The question now arises what value should we use for $\alpha$? In \citet{Marthi2014} they propose 
+$\alpha = 0.3$. Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
+venture a clever guess by studying what the choice of $\alpha$ is in the case of skymodel-based StEFCal. Recall from Section~\ref{sec:sbc} that $\alpha$ is equal to a half 
+in the case of StEFCal. If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two,
+which is the value we used in this paper.
 
-At this point there is no way of knowing if this is mere coincidence. DEF REWRITE THIS.
+% At this point there is no way of knowing if this is mere coincidence. DEF REWRITE THIS.
+% 
+% REWRTIE THIS IN A DIFFERENT WAY. START WITH CHENGULAR AND JUST MENTION THE LINK TO STEFCAL'S CHOICE OF ALPHA.
+% 
+% The update rules in Eq.~\eqref{eq:lambda} and Eq.~\eqref{eq:alpha} have been derived before, by Chengular... The approach they followed is discussed in the Appendix.
+% 
+% Interestingly enough, if we substitute $\alpha = 1$ into Eq.~\ref{eq:g_update} then it reduces to the skymodel-based StEFCal update rule. In Chengular they propose 
+% an $\alpha = 0.3$.
+% 
+% In an attempt to merge the terminology that has independently develop in the general calibration and redundant calibration literature and to emphasize the close
+% relationship between Stefcal and the approach derived by I will use the label Redunandat SteFCal (R-Stefcal) to refer to the NLS method proposed by ... 
+% 
+% ****\\
+% 
+% with $\alpha = \frac{1}{1+\lambda}$. Moreover $\lambda = \frac{1-\alpha}{\alpha}$. So in Marthi and Chengular (2014) they use an $\alpha$ of 0.3, which corresponds to an LM damping factor $\lambda$
+% of $2\frac{1}{3}$.
+% 
+% NB:: NEED TO ADD SNR PLOTS HERE
+% PLUS IMAGE OF HESSIAN FOR THE DISCUSSION
 
-REWRTIE THIS IN A DIFFERENT WAY. START WITH CHENGULAR AND JUST MENTION THE LINK TO STEFCAL'S CHOICE OF ALPHA.
-
-The update rules in Eq.~\eqref{eq:lambda} and Eq.~\eqref{eq:alpha} have been derived before, by Chengular... The approach they followed is discussed in the Appendix.
-
-Interestingly enough, if we substitute $\alpha = 1$ into Eq.~\ref{eq:g_update} then it reduces to the skymodel-based StEFCal update rule. In Chengular they propose 
-an $\alpha = 0.3$.
-
-In an attempt to merge the terminology that has independently develop in the general calibration and redundant calibration literature and to emphasize the close
-relationship between Stefcal and the approach derived by I will use the label Redunandat SteFCal (R-Stefcal) to refer to the NLS method proposed by ... 
-
-****\\
-
-with $\alpha = \frac{1}{1+\lambda}$. Moreover $\lambda = \frac{1-\alpha}{\alpha}$. So in Marthi and Chengular (2014) they use an $\alpha$ of 0.3, which corresponds to an LM damping factor $\lambda$
-of $2\frac{1}{3}$.
-
-NB:: NEED TO ADD SNR PLOTS HERE
-PLUS IMAGE OF HESSIAN FOR THE DISCUSSION
-
-\subsection{Conjugate Gradient Method}
+\subsection{Preconditioned Conjugate Gradient Method}
 \label{sec:pcg}
+In this section we investigate the computational complexity of the PCG method when applied to the redundant calibration problem. 
+The PCG method was presented in Section~\ref{sec:conj_grad}.
+The PCG method differs from the ADI method presented in Section~\ref{sec:adi} in that in the case of PCG we compute the exact inverse of the modified Hessian instead 
+of using some sort of approximation as is the case for ADI. As we mentioned in Section~\ref{sec:pcg} there
+are two factors which influence the computational complexity of the PCG method, namely the spectral condition number and the sparsity of the matrix we wish to invert. 
+We used a $\lambda$ value of two, implying we used Eq.~\eqref{eq:LM_update} instead of Eq.~\eqref{eq:GN_update} throughout this section.
+We respectively discuss the spectral condition number and the sparsity of the modified Hessian, which is a non-singular matrix in Section~\ref{sec:scn} and Section~\ref{sec:sparsity}.
+It is interesting to note, that the Hessian itself is singular which means that if we are to use Eq.~\eqref{eq:GN_update} instead we would need to be able invert a singular matrix. In Section~\ref{sec:normal},
+we showed that the PCG method can in fact be used to invert a singular Hessian matrix.
 
 \subsubsection{Spectral Condition Number}
+\label{sec:scn}
 kappa + itr plots
 \begin{figure*}
 \centering
 \subfigure[$\kappa$]{\includegraphics[width=0.47\textwidth]{./kappa.pdf}\label{fig:kappa}}
 % V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
 \subfigure[Iterations required before and after Preconditioning]{\includegraphics[width=0.47\textwidth]{./cg_itr.pdf}\label{fig:cg_itr}}
-\caption{The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}. In the left panel we have plotted the spectral condition number $\kappa$ of the Hessian $\bH$, before (magenta and red curves) and after preconditioning (blue curve), at different SNR values as a function of the
+\caption{The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}. In the left panel we have plotted the spectral condition number $\kappa$ of the modified Hessian $\bH$, before (magenta and red curves) and after preconditioning (blue curve), at different SNR values as a function of the
 number of antennas $N$ in the array. This plot shows us that we can drastically reduce the condition number of $\bH$ by preconditioning. Moreover, $\kappa$ is also
 independent of the problem size (the number of antennas in the array). The fact that $\kappa$ is small and independent of problem size (effectively constant) implies that it simply drops out 
 of Eq.~\eqref{eq:cg_bound}. The right hand panel confirms this result. In the right hand panel we have plotted the number of major iterations (line 6 of Algorithm \ref{algo:CG}) required by the conjugate 
@@ -1024,7 +1043,7 @@ and is much smaller than the dimension of $\bH$.
 \end{figure*}
 
 \subsubsection{Sparsity}
-
+\label{sec:sparsity}
 % \begin{enumerate}
 % \item $\boldsymbol{H}$: is a $(4N-2)\times(4N-2)$ or a $P \times P$ matrix. $N$ denotes the number of antennas and $P$ denotes the number of parameters. This matrix
 % contains $6N^2 - 2N - 2$ non-zero entries. It contains $16N^2 - 16N + 4$ entries. We can construct this matrix with $4N^2 -  4N$ or $\frac{1}{4} P^2 -1$ elementary operations.
