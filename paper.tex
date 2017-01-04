@@ -1082,10 +1082,10 @@ The sparsity and the asymptotic sparsity ratio of $\bmH$ are equal to
 However when our redundant array makes use of a more complicated geometric layout it becomes much more difficult to construct such expressions as $\bmH$ itself 
 becomes much harder to express analytically. 
 
-In Fig... we plot the sparsity ratio of three different geometric layouts as a function of the number antennas in the array. Discuss the solid lines 
-and how they relate to the two equations from above.
+In Fig.~\ref{fig:gamma} we plot the sparsity ratio for three different geometric layouts as a function of the number antennas in the array. Although, we can not explicitly calculate 
+the limit of the hexagonal and square layouts, Fig.~\ref{fig:gamma} seems to indicate that these limits do exist.  
 
-We can now use the sparsity factor to compute the order of the computational cost of inverting $\bH$ with
+We can now use the sparsity factor to compute the order of the computational complexity of inverting $\bmH$ with
 \begin{equation}
 P^{c} = (1 - \gamma)P^2.
 \end{equation}
@@ -1093,36 +1093,48 @@ Solving for $c$ we obtain
 \begin{align}
 c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2. \label{eq:c}
 \end{align}
-Asymptotically the computational cost of inverting $\bH$ is $O(P^2)$. However, the computational cost converges 
-very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ if a Hexagonal geometric layout is employed.
+In Fig.~\ref{fig:c} we plot the value of $c$ for three different geometric layouts as a function of the number antennas in the array.
+It is clear from Eq.~\eqref{eq:c} and Fig.~\ref{fig:c} that the computational complexity, under the assumption that $\lim_{N\rightarrow \infty} \gamma$ exists, is asymptotically bounded by $O(P^2)$. However, the computational complexity converges 
+very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ if a Hexagonal geometric layout containing less than 200 antennas is employed.
 
-sparsity derivation
-sparsity + computational complexity plots
 \begin{figure*}
 \centering
-\subfigure[$\gamma$]{\includegraphics[width=0.47\textwidth]{./sparsity.pdf}\label{fig:kappa}}
+\subfigure[$\gamma$]{\includegraphics[width=0.47\textwidth]{./sparsity.pdf}\label{fig:gamma}}
 % V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
-\subfigure[$c$]{\includegraphics[width=0.46\textwidth]{./comp_order.pdf}\label{fig:cg_itr}}
-\caption{In the left panel we plot the sparsity ratio $\gamma$ (the number of zero entries relative to the total number of entries in a matrix) of the Hessian $\bH$ as a function of the number 
+\subfigure[$c$]{\includegraphics[width=0.46\textwidth]{./comp_order.pdf}\label{fig:c}}
+\caption{In the left panel we plot the sparsity ratio $\gamma$ (the number of zero entries relative to the total number of entries in a matrix) of the modified Hessian $\bmH$ as a function of the number 
 of antennas $N$ in the array for different geometries, namely an hexagonal grid (blue circles), a square grid (green crosses) and a regular east-west grid (red circles). For the regular east-west grid we are able to construct an analytical expression for $\gamma$ (the dashed red line). Taking the limit 
-of this expression, Eq.~\eqref{eq:gamma}, as $N\rightarrow \infty$ produces the black dotted line. In the right panel we plot the order of the computational cost $c$ for inverting $\bH$ as a function of the number 
+of this expression, Eq.~\eqref{eq:gamma}, as $N\rightarrow \infty$ produces the black dotted line. In the right panel we plot the order of the computational cost $c$ for inverting $\bmH$ as a function of the number 
 of antennas in the array for different geometries. We use the same color scheme in the right and left panels. We compute $c$ using Eq.~\eqref{eq:c}. The red dashed line 
-in the righ panel is associated with the theoretical curve of $c$ we computed for the east-west regular grid. The limit of the red-dashed curve is two, which we 
+in the right panel is associated with the theoretical curve of $c$ we computed for the east-west regular grid. The limit of the red-dashed curve is two, which we 
 have plotted with a black dotted line.
-\label{fig:sup_anti}} 
+\label{fig:sparsity}} 
 \end{figure*}
 
 
 \subsection{Comparison}
 \label{sec:comparison}
-itr numbers plot and graph of $kP = P^{1.7}$.
+We are now in a position to make a final comparison between the ADI and PCG methods. One inversion using the ADI method is very cheap, while one inverse using PCG is more expensive. On the other side of the coin,  one inversion with PCG is much more 
+accurate than one inversion with ADI. The question is now, if the inverse using the PCG method is much more accurate will the LM implementation using it require much less LM-iterations than its ADI counterpart. Moreover, will the number 
+of LM iterations PCG require be so few that it manages to beat the ADI approach in any case. To answer this we first need to compute the number of iterations $k$; ADI-LM can make in the 
+same time it takes one single PCG-LM iteration to execute. We can compute this with
+\begin{align}
+\label{eq:k}
+ kP &\approx P^{1.7}, & k &\approx P^{0.7}.
+\end{align}
+Next we need to measure the amount of LM iterations we save by using the PCG method and compare it to Eq.\eqref{eq:k}. We make this comparison 
+in Fig.~\ref{fig:out_diff}. Fig.~\ref{fig:out_diff} tells us that the ADI method will outperform the PCG method as the number of LM iterations we save by taking the 
+full inverse is not enough to exceed $k$.
 
 \begin{figure*}
 \centering
-\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./outerloop.pdf}\label{fig:outerloop}}
+\subfigure[Number of LM iterations required by ADI and PCG.]{\includegraphics[width=0.47\textwidth]{./outerloop.pdf}\label{fig:outerloop}}
 % V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
-\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./diff.pdf}\label{fig:diff}}
-\caption{Hallo
+\subfigure[Difference between ADI and PCG.]{\includegraphics[width=0.47\textwidth]{./diff.pdf}\label{fig:diff}}
+\caption{The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}. In the left panel we have the number of LM iterations 
+that is required for the LM algorithm using the ADI (green and blue curve) and the PCG (magenta and red curve) methods to converge to a parameter convergence criteria of 1e-6 whilst using different 
+SNR values as a function of number of antennas $N$ in the array. In the right panel we have the average amount of LM iterations (difference between the ADI and PCG curves in the left panel) we save (green and blue curve) by computing the full-inverse with the PCG method whilst using different SNR values.
+The black curve is associated with $k$ (see Eq.~\eqref{eq:k}). Clearly we do not save enough iterations using the full-inverse of $\bmH$ for the PCG method to outperform the ADI method.
 \label{fig:out_diff}} 
 \end{figure*}
 
