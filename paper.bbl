@@ -1,5 +1,29 @@
 \begin{thebibliography}{}
 
+\bibitem[\protect\citeauthoryear{Ali, Parsons, Zheng, Pober, Liu, Aguirre,
+  Bradley, Bernardi, Carilli, Cheng et~al.,}{Ali et~al.}{2015}]{Ali2015}
+Ali Z.~S.,  Parsons A.~R.,  Zheng H.,  Pober J.~C.,  Liu A.,  Aguirre J.~E.,
+  Bradley R.~F.,  Bernardi G.,  Carilli C.~L.,  Cheng C.,    et~al., 2015, The
+  Astrophysical Journal, 809, 61
+
+\bibitem[\protect\citeauthoryear{Camps, Torres, Lopez-Dekker \& Frasier}{Camps
+  et~al.}{2003}]{Camps2003}
+Camps A.,  Torres F.,  Lopez-Dekker P.,    Frasier S.,  2003, International
+  journal of remote sensing, 24, 5183
+
+\bibitem[\protect\citeauthoryear{DeBoer, Aguirre, Bowman, Bradley, Carilli,
+  Furlanetto, Hewitt, Jacobs, Liu, Morales et~al.,}{DeBoer
+  et~al.}{2015}]{deboer2015}
+DeBoer D.~R.,  Aguirre J.,  Bowman J.,  Bradley R.,  Carilli C.,  Furlanetto
+  S.,  Hewitt J.,  Jacobs D.,  Liu A.,  Morales M.,    et~al., 2015, in {Radio
+  Science Meeting (Joint with AP-S Symposium), 2015 USNC-URSI} {The Hydrogen
+  Epoch of Reionization Array (HERA)}.
+pp 360--360
+
+\bibitem[\protect\citeauthoryear{{Hamaker}, {Bregman} \& {Sault}}{{Hamaker}
+  et~al.}{1996}]{ME1}
+{Hamaker} J.~P.,  {Bregman} J.~D.,    {Sault} R.~J.,  1996, \aaps, 117, 137
+
 \bibitem[\protect\citeauthoryear{Hestenes}{Hestenes}{1973}]{Hestenes1973}
 Hestenes M.~R.,  1973, Journal of Optimization Theory and Applications, 11, 323
 
@@ -10,6 +34,11 @@ Hestenes M.~R.,  Stiefel E.,  1952, Journal of Research of the National Bureau
 
 \bibitem[\protect\citeauthoryear{Kaniel}{Kaniel}{1966}]{Kaniel1966}
 Kaniel S.,  1966, Mathematics of Computation, 20, 369
+
+\bibitem[\protect\citeauthoryear{Kurien, Tarokh, Rachlin, Shah \&
+  Ashcom}{Kurien et~al.}{2016}]{Kurien2016}
+Kurien B.~G.,  Tarokh V.,  Rachlin Y.,  Shah V.~N.,    Ashcom J.~B.,  2016,
+  Monthly Notices of the Royal Astronomical Society, 461, 3585
 
 \bibitem[\protect\citeauthoryear{Levenberg}{Levenberg}{1944}]{Levenberg1944}
 Levenberg K.,  1944, The Quarterly J. of App. Math., 2, 164
@@ -30,6 +59,28 @@ Marquardt D.,  1963, SIAM J. of App. Math., 11, 431
 Marthi V.~R.,  Chengalur J.,  2014, Monthly Notices of the Royal Astronomical
   Society, 437, 524
 
+\bibitem[\protect\citeauthoryear{{Mitchell}, {Greenhill}, {Wayth}, {Sault},
+  {Lonsdale}, {Cappallo}, {Morales} \& {Ord}}{{Mitchell}
+  et~al.}{2008}]{Mitchell:MWA-cal}
+{Mitchell} D.~A.,  {Greenhill} L.~J.,  {Wayth} R.~B.,  {Sault} R.~J.,
+  {Lonsdale} C.~J.,  {Cappallo} R.~J.,  {Morales} M.~F.,    {Ord} S.~M.,  2008,
+  IEEE Journal of Selected Topics in Signal Processing, Vol.~2, Issue 5,
+  p.707-717, 2, 707
+
+\bibitem[\protect\citeauthoryear{Noordam \& {De Bruyn}}{Noordam \& {De
+  Bruyn}}{1982}]{Noordam1982}
+Noordam J.,  {De Bruyn} A.,  1982, Nature, 299, 597
+
+\bibitem[\protect\citeauthoryear{Noorishad, Wijnholds, van Ardenne \& van~der
+  Hulst}{Noorishad et~al.}{2012}]{Noorishad2012}
+Noorishad P.,  Wijnholds S.~J.,  van Ardenne A.,    van~der Hulst J.,  2012,
+  Astronomy \& Astrophysics, 545, A108
+
+\bibitem[\protect\citeauthoryear{Parsons, Pober, McQuinn, Jacobs \&
+  Aguirre}{Parsons et~al.}{2012}]{Parsons2012}
+Parsons A.,  Pober J.,  McQuinn M.,  Jacobs D.,    Aguirre J.,  2012, The
+  Astrophysical Journal, 753, 81
+
 \bibitem[\protect\citeauthoryear{Reid}{Reid}{1971}]{Reid1971}
 Reid J.~K., , 1971, {On the method of conjugate gradients for the solution of
   large sparse systems of linear equations}
@@ -46,6 +97,9 @@ Shewchuk J.~R., , 1994, {An introduction to the conjugate gradient method
   Tasse}{2015}]{Smirnov2015}
 Smirnov O.,  Tasse C.,  2015, MNRAS, 449, 2668
 
+\bibitem[\protect\citeauthoryear{{Smirnov}}{{Smirnov}}{2011}]{RRIME1}
+{Smirnov} O.~M.,  2011, \aap, 527, A106
+
 \bibitem[\protect\citeauthoryear{Sorber, Barel \& Lathauwer}{Sorber
   et~al.}{2012}]{Sorber2012}
 Sorber L.,  Barel M.~V.,    Lathauwer L.~D.,  2012, SIAM Journal on
@@ -59,7 +113,23 @@ Stiefel E.,  1952, Zeitschrift f{\"u}r angewandte Mathematik und Physik ZAMP,
   Sluis} \& van~der Vorst}{1986}]{Sluis1986}
 {Van der Sluis} A.,  van~der Vorst H.~A.,  1986, Numerische Mathematik, 48, 543
 
+\bibitem[\protect\citeauthoryear{Wieringa}{Wieringa}{1992}]{Wieringa1992}
+Wieringa M.~H.,  1992, Experimental Astronomy, 2, 203
+
+\bibitem[\protect\citeauthoryear{Wijnholds \& Noorishad}{Wijnholds \&
+  Noorishad}{2012}]{Wijnholds2012}
+Wijnholds S.~J.,  Noorishad P.,  2012, in {Signal Processing Conference
+  (EUSIPCO), 2012 Proceedings of the 20th European} {Statistically optimal
+  self-calibration of regular imaging arrays}.
+pp 1304--1308
+
 \bibitem[\protect\citeauthoryear{Wirtinger}{Wirtinger}{1927}]{Wirtinger1927}
 Wirtinger W.,  1927, Mathematische Annalen, 97, 357
+
+\bibitem[\protect\citeauthoryear{Zheng, Tegmark, Buza, Dillon, Gharibyan,
+  Hickish, Kunz, Liu, Losh, Lutomirski et~al.,}{Zheng et~al.}{2014}]{Zheng2014}
+Zheng H.,  Tegmark M.,  Buza V.,  Dillon J.~S.,  Gharibyan H.,  Hickish J.,
+  Kunz E.,  Liu A.,  Losh J.,  Lutomirski A.,    et~al., 2014, Monthly Notices
+  of the Royal Astronomical Society, 445, 1084
 
 \end{thebibliography}
