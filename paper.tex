@@ -367,8 +367,8 @@ while the LM update takes the following form
  \Delta \bzeta = (\bJ^T\bJ+\lambda\bD)^{-1} \bJ^T\brho,
 \end{equation}
 where $\bJ$ is the Jacobian matrix (i.e. the derivative of the model $\bnu$ with respect to the parameter vector $\bzeta$), $\lambda$ denotes the 
-damping factor, while $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper we denote 
-matrix transposition with $(*)^T$.
+damping factor, while $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper we respectively denote 
+matrix transposition and matrix inversion with $(*)^T$ and $(*)^{-1}$.
 These update steps can be used in an iterative manner to determine new estimates of $\bzeta$.
 
 The gradient based minimization algorithms that are generally used to solve least squares problems (i.e. GN and LM) generally require the model $\bnu$ to be differentiable
@@ -394,7 +394,7 @@ In this alternative approach we treat the complex parameters and their conjugate
 \section{Problem Statement}
 In Section~\ref{sec:s_mes}, we present the scalar measurement equation. Next, we define some indexing functions in Section~\ref{sec:indexing}. The measurement 
 equation and the indexing functions from Section~\ref{sec:indexing} are then used in Section~\ref{sec:r_mes} to phrase redundant calibration as a least-squares problem, i.e. Eq.~\eqref{eq:least_squares_red}.
-We present the Signal-to-noise ratio definition we used in this paper in Section\ref{sec:snr}. The general scope and limitations of this paper is discussed in Section~\ref{sec:scope}.
+We present the Signal-to-noise ratio (SNR) definition we used in this paper in Section\ref{sec:snr}. The general scope and limitations of this paper is discussed in Section~\ref{sec:scope}.
 
 \subsection{Scalar Measurement Equation}
 \label{sec:s_mes}
@@ -404,7 +404,7 @@ The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ 
 d_{pq} = g_{p}\conj{g_q}y_{pq} + n_{pq},
 \end{equation}
 where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
-and $n_{pq}$ is the thermal noise component. Eq.~\eqref{eq:vis_definition} is known as the scalar measurement equation. Conjugation is denoted by $\conj{(*)}$. The true value of $g_p$, $g_q$ and $y_{pq}$ are unknown. We try to estimate the value of
+and $n_{pq}$ is the thermal noise component. Eq.~\eqref{eq:vis_definition} is known as the scalar measurement equation. Conjugation is denoted by $\conj{(*)}$. The true value of $g_p$, $g_q$ and $y_{pq}$ are unknown. We normally try to estimate the true value of
 $g_p$, $g_q$ and $y_{pq}$ by calibrating our data and then imaging the result.
 
 The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation proportional to   
@@ -435,8 +435,8 @@ We denote the number of baselines in the array with $B$, i.e. $B = \frac{N^2-N}{
 
 Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
 The aforementioned fact allows us to group all the redundant baselines in a redundant array into the same redundant baseline group. When our array 
-is a redundant array we therefore only require single index values for each redundant baseline group, instead of having a unique single index label for 
-each and every baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
+is a redundant array we therefore only require single index values for each redundant baseline group, instead of a unique single index label for 
+each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
 $\phi_{pq} = 0$ if $p>q$. We can also define the following symmetric variant of $\phi_{pq}$:
 \begin{equation}
 \zeta_{pq} = 
@@ -520,7 +520,7 @@ We have now defined enough notation to enable us to formulate redundant calibrat
 \end{equation}
 where
 \begin{align}
- \by &= [y_1,\cdots,y_L]^T, & \bg &=[g_1,\cdots,g_N]^T,\nonumber\\
+ \bg &=[g_1,\cdots,g_N]^T, & \by &= [y_1,\cdots,y_L]^T,\nonumber\\
  \bz &= [\bg^T,\by^T]^T. &  &\label{eq:parm_definitions}
  \end{align}
 The number of model parameters that we need to solve for in Eq.~\eqref{eq:least_squares_red} is equal to $P = 2(N+L)$, since redundant calibration is a complex problem.
@@ -548,7 +548,7 @@ a function of the number of antennas $N$ in the array.
 
 \subsection{Signal-to-noise Ratio}
 \label{sec:snr}
-The following SNR (signal-to-noise ratio) definition is used in this paper  
+The following SNR definition is used in this paper  
 \begin{equation}
 \label{}
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}}, 
