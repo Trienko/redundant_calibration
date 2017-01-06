@@ -231,150 +231,7 @@ ADD SUMMARY PARAGRAPH WHICH DEPENDS ON PAPER LAYOUT
  
 \section{Preliminaries}
 
-\subsection{Scalar Measurement Equation}
-The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
-\begin{equation}
-\label{eq:vis_definition}
-d_{pq} = g_{p}\conj{g_q}y_{pq} + n_{pq},
-\end{equation}
-where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
-and $n_{pq}$ is the thermal noise component. Eq.~\eqref{eq:vis_definition} is known as the unpolarized measurement equation. Conjugation is denoted by $\conj{(*)}$. The true value of $g_p$, $g_q$ and $y_{pq}$ are of course unknown and is what we try to estimate when we calibrate 
-and image.
-
-The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation proportional to   
-\begin{equation}
-\sigma \propto \frac{T_{\textrm{sys}}}{\sqrt{\Delta \nu \tau}}, 
-\end{equation}
-where $T_{\textrm{sys}}$ is equal to the system temperature, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
-
-\subsection{Indexing Functions}
-\begin{figure*}
-\centering
-\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./ln.pdf}\label{fig:ln}}
-% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
-\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./pn.pdf}\label{fig:pn}}
-\caption{Hallo
-\label{fig:pl}} 
-\end{figure*}
-
-In general there are two ways of indexing the true visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
-or we can use a single unique baseline index which we assign in numerical order to each composite index; assuming the composite indexes are arranged in standard baseline order.
-The composite indexes $pq$ are in standard baseline order when they are arranged as follow: $12, 13, 1N, 23\cdots$. We use $N$ to denote the number of antennas in the array. Let 
-\begin{equation}
-\alpha_{pq} =
-\begin{cases}
-(q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
-%B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
-%B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
-0 & \textrm{otherwise}
-\end{cases}.
-\end{equation}
-We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.e. 
-\begin{equation}
-12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B.
-\end{equation}
-Moreover, $B$ denotes the number of baselines in the array, i.e. $B = \frac{N^2-N}{2}$.
-
-If an array is redundant then its redundant baselines should sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. The 
-fact that redundant baselines should measure the exact same visibility implies that every baseline does not require a unique baselines index; instead we can use a separate index for each unique redundant baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the redundant baseline indexes of an array. Note that $\phi_{pq}$ is not symmetric as 
-$\phi_{pq} = 0$ if $p>q$. We can also define the following symmetric variant of $\phi_{pq}$:
-\begin{equation}
-\zeta_{ij} = 
-\begin{cases}
-\phi_{pq}~\textrm{if}~p \leq q\\
-\phi_{qp}~\textrm{if}~p>q
-\end{cases}.
-\end{equation} 
-It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
-It becomes increasingly more difficult to construct analytic expressions of $\zeta_{pq}$ for other more complicated array layouts. The empirically constructed symmetric geometry
-functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{ij}$ with $\mathcal{R}(\zeta_{ij})$. The maximal element 
-that $\zeta_{ij}$ can ascertain is denoted by $L$ and can be construed as the maximal number of unique redundant baselines which can be formed for a given 
-array layout. Alternatively, we can interpret the symmetric geometry functions 
-in Fig.~\ref{fig:geometry_function} as matrices. In this alternative paradigm, $\zeta_{ij}$ denotes a matrix entry instead. The dimension of these so called geometry 
-matrices are $N\times N$, where $N$ denotes the number of antennas in the array. 
-
-\begin{figure*}
-\centering
-\subfigure[Hexagonal layout]
-{\includegraphics[width=0.33\textwidth]{./HEX_lay.pdf}\label{fig:HEX_lay}}
-\subfigure[Square layout]
-{\includegraphics[width=0.33\textwidth]{./SQR_lay.pdf}\label{fig:SQR_lay}}
-\subfigure[Regular east-west layout]
-{\includegraphics[width=0.33\textwidth]{./REG_lay.pdf}\label{fig:REG_lay}}
-
-\subfigure[Hexagonal: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./HEX_phi.pdf}\label{fig:HEX_phi}}
-\subfigure[Square: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
-\subfigure[Regular east-west: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
-\caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
-In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
-to construct the the hexagonal layout, while a 100 antennas where used in the square and east-west layouts. The maximal amount of redundant baselines that can be formed for 
-the hexagonal, square and east-west layouts in the top panel are 165, 180 and 99 baselines respectively.\label{fig:geometry_function}}
-\end{figure*}
-
-If the function $\phi_{ij}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline index itself then it is possible 
-to calculate the unknown antenna index. This can be computed via the following two expressions:
-\begin{equation}
-\xi_{ij} = 
-\begin{cases}
-p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
-0~\textrm{otherwise}
-\end{cases},
-\end{equation}
-and
-\begin{equation}
-\psi_{ij} = 
-\begin{cases}
-q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
-0~\textrm{otherwise}
-\end{cases}
-\end{equation}
-We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline index are known, while we use $\psi_{ij}$ to obtain 
-a similar result; the second antenna index of the composite antenna pair. \textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
-
-\subsection{Redundant Measurement Equation}
-If the array is redundant and the function $\phi_{ij}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
-\begin{equation}
-\label{eq:vis_red}
-d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq}.
-\end{equation}
-Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form 
-\begin{equation}
-\label{eq:vis_red_vec}
-\bd = \bv + \bn, 
-\end{equation}
-where 
-\begin{align}
- \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q}\nonumber\\
- \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
-\end{align}
-
-NB COLUMN VECTORS NEED TO ADD THIS...
-
-In Eq.~\eqref{eq:vec_definitions}, the size of the three vectors are equal to $B$ (i.e. $p<q$), which denotes the number of baselines in the array. Moreover,
-\begin{equation}
-\alpha_{pq} =
-\begin{cases}
-(q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
-B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
-%B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
-0 & \textrm{otherwise}
-\end{cases}.
-\end{equation}
-The easiest way to construct the vectors in Eq.~\ref{eq:vec_definitions} is to enumerate through the composite indexes $pq$ in the following order $12, 13,\cdots,1N,23,\cdots$.
-For each composite index we then compute the right hand side of the appropriate vector element definition which we then need to assign to the 
-correct vector position. The correct position is calculated with $\alpha_{pq}$. Using the aforementioned order, however, allows you to fill the vector in numerical order, i.e. $12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B$.  
-
-
-We will be using the following SNR (signal-to-noise ratio) definition in this paper  
-\begin{equation}
-\textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{t,pq}}{<\bn\odot\conj{\bn}>_{t,pq}}, 
-\end{equation}
-where $<*>_{t,pq}$ denotes averaging over time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
-
-\section{Conjugate Gradient Method}
+\subsection{Conjugate Gradient Method}
 \label{sec:conj_grad}
 The Conjugate Gradient (CG) method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
 reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear system. The CG method is generally used to solve
@@ -410,7 +267,7 @@ The iterative CG method is presented in Algorithm \ref{algo:CG}.
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Computational Complexity}
+\subsubsection{Computational Complexity}
 \citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
 \citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
 the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the spectral condition number of the matrix $\bA$.
@@ -428,7 +285,7 @@ The computational complexity of CG is therefore
 \end{equation}
 It should now also be clear to the reader why the CG method is especially applicable to sparse linear systems, since in those cases $m < P^2$.
 
-\subsection{Preconditioning}
+\subsubsection{Preconditioning}
 \label{sec:precon}
 Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix.
 We can now indirectly solve for $\bx$ by using 
@@ -449,7 +306,7 @@ Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner i
 \end{equation}
 where $\bI$ is the identity matrix. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
 
-\subsection{Normal Equation}
+\subsubsection{Normal Equation}
 \label{sec:normal}
 Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
 \begin{equation}
@@ -486,7 +343,7 @@ is a square positive semi-definite Hermitian matrix we do not use the spectral c
 number instead. The general spectral condition number is very similar to the spectral condition number; the only difference being that in Eq.~\eqref{eq:kappa} we replace  
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
 
-\section{Least Squares}
+\subsection{Least Squares}
 \label{sec:ls}
 The method of nonlinear least squares is tanatamount to solving the following optimization problem:  
 \begin{equation}
@@ -531,16 +388,172 @@ Using the above definitions we can now easily compute the following:
 \end{align}
 In this alternative approach we treat the complex parameters and their conjugates as separate parameters.
 
-\section{Redundant Calibration}
-Redundant calibration can be formulated as a least-squares problem:
+\section{Problem Statement}
+
+\subsection{Scalar Measurement Equation}
+The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
+\begin{equation}
+\label{eq:vis_definition}
+d_{pq} = g_{p}\conj{g_q}y_{pq} + n_{pq},
+\end{equation}
+where $g_{p}$ and $g_{q}$ are the direction independent gains associated with antenna $p$ and $q$, $y_{pq}$ denotes the true visibility that baseline $pq$ measured
+and $n_{pq}$ is the thermal noise component. Eq.~\eqref{eq:vis_definition} is known as the scalar measurement equation. Conjugation is denoted by $\conj{(*)}$. The true value of $g_p$, $g_q$ and $y_{pq}$ are unknown. We try to estimate the value of
+$g_p$, $g_q$ and $y_{pq}$ by calibrating our data and then imaging the result.
+
+The real and imaginary components of the thermal noise is normally distributed with a mean of zero and a standard deviation proportional to   
+\begin{equation}
+\sigma \propto \frac{T_{\textrm{sys}}}{\sqrt{\Delta \nu \tau}}, 
+\end{equation}
+where $T_{\textrm{sys}}$ is equal to the system temperature, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
+
+\subsection{Indexing Functions}
+
+In general there are two ways of indexing the true visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
+or we can use a single unique baseline index which we assign in numerical order to each composite index; assuming the composite indexes are arranged in standard baseline order.
+The composite indexes $pq$ are in standard baseline order when they are arranged as follow: $12, 13, 1N, 23\cdots$. Let 
+\begin{equation}
+\alpha_{pq} =
+\begin{cases}
+(q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
+%B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
+%B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
+0 & \textrm{otherwise}
+\end{cases}.
+\end{equation}
+We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.e. 
+\begin{equation}
+12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B.
+\end{equation}
+We denote the number of baselines in the array with $B$, i.e. $B = \frac{N^2-N}{2}$.
+
+Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
+The aforementioned fact allows us to group all the redundant baselines in a redundant array into the same redundant baseline group. When our array 
+is a redundant array we therefore only require single index values for each redundant baseline group, instead of having a unique single index label for 
+each and every baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
+$\phi_{pq} = 0$ if $p>q$. We can also define the following symmetric variant of $\phi_{pq}$:
+\begin{equation}
+\zeta_{pq} = 
+\begin{cases}
+\phi_{pq}~\textrm{if}~p \leq q\\
+\phi_{qp}~\textrm{if}~p>q
+\end{cases}.
+\end{equation} 
+It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
+It becomes increasingly more difficult to construct analytic expressions of $\zeta_{pq}$ for other more complicated array layouts. 
+We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
+functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
+that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be construed as the maximal number of unique redundant baseline groups which can be formed for a given 
+array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry instead. The dimension of these geometry 
+matrices are $N\times N$. 
+
+\begin{figure*}
+\centering
+\subfigure[Hexagonal layout]
+{\includegraphics[width=0.33\textwidth]{./HEX_lay.pdf}\label{fig:HEX_lay}}
+\subfigure[Square layout]
+{\includegraphics[width=0.33\textwidth]{./SQR_lay.pdf}\label{fig:SQR_lay}}
+\subfigure[Regular east-west layout]
+{\includegraphics[width=0.33\textwidth]{./REG_lay.pdf}\label{fig:REG_lay}}
+
+\subfigure[Hexagonal: $\zeta_{pq}$]
+{\includegraphics[width=0.33\textwidth]{./HEX_phi.pdf}\label{fig:HEX_phi}}
+\subfigure[Square: $\zeta_{pq}$]
+{\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
+\subfigure[Regular east-west: $\zeta_{pq}$]
+{\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
+\caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
+In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
+to construct the the hexagonal layout, while a 100 antennas where used in the square and east-west layouts. The maximal amount of redundant baselines that can be formed for 
+the hexagonal, square and east-west layouts in the top panel are 165, 180 and 99 baselines respectively.\label{fig:geometry_function}}
+\end{figure*}
+
+If the function $\phi_{pq}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline group index itself then it is possible 
+to calculate the unknown antenna index. This can be computed via the following two expressions:
+\begin{equation}
+\xi_{ij} = 
+\begin{cases}
+p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+0~\textrm{otherwise}
+\end{cases},
+\end{equation}
+and
+\begin{equation}
+\psi_{ij} = 
+\begin{cases}
+q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
+0~\textrm{otherwise}
+\end{cases}
+\end{equation}
+We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline group index are known, while we use $\psi_{ij}$ to obtain 
+a similar result: the second antenna index of the composite antenna pair. %\textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
+
+\subsection{Redundant Measurement Equation}
+If the array is redundant and the function $\phi_{pq}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
+\begin{equation}
+\label{eq:vis_red}
+d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq}.
+\end{equation}
+Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form 
+\begin{equation}
+\label{eq:vis_red_vec}
+\bd = \bv + \bn, 
+\end{equation}
+where 
+\begin{align}
+ \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q},\nonumber\\
+ \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
+\end{align}
+The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
+
+We have now defined enough notation to enable us to formulate redundant calibration as a least-squares problem:
 \begin{equation}
 \label{eq:least_squares_red}
 \min_{\bz} \Lambda(\bz) = \min_{\bz} \|\br\|_F^2 = \min_{\bz} \|\bd - \bv(\bz)\|_F^2, 
 \end{equation}
-where $\bz = [\bg^T,\by^T]^T$\footnote{In this paper we use the same symbol to denote corrupted predicted visibilities and true observed corrupted visibilities as it
-is trivial to distinguish which one is implied from the context.}. As discussed in Section~\ref{sec:ls}, we can solve the above minimization problem in one of two ways. We can split the problem into its real and
+where
+\begin{align}
+ \by &= [y_1,\cdots,y_L]^T, & \bg &=[g_1,\cdots,g_N]^T,\nonumber\\
+ \bz &= [\bg^T,\by^T]^T. &  &\label{eq:parm_definitions}
+ \end{align}
+The number of model parameters that we need to solve for in Eq.~\eqref{eq:least_squares_red} is equal to $P = 2(N+L)$, since redundant calibration is a complex problem.
+We plot the number of unique baseline groups $L$ and the number of parameters we need to estimate $P$ for two different geometric layouts in Fig~\ref{fig:pl}.
+The analytic expressions for the red and the blue curve in Fig.~\ref{fig:ln} are respectively equal to
+\begin{equation}
+L = 2N-\frac{1}{2}\sqrt{12N-3}-\frac{1}{2}, 
+\end{equation}
+and
+\begin{equation}
+L = N - 1. 
+\end{equation}
+
+
+\begin{figure*}
+\centering
+\subfigure[$L$.]{\includegraphics[width=0.47\textwidth]{./ln.pdf}\label{fig:ln}}
+% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
+\subfigure[$P$.]{\includegraphics[width=0.47\textwidth]{./pn.pdf}\label{fig:pn}}
+\caption{In the left panel we plot the number of unique baseline groups $L$ one can form when using a hexagonal (red curve) and regular east-west layout (blue curve) as 
+a function of the number of antennas $N$ in the array. In the right panel we plot the total number of parameters we need to estimate when employing redundant calibration for a hexagonal (red curve) and regular east-west layout (blue curve) as 
+a function of the number of antennas $N$ in the array. 
+\label{fig:pl}} 
+\end{figure*}
+
+
+\subsection{Signal-to-noise Ratio}
+The following SNR (signal-to-noise ratio) definition is used in this paper  
+\begin{equation}
+\label{}
+\textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}}, 
+\end{equation}
+where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
+
+HERE I CAN WRITE SOMETHING ABOUT THE LIMITATIONS OF THE PAPER.
+
+
+\section{Redundant Calibration}
+As discussed in Section~\ref{sec:ls}, we can solve Eq.~\eqref{eq:least_squares_red} in one of two ways. We can split the problem into its real and
 imaginary parts and then solve for the real and imaginary parts of the parameters seperately or we can employ the notion of Wirtinger derivatives. The former 
-approach is discussed in detail in Section~\ref{sec:ri}, while the latter approach is described in Section~\ref{sec:w}. 
+approach is discussed in Section~\ref{sec:ri}, while the latter approach is described in detail in Section~\ref{sec:w}. 
 
 \subsection{Real-Imag Framework}
 \label{sec:ri}
