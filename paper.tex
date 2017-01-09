@@ -832,20 +832,36 @@ Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we 
 % FIX TRANSPOSE PROBLEM
 
 \section{Results}
-In this section we compare the computational complexity of the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
-expensive operation of the two methods namely, computing the inverse of the Hessian (or modified Hessian in the case of LM). It becomes trivial to rate these two 
+In this section we compare the computational complexity of two newly proposed speedup algorithms for redundant calibration, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
+expensive operation of the two methods namely, computing the inverse of the Hessian $\bH$ (or modified Hessian $\bmH$ in the case of LM). It becomes trivial to rate these two 
 algorithms relative to each other once the computational complexity of the inverse operation is known. The simulations we performed to compare these two 
 methods are summarized in Section~\ref{sec:simulations}.
 
-In Section~\ref{sec:adi} we re-derive the ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
-objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
-We use the diagonal approximate method proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
-StEfCal \citep{Salvini2014}. Since we approximate the Hessian in the ADI method with its diagonal the computational complexity of its inverse becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
-the diagonal is not included in this estimate.}. 
+The basic difference between these two algorithms can be understood by inspecting Fig.~\ref{fig:hessian}. The first observation we can make by inspecting 
+Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the diagonal entries of the Hessians are more significant than the off-diagonal entries.
+It therefore makes sense to approximate the Hessian (or the modified Hessian) with its diagonal, which greatly simplifies the computational complexity of inverting 
+the Hessian, i.e. it becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
+the diagonal is not included in this estimate.} \citep{Smirnov2015}. This diagonal-approximation approach is effectively ADI \citep{Marthi2014}. The exact details of this 
+approach is discussed in Section~\ref{sec:adi}. We will also show how \citet{Marthi2014}, \citet{Smirnov2015} and \citet{Salvini2014} relate to each other in that same section.
 
-\citet{Liu2010} proposed the PCG method to compute the inverse of the Hessian, however the computational complexity of this approach was not analyzed therein. In 
-Section~\ref{sec:pcg}, we do a proper computational cost analysis of PCG. We find that the computational complexity of PCG is bounded by $\mathbb{O}(P^2)$, which is 
+The second observation we can make from Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the Hessians contain many zero entries, i.e. they are sparse matrices. This, in conjunction with the more significant diagonal entries observation, implies that the PCG method (presented in Section~\ref{sec:conj_grad}) 
+can be applied to invert them in a computationally efficient manner. \citet{Liu2010} proposed the PCG method to compute the inverse of the Hessian, however the computational complexity of this approach was not analyzed therein.  
+In Section~\ref{sec:pcg}, we do a proper computational complexity analysis of PCG. We find that the computational complexity of PCG is asymptotically bounded by $\mathbb{O}(P^2)$, which is 
 a lot better than straightforward inversion which takes $\mathbb{O}(P^3)$. 
+
+\begin{figure*}
+\centering
+\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./reg_hessian.pdf}\label{fig:hessian_reg}}
+% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
+\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./hex_hessian.pdf}\label{fig:hessian_hex}}
+\caption{The number of analytic terms out of which the entries of the Hessian $\bH$ consists for two different geometric layouts, namely a regular east-west grid with $N = 5$ (left panel) and 
+a hexagonal grid with $N = 7$. The diagonal entries of these two Hessians are clearly more significant than their off-diagonal entries. Moreover, these two Hessians, also 
+contain many zero-entries. Note that the location of the zero-entries are dependent on the geometry of the array layout.
+\label{fig:hessian}} 
+\end{figure*}
+
+%Since we approximate the Hessian in the ADI method with its diagonal the computational complexity of its inverse becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
+%the diagonal is not included in this estimate.}. 
 
 Even though the PCG method is computationally more expensive than the ADI method we can not arrive at a final conclusion at this point. With the ADI method 
 we only approximate the inverse of the Hessian, while in the case of the PCG method we compute the exact inverse. So the question arises whether the PCG method 
@@ -853,9 +869,10 @@ will converge much faster than the ADI method even though each iteration (which 
 
 \subsection{Simulations}
 \label{sec:simulations}
-The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
-simulations. For the skymodel we generated 100 sources, each source had a random flux value and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
-distributed in a 3 by 3 degree square grid around the field center. The remaining fixed simulation parameters can all be found in Table~\ref{tab:fixed_parm}. 
+%The main purpose of the simulations conducted in this paper is to genrate experimental results with which we can compare the computational complexity of ADI and PCG. We used an hexagonal geometric layout with an adjustable number of rings during the 
+%simulations. 
+For the skymodel we generated 100 sources, each source had a random flux value and position. The flux of the sources followed a Pareto distribution (with a shape parameter of 2), while their positions were uniformly 
+distributed in a 3$^{\circ}$ by 3$^{\circ}$ square grid around the field center. The remaining fixed simulation parameters can all be found in Table~\ref{tab:fixed_parm}. 
 We also employed three different gain error models which we summarize in Table~\ref{tab:gain_parm}. We found that it did not matter which gain error model we used during
 our simulations, as the model we used did not have an impact on the results. Moreover, we had two major experimental setups, we either made use of simulated observations consisting of one frequency channel and multiple time-slots or one time-slot and multiple channels.
 We describe these two experimental setups in more detail in Table~\ref{tab:ch_parm}. As was the case for the gain error models, the experimental setup 
@@ -932,19 +949,12 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \subsection{Alternating Direction Implicit Method}
 \label{sec:adi}
 
-In Section~\ref{sec:sbc} we briefly review the ADI method that is used for skymodel-based calibration. In Section~\ref{sec:red} we show how the ADI method used for skymodel-based
-calibration relates to the redundant ADI method presented in \citet{Marthi2014}. We also show that the computational complexity of the ADI method to invert the Hessian (assuming it has alredy been constructed)
-is equal to $\mathbb{O}(P)$.
-
-
-\begin{figure*}
-\centering
-\subfigure[Regular layout]{\includegraphics[width=0.47\textwidth]{./reg_hessian.pdf}\label{fig:hessian_reg}}
-% V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
-\subfigure[Hexagonal layout]{\includegraphics[width=0.47\textwidth]{./hex_hessian.pdf}\label{fig:hessian_hex}}
-\caption{Hallo
-\label{fig:hessian}} 
-\end{figure*}
+In Section~\ref{sec:sbc} we briefly review the ADI method that is used for skymodel-based calibration. 
+%In Section~\ref{sec:red} we show how the ADI method used for skymodel-based calibration relates to the redundant ADI method presented in \citet{Marthi2014}. 
+In Section~\ref{sec:red}, we re-derive the ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
+objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
+In Section~\ref{sec:red}, we use the diagonal-approximate approach proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
+\textsc{StEfCal} \citep{Salvini2014}.
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
@@ -955,13 +965,13 @@ is equal to $\mathbb{O}(P)$.
 %\subsection{Diagonalization and StEFCal}
 \subsubsection{Skymodel-based Calibration}
 \label{sec:sbc}
-StEFCal (Statistically Efficient Calibration) is an alternating direction implicit method, in which the measurement equation (cite the equation earlier in paper) is linearized by assuming that the gains are known, but
-that their conjugates are unknown (REMEMBER TO CITE ALL THE STEFCAL PAPERS MITCHELL ETC...). Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
-is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative new parameter estimation step [MUST IMPROVE HERE]. \cite{Salvini2014} also show that
-the convergence of the algorithm can be improved if for every even iteration the basic new parameter estimation step is modified as follows: the current gain estimate is replaced by the average of the current gain solution and the gain solution of the previous odd iteration.
-StEFCal lowers the computational complexity of normal skymodel-based calibration from O$(P^3)$ to O$(P^2)$. 
+\textsc{StEFCal} is an alternating direction implicit method, in which the measurement equation, Eq.~\eqref{eq:vis_definition}, is linearized by assuming that the gains are known, but
+that their conjugates are unknown \citep{Mitchell:MWA-cal,Salvini2014}. Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
+is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative new parameter estimation step. \cite{Salvini2014} also show that
+the convergence of the algorithm can be improved if for every even iteration the basic new parameter estimation step is modified as follows: the current gain estimate is replaced by the average of the current gain estimate and the gain estimate of the previous odd iteration.
+\textsc{StEFCal} lowers the computational complexity of normal skymodel-based calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$. 
 
-\citet{Smirnov2015} recently showed that one can also derive StEFCal by viewing normal skymodel-based calibration as a complex optimization problem. They first compute the skymodel-based calibration equivalent analytic expressions of $\bJ$,
+\citet{Smirnov2015} recently showed that one can also derive \textsc{StEFCal} by viewing normal skymodel-based calibration as a complex optimization problem. They first compute the skymodel-based calibration equivalent analytic expressions of $\bJ$,
 $\bH$ and $\bJ^H\breve{\br}$. While inspecting the skymodel-based $\bH$ it becomes apparent that its diagonal entries are much more significant than its off-diagonal entries.
 By approximating $\bH$ by its diagonal and substituting this approximate Hessian back into the GN update step they are able to re-derive the fundamental iterative StEFCal parameter estimation step. They then show that the 
 averaging parmeter step used on even iterations can be derived by substituting the approximate $H$ into the LM update step, whilst setting $\lambda$ to one.
