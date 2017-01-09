@@ -508,7 +508,7 @@ Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form
 \end{equation}
 where 
 \begin{align}
- \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= g_p y_{\phi_{pq}} \conj{g_q},\nonumber\\
+ \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= v_{pq}=g_p y_{\phi_{pq}} \conj{g_q},\nonumber\\
  \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
 \end{align}
 The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
@@ -993,19 +993,29 @@ y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq
 The computational complexity of inverting $\widetilde{\bH}$ is $\mathbb{O}(P)$.
 
 Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Als note that Eq.~\eqref{eq:g_update} is the fundamental
-gain estimator associated with StEfCal. We have therefore successfully used the diagonal approximation approach suggested by \citet{Smirnov2015} to re-derive the ADI method presented in 
+gain estimator associated with \textsc{StEfCal}. We have therefore successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the ADI method presented in 
 \citet{Marthi2014} and in doing so we have shown that the algorithm in \citet{Marthi2014} is actually redundant StEfCal. We could also have shown this by using a similar approach 
 to the one presented in \citet{Salvini2014}.
 
-The question now arises what value should we use for $\alpha$? In \citet{Marthi2014} they propose 
+The question now arises what value should we use for $\alpha$? In \citet{Marthi2014}, they propose 
 $\alpha = 0.3$. Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
-venture a clever guess by studying what the choice of $\alpha$ is in the case of skymodel-based StEFCal. Recall from Section~\ref{sec:sbc} that $\alpha$ is equal to a half 
-in the case of StEFCal (for even iterations). If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
+venture a clever guess by studying what the choice of $\alpha$ is in the case of skymodel-based \textsc{StEFCal}. The value of $\alpha$ is equal to a half 
+in the case of \textsc{StEFCal} (for even iterations); see Appendix~\ref{sec:sbc}. If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
 We used $\lambda$ equal to two in this paper.
+
+Optimality results of ADI were presented in \citet{Marthi2014}. We do not repeat their analysis here. We however, do present our own ADI results in Fig.~\ref{fig:prec_error} that confirm that the
+ADI method can accurately estimate the antenna gains and the observed visibilities at different SNR values. To quantity the exact error in our estimates we used the precentage error $\beta$ defined 
+as 
+\begin{equation}
+\label{eq:beta}
+\beta = \frac{\sum_{pq} |v_{pq} - \widehat{v}_{pq} |^2}{v_{pq}}.
+\end{equation}
+We have already defined $v_{pq}$ in Eq.~\eqref{eq:vec_definitions}. Moreover, in Eq.~\eqref{eq:beta}, $\widehat{v}_{pq}$ denotes the ADI estimate of $v_pq$.  
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
-\caption{Precentage Error}
+\caption{We plot the precentage error $\beta$ between the estimated 
+predicted visibilities and the true predicted visibilities for different SNR values as a function of the number of antennas in the array $N$. The graph presented here was generated using the first experimental setup in Table~\ref{tab:ch_parm}.}
 \label{fig:prec_error}
 \end{figure}
 
