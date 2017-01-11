@@ -1180,10 +1180,10 @@ have plotted with a black dotted line.
 
 \subsection{Comparison}
 \label{sec:comparison}
-We are now in a position to make a final comparison between the ADI and PCG methods. One inversion using the ADI method is very cheap, while one inverse using PCG is more expensive. On the other side of the coin,  one inversion with PCG is much more 
-accurate than one inversion with ADI. The question is now, if the inverse using the PCG method is much more accurate will the LM implementation using it require much less LM-iterations than its ADI counterpart. Moreover, will the number 
-of LM iterations PCG require be so few that it manages to beat the ADI approach in any case. To answer this we first need to compute the number of iterations $k$; ADI-LM can make in the 
-same time it takes one single PCG-LM iteration to execute. We can compute this with
+We are now in a position to make a final comparison between the ADI and PCG methods. Inverting $\bH$ by assuming it is a diagonal matrix (i.e. using the ADI method) is very cheap, while inverting $\bH$ using PCG is more expensive. On the other side of the coin,  one inversion with PCG is much more 
+accurate than using the approximate inverse which is associated with the ADI method. The question is now, if the inverse using the PCG method is much more accurate will the LM implementation using it require much less LM-iterations than its ADI counterpart. Moreover, will the number 
+of LM iterations PCG require be so few that it manages to beat the ADI method after all. To answer this we first need to compute the number of iterations, $k$, the LM implementation associated with the ADI method can make in the 
+same time it takes the LM implementation associated with the PCG method to perform a single iteration. We can compute this with
 \begin{align}
 \label{eq:k}
  kP &\approx P^{1.7}, & k &\approx P^{0.7}.
@@ -1198,14 +1198,23 @@ full inverse is not enough to exceed $k$.
 % V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
 \subfigure[Difference between ADI and PCG.]{\includegraphics[width=0.47\textwidth]{./diff.pdf}\label{fig:diff}}
 \caption{The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}. In the left panel we have the number of LM iterations 
-that is required for the LM algorithm using the ADI (green and blue curve) and the PCG (magenta and red curve) methods to converge to a parameter convergence criteria of 1e-6 whilst using different 
-SNR values as a function of number of antennas $N$ in the array. In the right panel we have the average amount of LM iterations (difference between the ADI and PCG curves in the left panel) we save (green and blue curve) by computing the full-inverse with the PCG method whilst using different SNR values.
-The black curve is associated with $k$ (see Eq.~\eqref{eq:k}). Clearly we do not save enough iterations using the full-inverse of $\bmH$ for the PCG method to outperform the ADI method.
+that is required for the LM algorithm using the ADI (green and blue curve) and the PCG (magenta and red curve) methods to converge to a parameter error tolerance of 1e-6 whilst using different 
+SNR values as a function of the number of antennas $N$ in the array. In the right panel we have the average amount of LM iterations (difference between the ADI and PCG curves in the left panel) we save (green and blue curve) by computing the full-inverse with the PCG method whilst using different SNR values.
+The black curve is associated with $k$, the number of iterations the LM implementation using the ADI method can perform in the same time it takes the LM implementation using 
+the PCG method to perform one iteration.
 \label{fig:out_diff}} 
 \end{figure*}
 
 \section{Conclusion}
-Hallo
+In Section~\ref{sec:} we showed that instead of using the traditional phase-and-amplitude approach to perform redundant calibration we can actually use a purely complex
+framework. In this framework the unknown variables and their conjugates are treated as independent variables that have to be estimated. We have also 
+proposed to use the LM algorithm, instead of the GN algorithm, to perform the actual parameter estimation within this complex framework. The LM algorithm exhibits better convergence properties than the 
+GN algorithm. This has the immediate consequence that the amount of algorithmic layers that are needed to perform redundant calibration are reduced.
+Them most expensive operation associated with the LM algorithm (as well as the GN algorithm) is the inversion of $\bH$.
+We also compared the computational complexity of two previously proposed algorithms to efficiently invert $\bH$ for the redundant calibration use case, namely 
+ADI and PCG. We showed that the computational complexity of the ADI method is $\mathbb{O}(P)$, while the computational complexity of the PCG method is asymptotically bounded
+by $\mathbb{O}(P^2)$. Both of these algorithms perform much better than stock standard inversion, which has a computational complexity of $\mathbb{O}(P^3)$.
+Although the ADI method does execute faster than the PCG method it is less robust as it 
 
 
 
