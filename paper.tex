@@ -838,20 +838,25 @@ Eq.~\eqref{eq:GN_update} we see that the most expensive operation used by the GN
 way of speeding up the algorithm is to investigate whether we can do this inversion in some efficient way.
 
 Two recent algorithms have been proposed that are able to invert $\bH$ in an efficient manner, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. 
-We restrict ourselves to comparing the most 
-expensive operation of the two methods namely, computing the inverse of the Hessian $\bH$ (or modified Hessian $\bmH$ in the case of LM). It becomes trivial to rate these two 
-algorithms relative to each other once the computational complexity of the inverse operation is known. The simulations we performed to compare these two 
+Note that here we focus solely on comparing the computational complexity of inverting $\bH$ using either one of these two methods. Rating the LM or GN algorithms
+using one of these approaches relative to each other once the computation complexity of inverting $\bH$ is known is trivial. The simulations we performed to compare these two 
 methods are summarized in Section~\ref{sec:simulations}.
 
-The basic difference between these two algorithms can be understood by inspecting Fig.~\ref{fig:hessian}. The first observation we can make by inspecting 
+%We restrict ourselves to comparing the most 
+%expensive operation of the two methods namely, computing the inverse of the Hessian $\bH$ (or modified Hessian $\bmH$ in the case of LM). It becomes trivial to rate these two 
+%algorithms relative to each other once the computational complexity of the inverse operation is known. 
+
+The basic difference between these two speedup algorithms can be understood by inspecting Fig.~\ref{fig:hessian}. The first observation we can make by inspecting 
 Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the diagonal entries of the Hessians are more significant than the off-diagonal entries.
-It therefore makes sense to approximate the Hessian (or the modified Hessian) with its diagonal, which greatly simplifies the computational complexity of inverting 
-the Hessian, i.e. it becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
+It therefore makes sense to approximate the $\bH$ (or the modified Hessian $\bmH$) with its diagonal, which greatly simplifies the computational complexity of inverting 
+$\bH$, i.e. it becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
 the diagonal is not included in this estimate.} \citep{Smirnov2015}. This diagonal-approximation approach is effectively ADI \citep{Marthi2014}. The exact details of this 
-approach is discussed in Section~\ref{sec:adi}. We will also show how \citet{Marthi2014}, \citet{Smirnov2015} and \citet{Salvini2014} relate to each other in that same section. In Appendix~\ref{sec:sbc} we briefly summarize the ADI method that is used for skymodel-based calibration.
+approach is discussed in Section~\ref{sec:adi}. We will also show how \citet{Marthi2014}, \citet{Smirnov2015} and \citet{Salvini2014} relate to each other in that same section. It should be noted that the ADI method actually refers to the complete LM update step using the approximate $\bH$ and not just 
+to the inversion of the approximate $\bH$. Furhtermore, the name ADI also implies that with this algorithm we alternate between computing the 
+gains, their conjugates and the true observed visibilities. %In Appendix~\ref{sec:sbc} we briefly summarize the ADI method that is used for skymodel-based calibration.
 
 The second observation we can make from Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the Hessians contain many zero entries, i.e. they are sparse matrices. This, in conjunction with the more significant diagonal entries observation, implies that the PCG method (presented in Section~\ref{sec:conj_grad}) 
-can be applied to invert them in a computationally efficient manner. \citet{Liu2010} proposed the PCG method to compute the inverse of the Hessian, however the computational complexity of this approach was not analyzed therein.  
+can be applied to invert them in a computationally efficient manner. \citet{Liu2010} proposed the PCG method to compute the inverse of $\bH$, however the computational complexity of this approach was not analyzed therein.  
 In Section~\ref{sec:pcg}, we do a proper computational complexity analysis of PCG. We find that the computational complexity of PCG is asymptotically bounded by $\mathbb{O}(P^2)$, which is 
 a lot better than straightforward inversion which takes $\mathbb{O}(P^3)$. 
 
@@ -955,10 +960,12 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \subsection{Alternating Direction Implicit Method}
 \label{sec:adi}
 %In Section~\ref{sec:adi} we show how the ADI method used for skymodel-based calibration relates to the redundant ADI method presented in \citet{Marthi2014}. 
-In this section we re-derive the ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
+
+We start this section by briefly reviewing the ADI method as it pertains to skymodel-based calibration in Section~\ref{sec:sbc} \citep{Salvini2014,Smirnov2015}.
+In Section~\ref{sec:red_c} we re-derive the redundant calibration ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
 objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
 We will use the diagonal-approximate approach proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
-\textsc{StEfCal} \citep{Salvini2014}. Perusing through Appendix~\ref{sec:sbc} is advised before continuing this section.
+\textsc{StEfCal} \citep{Salvini2014}. 
 
 \subsubsection{Skymodel-based Calibration}
 \label{sec:sbc}
@@ -969,8 +976,9 @@ the convergence of the algorithm can be improved if for every even iteration the
 \textsc{StEFCal} lowers the computational complexity of normal skymodel-based calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$. 
 
 \citet{Smirnov2015} recently showed that one can also derive \textsc{StEFCal} by viewing normal skymodel-based calibration as a complex optimization problem.
-As in the redundant use case depicted in Fig.~\ref{fig:hessian}, when we inspect the skymodel-based $\bH$ it becomes apparent that its diagonal entries are much more significant than its off-diagonal entries.
-By approximating $\bH$ by its diagonal and substituting this approximate Hessian $\widetilde{\bH}$ back into the fundamental skymodel-based LM update step we obtain \citep{Smirnov2015} 
+They realized while inspecting the skymodel-based $\bH$ that its diagonal entries are much more significant than its off-diagonal entries.
+As we mention in Section~\ref{sec:results}, the exact same conclusion can be reached if we inspect the Hessian $\bH$ that is associated with redundant calibration (see Fig.~\ref{fig:hessian}). 
+By approximating the skymodel-based $\bH$ by its diagonal and substituting this approximate Hessian $\widetilde{\bH}$ back into the fundamental skymodel-based LM update step we obtain \citep{Smirnov2015} 
 \begin{align}
 \breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k,\label{eq:stef_lambda}\\
  &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, \label{eq:stef_alpha}  
@@ -989,7 +997,9 @@ Note that in Eq.~\eqref{eq:one_half} the influence that the estimate of the para
 in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Note the similarity between the last terms of Eq.~\eqref{eq:stef_alpha} and Eq.~\eqref{eq:one_half} when $\alpha$ is a half.
 
 \subsubsection{Redundant Calibration}
-As we mention in Section~\ref{sec:results}, inspecting Fig.~\ref{fig:hessian} (also see Eq.~\eqref{eq:red_H}) reveals that in the case of redundant calibration the Hessian's diagonal entries are more significant than its off-diagonal entries.
+\label{sec:red_c}
+Since the diagonal entries of the $\bH$ associated with redundant calibration are more significant than its off-diagonal entries it makes 
+sense to try and approximate it with its diagonal (see Fig.~\ref{fig:hessian} and Eq.~\eqref{eq:red_H}).
 If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ (by its diagonal approximation) and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
 \begin{equation}
 \label{eq:appr_GN}
@@ -1024,15 +1034,15 @@ y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq
 \end{equation}
 The computational complexity of inverting $\widetilde{\bH}$ is $\mathbb{O}(P)$.
 
-Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Als note that Eq.~\eqref{eq:g_update} is the fundamental
+Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Also note that Eq.~\eqref{eq:g_update} is the fundamental
 gain estimator associated with \textsc{StEfCal}. We have therefore successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the ADI method presented in 
-\citet{Marthi2014} and in doing so we have shown that the algorithm in \citet{Marthi2014} is actually redundant StEfCal. We could also have shown this by using a similar approach 
-to the one presented in \citet{Salvini2014}.
+\citet{Marthi2014} and in doing so we have shown that the algorithm in \citet{Marthi2014} is actually redundant StEfCal. We could also have shown this by using the alternating approach 
+presented in \citet{Salvini2014}; which explains why, in this paper, we have been referring to the algorithm presented in \citet{Marthi2014} as the ADI method.
 
 The question now arises what value should we use for $\alpha$? In \citet{Marthi2014}, they propose 
 $\alpha = 0.3$. Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
 venture a clever guess by studying what the choice of $\alpha$ is in the case of skymodel-based \textsc{StEFCal}. The value of $\alpha$ is equal to a half 
-in the case of \textsc{StEFCal} (for even iterations); see Appendix~\ref{sec:sbc}. If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
+in the case of \textsc{StEFCal} (for even iterations); see Section~\ref{sec:sbc}. If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
 We used $\lambda$ equal to two in this paper.
 
 Optimality results of ADI were presented in \citet{Marthi2014}. We do not repeat their analysis here. We however, do present our own ADI results in Fig.~\ref{fig:prec_error} that confirm that the
