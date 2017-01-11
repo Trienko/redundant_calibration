@@ -1214,7 +1214,8 @@ Them most expensive operation associated with the LM algorithm (as well as the G
 We also compared the computational complexity of two previously proposed algorithms to efficiently invert $\bH$ for the redundant calibration use case, namely 
 ADI and PCG. We showed that the computational complexity of the ADI method is $\mathbb{O}(P)$, while the computational complexity of the PCG method is asymptotically bounded
 by $\mathbb{O}(P^2)$. Both of these algorithms perform much better than stock standard inversion, which has a computational complexity of $\mathbb{O}(P^3)$.
-Although the ADI method does execute faster than the PCG method it is less robust as it 
+Although the ADI method does execute faster than the PCG method it is far less robust as it would be less straightforward to apply to other calibration uses cases. The reason being,
+the diagonal approximation we make with might not be accurate
 
 
 
