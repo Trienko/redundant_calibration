@@ -833,7 +833,12 @@ Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we 
 
 \section{Results}
 \label{sec:results}
-In this section we compare the computational complexity of two newly proposed speedup algorithms for redundant calibration, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. We restrict ourselves to comparing the most 
+In the previous section we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
+Eq.~\eqref{eq:GN_update} we see that the most expensive operation used by the GN and LM algorithms is the inversion of the Hessian $\bH$. The most logical 
+way of speeding up the algorithm is to investigate whether we can do this inversion in some efficient way.
+
+Two recent algorithms have been proposed that are able to invert $\bH$ in an efficient manner, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. 
+We restrict ourselves to comparing the most 
 expensive operation of the two methods namely, computing the inverse of the Hessian $\bH$ (or modified Hessian $\bmH$ in the case of LM). It becomes trivial to rate these two 
 algorithms relative to each other once the computational complexity of the inverse operation is known. The simulations we performed to compare these two 
 methods are summarized in Section~\ref{sec:simulations}.
@@ -955,6 +960,35 @@ objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result 
 We will use the diagonal-approximate approach proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
 \textsc{StEfCal} \citep{Salvini2014}. Perusing through Appendix~\ref{sec:sbc} is advised before continuing this section.
 
+\subsubsection{Skymodel-based Calibration}
+\label{sec:sbc}
+\textsc{StEFCal} is an alternating direction implicit method, in which the measurement equation, Eq.~\eqref{eq:vis_definition}, is linearized by assuming that the gains are known, but
+that their conjugates are unknown \citep{Mitchell:MWA-cal,Salvini2014}. Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
+is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative new parameter estimation step. \cite{Salvini2014} also show that
+the convergence of the algorithm can be improved if for every even iteration the basic new parameter estimation step is modified as follows: the current gain estimate is replaced by the average of the current gain estimate and the gain estimate of the previous odd iteration.
+\textsc{StEFCal} lowers the computational complexity of normal skymodel-based calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$. 
+
+\citet{Smirnov2015} recently showed that one can also derive \textsc{StEFCal} by viewing normal skymodel-based calibration as a complex optimization problem.
+As in the redundant use case depicted in Fig.~\ref{fig:hessian}, when we inspect the skymodel-based $\bH$ it becomes apparent that its diagonal entries are much more significant than its off-diagonal entries.
+By approximating $\bH$ by its diagonal and substituting this approximate Hessian $\widetilde{\bH}$ back into the fundamental skymodel-based LM update step we obtain \citep{Smirnov2015} 
+\begin{align}
+\breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k,\label{eq:stef_lambda}\\
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, \label{eq:stef_alpha}  
+\end{align}
+
+If we choose $\lambda$ to be zero, which corresponds to an $\alpha$ equal to one, we obtain the new parameter estimation step of \textsc{StEfCal}; used during odd iterations. On the other hand if we choose $\lambda$ equal to one, which corresponds
+to an $\alpha$ equal to a half, we obtain the new parameter estimation step of \textsc{StEfCal}; used during even iterations. 
+
+Furthermore, the simplified skymodel-based GN equivalent of Eq.~\eqref{eq:two_thrids} is equal to
+\citep{Smirnov2015}
+\begin{equation}
+\label{eq:one_half}
+\breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}. 
+\end{equation}
+Note that in Eq.~\eqref{eq:one_half} the influence that the estimate of the parameters from the previous iteration has on the current iteration is scaled by a half, while
+in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Note the similarity between the last terms of Eq.~\eqref{eq:stef_alpha} and Eq.~\eqref{eq:one_half} when $\alpha$ is a half.
+
+\subsubsection{Redundant Calibration}
 As we mention in Section~\ref{sec:results}, inspecting Fig.~\ref{fig:hessian} (also see Eq.~\eqref{eq:red_H}) reveals that in the case of redundant calibration the Hessian's diagonal entries are more significant than its off-diagonal entries.
 If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ (by its diagonal approximation) and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
 \begin{equation}
@@ -1402,33 +1436,6 @@ Eq.~\eqref{eq:LINCAL_update} is used to iteratively determine a new estimate of 
 \end{equation}
 Note that we do not explicitly denote the $k$ index in Eq.~\eqref{eq:LINCAL_update}. We update our parameter vector until convergence is reached.   
 
-\section{Skymodel-based Calibration}
-\label{sec:sbc}
-\textsc{StEFCal} is an alternating direction implicit method, in which the measurement equation, Eq.~\eqref{eq:vis_definition}, is linearized by assuming that the gains are known, but
-that their conjugates are unknown \citep{Mitchell:MWA-cal,Salvini2014}. Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
-is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative new parameter estimation step. \cite{Salvini2014} also show that
-the convergence of the algorithm can be improved if for every even iteration the basic new parameter estimation step is modified as follows: the current gain estimate is replaced by the average of the current gain estimate and the gain estimate of the previous odd iteration.
-\textsc{StEFCal} lowers the computational complexity of normal skymodel-based calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$. 
-
-\citet{Smirnov2015} recently showed that one can also derive \textsc{StEFCal} by viewing normal skymodel-based calibration as a complex optimization problem.
-As in the redundant use case depicted in Fig.~\ref{fig:hessian}, when we inspect the skymodel-based $\bH$ it becomes apparent that its diagonal entries are much more significant than its off-diagonal entries.
-By approximating $\bH$ by its diagonal and substituting this approximate Hessian $\widetilde{\bH}$ back into the fundamental skymodel-based LM update step we obtain \citep{Smirnov2015} 
-\begin{align}
-\breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k,\label{eq:stef_lambda}\\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, \label{eq:stef_alpha}  
-\end{align}
-
-If we choose $\lambda$ to be zero, which corresponds to an $\alpha$ equal to one, we obtain the new parameter estimation step of \textsc{StEfCal}; used during odd iterations. On the other hand if we choose $\lambda$ equal to one, which corresponds
-to an $\alpha$ equal to a half, we obtain the new parameter estimation step of \textsc{StEfCal}; used during even iterations. 
-
-Furthermore, the simplified skymodel-based GN equivalent of Eq.~\eqref{eq:two_thrids} is equal to
-\citep{Smirnov2015}
-\begin{equation}
-\label{eq:one_half}
-\breve{\bg}_{k+1} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\bd} + \frac{1}{2}\breve{\bg}_{k}. 
-\end{equation}
-Note that in Eq.~\eqref{eq:one_half} the influence that the estimate of the parameters from the previous iteration has on the current iteration is scaled by a half, while
-in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Note the similarity between the last terms of Eq.~\eqref{eq:stef_alpha} and Eq.~\eqref{eq:one_half} when $\alpha$ is a half.
 
 \label{lastpage}
 \end{document}
