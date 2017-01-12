@@ -562,6 +562,7 @@ is applied between the different timeslots and channels. The reader interested i
 Moreover, we do not explicitly deal with any of the degeneracies normally associated with redundant calibration \citep{Zheng2014,Kurien2016}. Similar to the approach taken in \citep{Marthi2014}, we assume that the degeneracies present in the redundant calibration solutions are removed with a final round of skymodel-based calibration.
 
 \section{Redundant Calibration}
+\label{sec:main_sec}
 As discussed in Section~\ref{sec:ls}, we can solve Eq.~\eqref{eq:least_squares_red} in one of two ways. We can split the problem into its real and
 imaginary parts and then solve for the real and imaginary parts of the parameters seperately or we can employ the notion of Wirtinger derivatives. The former 
 approach is discussed in Section~\ref{sec:ri}, while the latter approach is described in detail in Section~\ref{sec:w}. 
@@ -610,6 +611,7 @@ $\bv$ becomes analytic in $\bz$ and $\conj{\bz}$ as a whole \citep{Smirnov2015}.
 and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
 
 \subsubsection{Complex GN and LM}
+\label{sec:complex_GN_LM}
 In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
 \begin{equation}
 \label{eq:Jacobian}
@@ -1206,34 +1208,26 @@ the PCG method to perform one iteration.
 \end{figure*}
 
 \section{Conclusion}
-In Section~\ref{sec:} we showed that instead of using the traditional phase-and-amplitude approach to perform redundant calibration we can actually use a purely complex
-framework. In this framework the unknown variables and their conjugates are treated as independent variables that have to be estimated. We have also 
-proposed to use the LM algorithm, instead of the GN algorithm, to perform the actual parameter estimation within this complex framework. The LM algorithm exhibits better convergence properties than the 
+In Section~\ref{sec:main_sec} we showed that instead of using the traditional phase-and-amplitude approach to perform redundant calibration we can actually use a purely complex
+framework. In this framework the unknown variables and their conjugates are treated as independent variables that have to be estimated. 
+We then derived the GN and LM update steps associated with this complex framework (see Section~\ref{sec:complex_GN_LM}). In this paper we focused more on the LM algorithm than on the GN algorithm. The LM algorithm exhibits better convergence properties than the 
 GN algorithm. This has the immediate consequence that the amount of algorithmic layers that are needed to perform redundant calibration are reduced.
-Them most expensive operation associated with the LM algorithm (as well as the GN algorithm) is the inversion of $\bH$.
-We also compared the computational complexity of two previously proposed algorithms to efficiently invert $\bH$ for the redundant calibration use case, namely 
-ADI and PCG. We showed that the computational complexity of the ADI method is $\mathbb{O}(P)$, while the computational complexity of the PCG method is asymptotically bounded
+
+The most expensive operation associated with the LM algorithm (as well as the GN algorithm) is the inversion of $\bH$.
+We compared the computational complexity of two previously proposed algorithms to efficiently invert $\bH$ for the redundant calibration use case in Section~\ref{sec:results}, namely 
+ADI \citep{Marthi2014} and PCG \citep{Liu2010}. We showed that the computational complexity of the ADI method is $\mathbb{O}(P)$, while the computational complexity of the PCG method is asymptotically bounded
 by $\mathbb{O}(P^2)$. Both of these algorithms perform much better than stock standard inversion, which has a computational complexity of $\mathbb{O}(P^3)$.
 Although the ADI method does execute faster than the PCG method it is far less robust as it would be less straightforward to apply to other calibration uses cases. The reason being,
-the diagonal approximation we make with might not be accurate
+the diagonal approximation we make with ADI might not be accurate enough in general.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Lastly, we showed how \citet{Marthi2014}, \citet{Salvini2014} and \citet{Smirnov2015} relate to each other (see Section~\ref{sec:red_c}). The ADI method associated with skymodel-based calibration (i.e. \textsc{StEfCal}) is presented
+in \citet{Salvini2014}. \citet{Smirnov2015} showed that it is possible to rederive this skymodel-based ADI method through complex optimization. In particular, they showed that if 
+we approximate the $\bH$ associated with the LM algorithm with its diagonal then we can rederive the ADI update rules presented in \citet{Salvini2014}. 
+\citet{Marthi2014} applied the ADI method to the redundant use case. This fact is not immediatly clear when inspecting \citet{Marthi2014}. The ADI update rules presented \citet{Marthi2014} were derived by taking the partial derivatives of 
+the objective function towards the unknown parameters, setting the intermediate results to zero and then solving for the unknowns. In this paper we show that 
+these same ADI update rules can be derived using the diagonal approximation technique proposed in \citet{Smirnov2015}. The fact that we can use this diagonal approximation
+technique to derive these update rules imply that the algorithm presented in \citet{Marthi2014} is in fact the ADI method (i.e. redundant \textsc{StEfCal}). This same
+fact can be established by directly applying the skymodel-based ADI derivation presented in \citet{Salvini2014} to the redundant use case.
 
 % fiducial initial guess 
 % 
