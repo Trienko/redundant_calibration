@@ -156,23 +156,29 @@ of the solution.
 
 New instruments like LOFAR (Low Frequency Array) \citep{Noorishad2012}, PAPER (Precision Array for Probing the Epoch of Reionization) \citep{Ali2015} and HERA (Hydrogen Epoch of Reionization Array) \citep{deboer2015} have also recently sparked a renewed interest in redundant calibration. Using redundancy is especially advantageous when we are trying to detect the EoR (Epoch of Reionization) 21 cm signal,
 which is inherently quite faint \citep{Parsons2012}. Since redundant baselines make statistically independent measurements of the same $uv$-modes redundancy can greatly 
-improve the SNR (signal-to-noise ratio) of EoR detection experiments. This explains why PAPER and HERA, are highly redundant arrays, as they are both primarily used to detect the EoR 21 cm signal.
+improve the SNR (signal-to-noise ratio) of EoR detection experiments. This explains why PAPER and HERA, are highly redundant arrays, as they are both primarily used for EoR 21 cm detection experiments.
 
 \noindent
 \textbf{[GIANNI TO REWRITE AND EXTEND EOR SECTION]}
 
 Two ways of speeding up redundant calibration have also been proposed recently. The first technique makes use of the ADI method, in which we alternate between solving the gains, their conjugates and 
-the true observed visibilities \citep{Wijnholds2012,Marthi2014}. The second is to use the preconditioned conjugate gradient (PCG) method. PCG allows us to exploit the sparsity inherent in the redundant calibration problem, 
+the true observed visibilities \citep{Wijnholds2012,Marthi2014}. Note that the fact that \citet{Marthi2014} is making use of the ADI method is not immediately clear
+from the paper itself. We will elaborate on this later on in the paper (see Section~\ref{sec:results}). The second is to use the preconditioned conjugate gradient (PCG) method. PCG allows us to exploit the sparsity inherent in the redundant calibration problem, 
 to speed it up \citep{Liu2010}. A proper comparison between these two approaches has not been done before.
 
 In this paper we propose to use the complex framework introduced by \citet{Smirnov2015} instead of the traditional amplitude-and-phase approach used by \textsc{lincal}.
 We also propose to use the Levenberg-Marquardt (LM) gradient-based algorithm instead of the Gauss-Newton (GN) algorithm as it exhibits better convergence properties.
 Using the LM algorithm, reduces the number of algorithmic layers that are needed to perform redundant calibration. 
 We also compare two recent redundant calibration speedup algorithms with each other, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. In this paper, we decided to mainly focus on the complex framework proposed by \citet{Smirnov2015} rather than the traditional phase-and-amplitude approach as it 
-allows us to trivially prove that the ADI method proposed by \citep{Marthi2014} is merely a special case of the more general LM algorithm. Moreover, this framework also 
-allows us to show that the ADI method proposed by \citep{Marthi2014} can for all intents and purposes be renamed to redundant \textsc{StEfCal} \citep{Mitchell:MWA-cal,Salvini2014}. 
+allows us to trivially prove that the ADI method proposed by \citep{Marthi2014} is merely a special case of the more general LM algorithm. 
 
-ADD SUMMARY PARAGRAPH WHICH DEPENDS ON PAPER LAYOUT
+%Moreover, this framework also 
+%allows us to show that the ADI method proposed by \citep{Marthi2014} can for all intents and purposes be renamed to redundant \textsc{StEfCal} \citep{Mitchell:MWA-cal,Salvini2014}. 
+
+We start the paper by presenting some useful preliminaries in Section~\ref{sec:preliminaries}. In Section~\ref{sec:p_statement}, we formulate redundant calibration 
+as a least squares problem, i.e. Eq~\eqref{eq:least_squares_red}. In Section~\ref{sec:main_sec}, we use the complex framework proposed by \citet{Smirnov2015} to derive a numerical
+algorithm (see Eq.~\eqref{eq:GN_update} to Eq.~\eqref{eq:update}), which we can use to solve Eq~\eqref{eq:least_squares_red}. In Section~\ref{sec:results}, we compare the computational complexity of two recently proposed redundant calibration speedup algorithms with one another.
+We end the paper with some final conclusions.
 
 % Main contributions of the paper:
 % 
@@ -235,7 +241,8 @@ ADD SUMMARY PARAGRAPH WHICH DEPENDS ON PAPER LAYOUT
 %  We
  
 \section{Preliminaries}
-There are two major pre-existing algorithms we use throughout this paper, namely the Conjugate Gradient (CG) method and least-squares parameter estimation.
+\label{sec:preliminaries}
+There are two major pre-existing algorithms we use throughout this paper, namely the Conjugate Gradient (CG) method and the least-squares solver.
 We respectively discuss the CG method and least-squares in Section~\ref{sec:conj_grad} and Section~\ref{sec:ls}.
 
 \subsection{Conjugate Gradient Method}
@@ -262,12 +269,12 @@ The iterative CG method is presented in Algorithm \ref{algo:CG}.
 \State $\delta_{\textrm{new}} \gets \br^H\br$
 \State $\delta_0 \gets \delta_{\textrm{new}}$
 \While{$k\leq k_{\textrm{max}}$ and $\delta_{\textrm{new}} > \epsilon^2\delta_0$}
-\State $\alpha_k \gets \frac{\delta_{\textrm{new}}}{\bp^H\bA\bp}$
-\State $\bx \gets \bx + \alpha_k\bp$
+\State $\alpha \gets \frac{\delta_{\textrm{new}}}{\bp^H\bA\bp}$
+\State $\bx \gets \bx + \alpha\bp$
 \State $\br \gets \br - \alpha\bA\bp$
 \State $\delta_{\textrm{old}} \gets \delta_{\textrm{new}}$ 
 \State $\delta_{\textrm{new}} \gets \br^H\br$
-\State $\beta_{k} \gets \frac{\delta_{\textrm{new}}}{\delta_{\textrm{old}}}$
+\State $\beta \gets \frac{\delta_{\textrm{new}}}{\delta_{\textrm{old}}}$
 \State $\bp \gets \br + \beta\bp$
 \State $k \gets k + 1$
 \EndWhile
@@ -301,7 +308,7 @@ We can now indirectly solve for $\bx$ by using
 \bM^{-1}\bA\bx = \bM^{-1}\bb.
 \end{equation}
 If $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e. a good preconditioner lowers the condition number of a matrix which in turn increases the convergence speed 
-of CG (see Eq.~\eqref{eq:cg_bound}). The best possible choice of $\bM$ would therefore be $\bA$, which would lead to $\kappa$ becoming unity (as the largest and smallest eigenvalue of the Identity matrix is equal to one).
+of CG (see Eq.~\eqref{eq:cg_bound}). In this paper, we denote matrix inversion with $(*)^{-1}$. The best possible choice of $\bM$ would therefore be $\bA$, which would lead to $\kappa$ becoming unity (as the largest and smallest eigenvalue of the Identity matrix is equal to one).
 If $\kappa$ is one then Eq.~\eqref{eq:cg_bound} simplifies and becomes $\mathbb{O}(m)$. However, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
 In short, a good preconditioner $\bM$ must approximate $\bA$ fairly accurately. However, if it is not much less expensive to 
 compute the inverse of $\bM$ than that of $\bA$ we actually gain nothing (see Eq.~\eqref{eq:prec}).  
@@ -362,7 +369,7 @@ where $\Lambda$ is known as the objective function, $\brho$ is the residual vect
 In Eq.~\eqref{eq:least_squares}, we assume that the optimization problem is real valued.
 The main objective of least squares is to find the model-parameters which minimizes the squared difference between the observed data and the model-predicted data.
 
-The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: Gauss-Newton and Levenberg-Marquardt \citep{Levenberg1944,Marquardt1963}. 
+The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient type of minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}. 
 The GN update step is defined as
 \begin{equation}
  \Delta \bzeta = (\bJ^T\bJ)^{-1} \bJ^T\brho,
@@ -372,8 +379,8 @@ while the LM update takes the following form
  \Delta \bzeta = (\bJ^T\bJ+\lambda\bD)^{-1} \bJ^T\brho,
 \end{equation}
 where $\bJ$ is the Jacobian matrix (i.e. the derivative of the model $\bnu$ with respect to the parameter vector $\bzeta$), $\lambda$ denotes the 
-damping factor, while $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper we respectively denote 
-matrix transposition and matrix inversion with $(*)^T$ and $(*)^{-1}$.
+damping factor, while $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper, we denote 
+matrix transposition with $(*)^T$.
 These update steps can be used in an iterative manner to determine new estimates of $\bzeta$.
 
 The gradient based minimization algorithms that are generally used to solve least squares problems (i.e. GN and LM) generally require the model $\bnu$ to be differentiable
@@ -397,9 +404,10 @@ Using the above definitions we can now easily compute the following:
 In this alternative approach we treat the complex parameters and their conjugates as separate parameters.
 
 \section{Problem Statement}
+\label{sec:p_statement}
 In Section~\ref{sec:s_mes}, we present the scalar measurement equation. Next, we define some indexing functions in Section~\ref{sec:indexing}. The measurement 
 equation and the indexing functions from Section~\ref{sec:indexing} are then used in Section~\ref{sec:r_mes} to phrase redundant calibration as a least-squares problem, i.e. Eq.~\eqref{eq:least_squares_red}.
-We present the Signal-to-noise ratio (SNR) definition we used in this paper in Section\ref{sec:snr}. The general scope and limitations of this paper is discussed in Section~\ref{sec:scope}.
+We present the Signal-to-noise ratio (SNR) definition we used in this paper in Section~\ref{sec:snr}. The limitations of this paper are discussed in Section~\ref{sec:scope}.
 
 \subsection{Scalar Measurement Equation}
 \label{sec:s_mes}
@@ -439,8 +447,7 @@ We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.
 We denote the number of baselines in the array with $B$, i.e. $B = \frac{N^2-N}{2}$.
 
 Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
-The aforementioned fact allows us to group all the redundant baselines in a redundant array into the same redundant baseline group. When our array 
-is a redundant array we therefore only require single index values for each redundant baseline group, instead of a unique single index label for 
+Let us now group all the baselines that measure the same $uv$-modes in a redundant array into the same redundant baseline group. Assigning the baselines of a redundant array to redundant baseline groups has the advantage that it reduces the number of single index values we require. We now only require single index values for each redundant baseline group, instead of a unique single index label for 
 each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
 $\phi_{pq} = 0$ if $p>q$. We can also define the following symmetric variant of $\phi_{pq}$:
 \begin{equation}
@@ -494,7 +501,7 @@ and
 \begin{cases}
 q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
 0~\textrm{otherwise}
-\end{cases}
+\end{cases}.
 \end{equation}
 We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline group index are known, while we use $\psi_{ij}$ to obtain 
 a similar result: the second antenna index of the composite antenna pair. %\textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
@@ -558,9 +565,9 @@ The following SNR definition is used in this paper
 \label{}
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}}, 
 \end{equation}
-where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baselines and $\odot$ denotes the Hadamard product. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
+where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baselines. The definition we use here is based on the SNR definitions used in \citet{Liu2010} and \citet{Marthi2014}.
 
-\subsection{Paper Scope}
+\subsection{Limitations}
 \label{sec:scope}
 We only deal with per-timeslot and frequency channel calibration. No solution smoothing  
 is applied between the different timeslots and channels. The reader interested in this is referred to \citep{Zheng2014}. 
@@ -583,12 +590,14 @@ The aforementioned is achieved by first rewriting Eq.~\eqref{eq:least_squares_re
 \label{eq:least_squares_lincal}
 \min_{\bmath{\varrho}} \|\breve{\br}\| = \min_{\bmath{\varrho}} \|\breve{\bd} - \breve{\bv}(\bmath{\varrho})\|, 
 \end{equation}
-where $\breve{\bd} = [\bd^T,\conj{\bd}^T]^T$, $\breve{\bv} = [\bv^T,\conj{\bv}^T]$ and $\bmath{\varrho}$ is the phase and amplitude parameter vector which we define in Appendix~\ref{sec:lincal}. 
-With the aid of Eq.~\eqref{eq:least_squares_lincal} we can derive the \textsc{lincal} algorithm (see Appendix~\ref{sec:lincal}).
+where $\breve{\bd} = [\bd^T,\conj{\bd}^T]^T$, $\breve{\bv} = [\bv^T,\conj{\bv}^T]^T$ and $\bmath{\varrho}$ is the phase and amplitude parameter vector which we define in Appendix~\ref{sec:lincal}. 
+With the aid of Eq.~\eqref{eq:least_squares_lincal} we can derive the algorithm implemented in \textsc{lincal} (see Appendix~\ref{sec:lincal}).
 The Jacobian associated with Eq.~\eqref{eq:least_squares_lincal} is equal to Eq.~\eqref{eq:Jac_lin}. 
 At the hand of Appendix~\ref{sec:lincal} it becomes evident that \textsc{lincal} is equivalent to a basic GN update step \citep{Kurien2016}. 
-Therefore, a straightforward way of improving the convergence properties of stock standard \textsc{lincal} would be to simply add the LM damping factor to the basic \textsc{lincal} update step. 
-
+Therefore, a straightforward way of improving the convergence properties of stock standard \textsc{lincal} would be to simply add the LM damping factor to the basic \textsc{lincal} update step.
+In doing so the need to use $\textsc{logcal}$ before $\textsc{lincal}$ becomes superfluous. The use of $\textsc{logcal}$ may, however, still offer 
+a computational advantage, as it is a very fast method to obtain a good starting solution, and would reduce the number of iterations needed by the LM algorithm.
+Proper experiments would need to be conducted to determine whether it is worth keeping $\textsc{logcal}$ in the algorithmic hierarchy. 
 
 \subsection{Complex Framework}
 \label{sec:w}
@@ -617,7 +626,7 @@ and complex LM to Eq.~\eqref{eq:least_squares_complex}.
 
 \subsubsection{Complex GN and LM}
 \label{sec:complex_GN_LM}
-In this section we discuss how we can use the GN and LM algorithms to solve Eq.~\eqref{eq:least_squares_complex} (i.e. estimate $\breve{\bz}$). The complex Jacobian is defined to be
+The complex Jacobian is defined to be
 \begin{equation}
 \label{eq:Jacobian}
 \bJ = \begin{bmatrix}
@@ -652,6 +661,7 @@ We update our parameter vector by using Eq.~\eqref{eq:update} until convergence 
 Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
 \subsubsection{Analytic Expressions}
+\label{sec:analytic}
 If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:least_squares_complex} we obtain the following analytic result:
 \begin{equation}
 \label{eq:Jacobian_red}
@@ -735,7 +745,7 @@ where
 \begin{equation}
 [\bE]_{ij} = 
 \begin{cases}
- \sum_{pq \in \mathcal{PQ}_i} \left | g_p \right |^2 \left | g_q \right |^2  & \textrm{if} ~ i=j\\
+ \sum_{rs \in \mathcal{RS}_i} \left | g_r \right |^2 \left | g_s \right |^2  & \textrm{if} ~ i=j\\
  0 & \textrm{otherwise}
 \end{cases},
 \end{equation}
@@ -754,9 +764,9 @@ and
  0 & \textrm{otherwise}
 \end{cases}.
 \end{equation}
-Moreover, $(*)^T$ denotes matrix transposition and
+Moreover, 
 \begin{equation}
-\mathcal{PQ}_i = \left\{pq\in\mathbb{N}^2|(\phi_{pq} = i) \right\}.
+\mathcal{RS}_i = \left\{rs\in\mathbb{N}^2|(\phi_{rs} = i) \right\}.
 \end{equation}
 
 Furthermore, substituting Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\breve{\br}$ results in
@@ -771,7 +781,7 @@ Furthermore, substituting Eq.~\eqref{eq:Jacobian_red} into $\bJ^H\breve{\br}$ re
 where
 \begin{align}
 \label{eq:ab}
-\left [ \ba \right ]_i &= \sum_{k\neq i} g_k \widetilde{y}_{ik}r_{ik},  & \left [ \bb \right ]_i &= \sum_{pq\in\mathcal{PQ}_i}\conj{g}_p g_q r_{pq},
+\left [ \ba \right ]_i &= \sum_{k\neq i} g_k \widetilde{y}_{ik}r_{ik},  & \left [ \bb \right ]_i &= \sum_{rs\in\mathcal{RS}_i}\conj{g}_r g_s r_{rs},
 \end{align}
 and
 \begin{equation}
@@ -781,10 +791,8 @@ and
 y_{\zeta_{ik}} & \textrm{otherwise}
 \end{cases}.
 \end{equation}
-Moreover $\ba$ and $\bb$ are both column vectors.
-
-HAVE TO RECHECK THE ABOVE EQUATIONS DIRECTLY FROM THE CODE.
-DEFINED ALL OPERATORS AND SYMBOLS?
+Moreover $\ba$ and $\bb$ are both column vectors. The length of $\ba$ and $\bb$ is $N$ and $L$, respectively.
+The dimensions of the matrices we defined in this section are presented in Table~\ref{tab:matrix_dimensions}.
 
 % \begin{equation}
 % \boldsymbol{J}^H\breve{\boldsymbol{d}} = 
@@ -800,7 +808,36 @@ DEFINED ALL OPERATORS AND SYMBOLS?
 % \end{matrix}
 % \end{equation}
 
-
+\begin{table}
+\centering
+\caption{The dimensions of the matrices defined in Section~\ref{sec:analytic}.}
+\begin{tabular}{|c c|} 
+\hline
+Matrix & Dimension\\
+\hline
+\hline
+$\bJ$ & $2B \times P$ \\
+$\bM$ & $B \times (N+L)$ \\
+$\bN$ & $B \times (N+L)$ \\
+$\bO$ & $B \times N$ \\
+$\bP$ & $B \times L$ \\
+$\bQ$ & $B \times N$ \\
+$\bzero$ & $B \times L$ \\
+\hline
+\hline
+$\bH$ & $P\times P$\\
+$\bA$ & $(N+L)\times (N+L)$\\
+$\bB$ & $(N+L)\times (N+L)$\\
+$\bC$ & $N \times N$\\
+$\bD$ & $N \times L$\\
+$\bE$ & $L \times L$\\
+$\bF$ & $N \times N$\\
+$\bG$ & $N \times L$\\
+$\bzero$ & $L \times L$\\
+\hline
+\end{tabular}
+\label{tab:matrix_dimensions}
+\end{table}
 
 \subsubsection{Simplifying GN}
 
