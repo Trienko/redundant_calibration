@@ -74,6 +74,7 @@
 \newcommand{\bmJ}{\bmath{\mathcal{J}}}
 \newcommand{\bmH}{\bmath{\mathcal{H}}}
 \newcommand{\bzero}{\bmath{0}}
+\newcommand{\bone}{\bmath{1}}
 %\newcommand{\bvarrho}{\bmath{\varrho}}
 %\newcommand{\bnu}{\bmath{\nu}}
 %\newcommand{\bvarphi}{\bmath{\varphi}}
@@ -163,7 +164,7 @@ improve the SNR (signal-to-noise ratio) of EoR detection experiments. This expla
 
 Two ways of speeding up redundant calibration have also been proposed recently. The first technique makes use of the ADI method, in which we alternate between solving the gains, their conjugates and 
 the true observed visibilities \citep{Wijnholds2012,Marthi2014}. Note that the fact that \citet{Marthi2014} is making use of the ADI method is not immediately clear
-from the paper itself. We will elaborate on this later on in the paper (see Section~\ref{sec:results}). The second is to use the preconditioned conjugate gradient (PCG) method. PCG allows us to exploit the sparsity inherent in the redundant calibration problem, 
+from the paper itself. We will elaborate on this later on in Section~\ref{sec:adi}. The second is to use the preconditioned conjugate gradient (PCG) method. PCG allows us to exploit the sparsity inherent in the redundant calibration problem, 
 to speed it up \citep{Liu2010}. A proper comparison between these two approaches has not been done before.
 
 In this paper we propose to use the complex framework introduced by \citet{Smirnov2015} instead of the traditional amplitude-and-phase approach used by \textsc{lincal}.
@@ -877,13 +878,13 @@ Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we 
 
 \section{Results}
 \label{sec:results}
-In the previous section we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
-Eq.~\eqref{eq:GN_update} we see that the most expensive operation used by the GN and LM algorithms is the inversion of the Hessian $\bH$. The most logical 
+In Section~\ref{sec:main_sec} we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
+Eq.~\eqref{eq:LM_update} we see that the most expensive operation used by the GN and LM algorithms is the inversion of the Hessian $\bH$. The most logical 
 way of speeding up the algorithm is to investigate whether we can do this inversion in some efficient way.
 
 Two recent algorithms have been proposed that are able to invert $\bH$ in an efficient manner, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. 
 Note that here we focus solely on comparing the computational complexity of inverting $\bH$ using either one of these two methods. Rating the LM or GN algorithms
-using one of these approaches relative to each other once the computation complexity of inverting $\bH$ is known is trivial. The simulations we performed to compare these two 
+using one of these approaches relative to each other once the computational complexity of inverting $\bH$ is known is trivial. The simulations we performed to compare these two 
 methods are summarized in Section~\ref{sec:simulations}.
 
 %We restrict ourselves to comparing the most 
@@ -894,10 +895,12 @@ The basic difference between these two speedup algorithms can be understood by i
 Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the diagonal entries of the Hessians are more significant than the off-diagonal entries.
 It therefore makes sense to approximate the $\bH$ (or the modified Hessian $\bmH$) with its diagonal, which greatly simplifies the computational complexity of inverting 
 $\bH$, i.e. it becomes $\mathbb{O}(P)$\footnote{The cost of constructing 
-the diagonal is not included in this estimate.} \citep{Smirnov2015}. This diagonal-approximation approach is effectively ADI \citep{Marthi2014}. The exact details of this 
-approach is discussed in Section~\ref{sec:adi}. We will also show how \citet{Marthi2014}, \citet{Smirnov2015} and \citet{Salvini2014} relate to each other in that same section. It should be noted that the ADI method actually refers to the complete LM update step using the approximate $\bH$ and not just 
-to the inversion of the approximate $\bH$. Furhtermore, the name ADI also implies that with this algorithm we alternate between computing the 
-gains, their conjugates and the true observed visibilities. %In Appendix~\ref{sec:sbc} we briefly summarize the ADI method that is used for skymodel-based calibration.
+the diagonal is not included in this estimate.} \citep{Smirnov2015}. This diagonal-approximation approach is effectively ADI \citep{Marthi2014}. The exact details of why this 
+is the case is discussed in Section~\ref{sec:adi}. We will also show how \citet{Marthi2014}, \citet{Smirnov2015} and \citet{Salvini2014} relate to each other in that same section. It should be noted here that strictly speaking the ADI method actually refers to the complete LM update step using the approximate $\bH$ and not just 
+to the inversion of the approximate $\bH$. To improve the readability of the paper, we use the acronym ADI to refer to both the faster approximate inverse approach and the complete LM algorithm that uses it.
+Which one of these two concepts we are actually referring to, however, is always perfectly clear from the context.
+%Furhtermore, the name ADI also implies that with this algorithm we alternate between computing the 
+%gains, their conjugates and the true observed visibilities. %In Appendix~\ref{sec:sbc} we briefly summarize the ADI method that is used for skymodel-based calibration.
 
 The second observation we can make from Fig.~\ref{fig:hessian_reg} and Fig.~\ref{fig:hessian_hex} is that the Hessians contain many zero entries, i.e. they are sparse matrices. This, in conjunction with the more significant diagonal entries observation, implies that the PCG method (presented in Section~\ref{sec:conj_grad}) 
 can be applied to invert them in a computationally efficient manner. \citet{Liu2010} proposed the PCG method to compute the inverse of $\bH$, however the computational complexity of this approach was not analyzed therein.  
@@ -919,7 +922,7 @@ contain many zero-entries. Note that the location of the zero-entries are depend
 %the diagonal is not included in this estimate.}. 
 
 Even though the PCG method is computationally more expensive than the ADI method we can not arrive at a final conclusion at this point. With the ADI method 
-we only approximate the inverse of the Hessian, while in the case of the PCG method we compute the exact inverse. So the question arises whether the PCG method 
+we only approximate the inverse of the Hessian, while in the case of the PCG method we compute the exact inverse. So the question arises whether the LM algorithm using the PCG method 
 will converge much faster than the ADI method even though each iteration (which includes an inversion) is more expensive. We investigate this question in Section~\ref{sec:comparison}.
 
 \subsection{Simulations}
@@ -933,9 +936,8 @@ our simulations, as the model we used did not have an impact on the results. Mor
 We describe these two experimental setups in more detail in Table~\ref{tab:ch_parm}. As was the case for the gain error models, the experimental setup 
 that was used did not alter the simulation results. 
 
-The main flow of a single simulation is as follow. We created corrupted visibilities, using either one of the experimental setups summarized in Table~\ref{tab:ch_parm} and
-the fixed simulation parameters presented in Table~\ref{tab:fixed_parm}. We then used per time-slot and channel redundant calibration, i.e. we either used the ADI or PCG algorithm, to 
-estimate the gains and the true observed visibilities. To obtain statistically significant results we performed, for both the ADI and PCG algorithms, multiple statistical independent simulations. 
+The main flow of a single simulation is as follow. We created corrupted visibilities, using the fixed simulation parameters presented in Table~\ref{tab:fixed_parm} and either one of the experimental setups summarized in Table~\ref{tab:ch_parm}. We then used per time-slot and channel redundant calibration, i.e. we use the LM algorithm which in turn makes use of either the ADI or PCG method, to 
+estimate the gains and the true observed visibilities. To obtain statistically significant results we performed, for both the ADI and PCG methods, multiple statistical independent simulations. 
 
 %We compare ADI with PCG in Section \textbf{??}, by using the results generated from the simulations we performed using 
 %these two methods.
@@ -996,6 +998,7 @@ $\nu$-range & 100-200 MHz & 1.4 GHz\\
 Num. timeslots & 1 & 50\\
 %Hour angle &-1^h & [-1^h,1^h]\\
 Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
+Initial guess: $\bz_0$ & $\bone$ & $\bone$\\
 \hline
 \end{tabular}
 \label{tab:ch_parm}
@@ -1004,16 +1007,18 @@ Gain error model (Table~\ref{tab:gain_parm}) & 2 & 1\\
 \subsection{Alternating Direction Implicit Method}
 \label{sec:adi}
 %In Section~\ref{sec:adi} we show how the ADI method used for skymodel-based calibration relates to the redundant ADI method presented in \citet{Marthi2014}. 
-
 We start this section by briefly reviewing the ADI method as it pertains to skymodel-based calibration in Section~\ref{sec:sbc} \citep{Salvini2014,Smirnov2015}.
-In Section~\ref{sec:red_c} we re-derive the redundant calibration ADI method presented in \citet{Marthi2014}. In \citet{Marthi2014} the ADI method is derived by taking the derivative of the 
+
+In Section~\ref{sec:red_c}, we re-derive the fast redundant calibration algorithm presented in \citet{Marthi2014} using the complex framework proposed by \citet{Smirnov2015}. In \citet{Marthi2014} it is derived by taking the derivative of the 
 objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
-We will use the diagonal-approximate approach proposed in \citet{Smirnov2015} to show that the ADI algorithm presented in \citet{Marthi2014} is in actual fact redundant 
-\textsc{StEfCal} \citep{Salvini2014}. 
+To elaborate a little, the conclusion that the algorithm presented in \citet{Marthi2014} is nothing more than a redundant extension of the skymodel-based ADI method (i.e. redundant \textsc{StEfCal}) is in actual fact not obvious either (something we only briefly mentioned in the introduction and then for the sake of simplicity and convenience chose to ignore until now) if the aforementioned 
+partial derivative strategy is used to derive it. In Section~\ref{sec:red_c}, we will, therefore, also explicitly show that 
+the redundant calibration algorithm presented in \citet{Marthi2014} is in actual fact nothing more than an ADI method and in doing so we will have justified the naming 
+convention we have used throughout the paper.
 
 \subsubsection{Skymodel-based Calibration}
 \label{sec:sbc}
-\textsc{StEFCal} is an alternating direction implicit method, in which the measurement equation, Eq.~\eqref{eq:vis_definition}, is linearized by assuming that the gains are known, but
+\textsc{StEFCal} is an ADI method, in which the measurement equation, Eq.~\eqref{eq:vis_definition}, is linearized by assuming that the gains are known, but
 that their conjugates are unknown \citep{Mitchell:MWA-cal,Salvini2014}. Under this assumption, the conjugates of the gains can be obtained trivially. Once the conjugates of the gains have been computed, the gains can be solved for. One can then alternate between computing the gains and their conjugates until convergence
 is reached. By correctly exploiting the symmetry inherent in the calibration problem this alternating approach can be replaced by a single iterative new parameter estimation step. \cite{Salvini2014} also show that
 the convergence of the algorithm can be improved if for every even iteration the basic new parameter estimation step is modified as follows: the current gain estimate is replaced by the average of the current gain estimate and the gain estimate of the previous odd iteration.
@@ -1027,6 +1032,7 @@ By approximating the skymodel-based $\bH$ by its diagonal and substituting this 
 \breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k,\label{eq:stef_lambda}\\
  &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, \label{eq:stef_alpha}  
 \end{align}
+where $\alpha = \frac{1}{1+\lambda}$. Moreover, $\lambda = \frac{1-\alpha}{\alpha}$.
 
 If we choose $\lambda$ to be zero, which corresponds to an $\alpha$ equal to one, we obtain the new parameter estimation step of \textsc{StEfCal}; used during odd iterations. On the other hand if we choose $\lambda$ equal to one, which corresponds
 to an $\alpha$ equal to a half, we obtain the new parameter estimation step of \textsc{StEfCal}; used during even iterations. 
@@ -1044,7 +1050,7 @@ in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Note the similarity bet
 \label{sec:red_c}
 Since the diagonal entries of the $\bH$ associated with redundant calibration are more significant than its off-diagonal entries it makes 
 sense to try and approximate it with its diagonal (see Fig.~\ref{fig:hessian} and Eq.~\eqref{eq:red_H}).
-If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ (by its diagonal approximation) and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
+If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
 \begin{equation}
 \label{eq:appr_GN}
  \Delta \breve{\bz} \approx \widetilde{\bH}^{-1}\bJ^H(\breve{\bd}-\breve{\bv})
@@ -1061,9 +1067,8 @@ We obtain a similar result if we repeat the above procedure, only in this case w
 namely
 \begin{align}
 \breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k, \label{eq:alpha}  
+ &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k. \label{eq:alpha}  
 \end{align}
-where $\alpha = \frac{1}{1+\lambda}$. Moreover, $\lambda = \frac{1-\alpha}{\alpha}$.
 The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
 expression of $\bJ^H\breve{\br}$, the only difference being that in Eq.~\eqref{eq:ab} the letter $r$ would be replaced by a $d$. If we substitute the analytic expression
 of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which is easily computed as the matrix is a diagonal matrix) into Eq.~\eqref{eq:alpha} we obtain the following two update rules:
@@ -1079,9 +1084,9 @@ y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq
 The computational complexity of inverting $\widetilde{\bH}$ is $\mathbb{O}(P)$.
 
 Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Also note that Eq.~\eqref{eq:g_update} is the fundamental
-gain estimator associated with \textsc{StEfCal}. We have therefore successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the ADI method presented in 
-\citet{Marthi2014} and in doing so we have shown that the algorithm in \citet{Marthi2014} is actually redundant StEfCal. We could also have shown this by using the alternating approach 
-presented in \citet{Salvini2014}; which explains why, in this paper, we have been referring to the algorithm presented in \citet{Marthi2014} as the ADI method.
+gain estimator associated with \textsc{StEfCal}. We have therefore successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the fast redundant calibration method presented in 
+\citet{Marthi2014} and in doing so we have shown that this algorithm is in actual fact nothing more than the ADI method (i.e. redundant \textsc{StEfCal}), which justifies the naming convention we have been using for this method. We could also have shown this same result by using
+a more direct approach. We could simply have used the alternating strategy presented in the skymodel-based ADI paper itself \citep{Salvini2014}.
 
 The question now arises what value should we use for $\alpha$? In \citet{Marthi2014}, they propose 
 $\alpha = 0.3$. Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
@@ -1090,7 +1095,7 @@ in the case of \textsc{StEFCal} (for even iterations); see Section~\ref{sec:sbc}
 We used $\lambda$ equal to two in this paper.
 
 Optimality results of ADI were presented in \citet{Marthi2014}. We do not repeat their analysis here. We however, do present our own ADI results in Fig.~\ref{fig:prec_error} that confirm that the
-ADI method can accurately estimate the antenna gains and the observed visibilities at different SNR values. To quantity the exact error in our estimates we used the precentage error $\beta$ defined 
+ADI method can accurately estimate the antenna gains and the observed visibilities at different SNR values. To quantity the exact error in our estimates we used the percentage error $\beta$ defined 
 as 
 \begin{equation}
 \label{eq:beta}
@@ -1100,7 +1105,7 @@ We have already defined $v_{pq}$ in Eq.~\eqref{eq:vec_definitions}. Moreover, in
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
-\caption{We plot the precentage error $\beta$ between the estimated 
+\caption{We plot the percentage error $\beta$ between the estimated 
 predicted visibilities and the true predicted visibilities for different SNR values as a function of the number of antennas in the array $N$. The graph presented here was generated using the first experimental setup in Table~\ref{tab:ch_parm}.}
 \label{fig:prec_error}
 \end{figure}
