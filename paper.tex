@@ -107,15 +107,17 @@ $^{2}$Building, Institute, Street Address, City, Code, Country}
 \label{firstpage}
 
 \begin{abstract}
-Traditionally redundant calibration is implemented via a hierarchical algorithmic strategy, i.e. a basic \textsc{firstcal} is performed, followed by \textsc{logcal} and \textsc{lincal}.  
-\textsc{logcal} requires the use of the logartihm, while \textsc{lincal} makes use of the gradient-based Gauss-Newton algorithm.
-We show that instead of splitting our calibration problem into its phase and amplitude components,
-which is the approach taken by \textsc{lincal}, we can treat the complex unknown model parameters and their complex conjugates as separate unknowns instead. 
-We further propose the use of the Levenberg-Marquardt algorithm, instead of the Gauss-Newton algorithm, to improve the convergence properties of the proposed complex
-framework, which in turn reduces the number of layers that redundant calibration pipelines would require. We also compare two previously proposed methods to speedup redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating 
+Traditionally redundant calibration is implemented via a hierarchical algorithmic strategy.  
+We show that instead of splitting our redundant calibration problem into its phase-and-amplitude components,
+which is the more traditional approach, we can treat the complex unknown model parameters and their complex conjugates as separate unknowns instead. 
+We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework.
+We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton.
+Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration.
+The Gauss-Newton algorithm is, however, still the de facto standard that is currently being used to perform redundant calibration.
+We also compare two previously proposed methods to speedup redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating 
 direction implicit method outperforms the preconditioned conjugate gradient method, however the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. 
-We mainly focus on the complex framework in this paper rather than the amplitude and phase approach as it makes it trivial to relate the alternating direction implicit method 
-and the Levenberg-Marquardt algorithm with each other.
+We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method 
+and the Levenberg-Marquardt algorithm with one another.
 \end{abstract}
 
 %that \textsc{lincal} is effectively the non-linear least-squares gradient-based Gauss-Newton algorithm. Therefore, an easy way to reduce the number of layers used in performing redundant calibration is to employ the Levenberg-Marquardt algorithm instead (which would improve the convergence properties of stock standard \textsc{lincal})
@@ -125,45 +127,48 @@ circumstellar matter -- infrared: stars.
 \end{keywords}
 
 \section{Introduction}
-The propogation effects (i.e. the ionosphere, antenna gains, etc.) a celestial signal experiences along its propogation path is modelled with the radio interforemetric measurement equation (RIME) \citep{ME1,RRIME1}.
-Calibration is the procedure by which we remove the errors that these propogation effects induce onto our intereferometric data and is normally accomplished using a 
+The propogation effects (i.e. the ionosphere, antenna gains, etc.) a celestial signal experiences along its propagation path is modelled with the radio interferometric measurement equation (RIME) \citep{ME1,RRIME1}.
+Calibration is the procedure by which we remove the errors that these propagation effects induce onto our interferometric data and is normally accomplished using a 
 least-squares solver. In the case where we only model the antenna gains, which is the most basic form of the RIME, we can define calibration as finding the antenna gains that minimizes the difference betweem our observed and predicted visibilities. 
 
-There are two recent developments in skymodel-based calibration which should be explicitly mentioned at this point, since they form the foundation this paper builds on. The first is the discovery of \textsc{StEfCal} \citep{Mitchell:MWA-cal,Salvini2014}, which 
+There are two recent developments in skymodel-based calibration which should be explicitly mentioned at this point, since they form the foundation this paper builds on. The first is the discovery of \textsc{StEfCal} (Statistically Efficient Calibration) \citep{Mitchell:MWA-cal,Salvini2014}, which 
 is an alternating direction implicit (ADI) skymodel-based calibration algorithm. It works by assuming the gains are known while solving for their conjugates and then performing the reverse. 
 This procedure results in the linearization of the calibration algorithm and reduces the computational complexity of calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$, where $N$ denotes the number of antennas in the array. 
-assume the conugates are known and solve for the gains. The second development is the idea: to not break the calibration problem 
-into its real and imaginary parts and then to solve for the real and imaginary parts of the unknown parameters seperately, but to rather treat the antenna gains and their 
+The second development is the idea: to not break the calibration problem 
+into its real and imaginary parts and then to solve for the real and imaginary parts of the unknown parameters separately, but to rather treat the antenna gains and their 
 conjugates as seperate parameters to estimate \citep{Smirnov2015}. \citet{Smirnov2015} also showed that the \textsc{StEfCal} algorithm itself is merely a special case of this
-gain-and-conjugate approach. 
+gain-and-conjugate framework. 
 
-Two baselines are redundant if their beaseline difference vectors have the same lenght and orientation, which imply that they measure the same $uv$-modes. When we use a redundant array layout we dramatically 
-reduce the number of unkowns. If our array is redundant enough we reduce the number of unknowns to such an extend that we are able to solve for the unknown 
+Two baselines are redundant if their baseline difference vectors have the same length and orientation, which imply that they measure the same $uv$-modes. When we use a redundant array layout we dramatically 
+reduce the number of unknowns. If our array is redundant enough we reduce the number of unknowns to such an extend that we are able to solve for the unknown 
 observed visibilities themselves in addition to the antenna gains. Redundant calibration is the procedure by which we estimate the unknown observed visibilities in addition
 to the antenna gains.
 
-Redundant calibration was already quite popular in the 1980's. \citet{Noordam1982} used redundant calibration and the WSRT (Westerbork Synthesis Radio Telescope) to produce high-dynamic range images of 3C84.
+Redundant calibration was popularized in the 1980's. \citet{Noordam1982} used redundant calibration and the WSRT (Westerbork Synthesis Radio Telescope) to produce high-dynamic range images of 3C84.
 The first implementations of redundant calibration made use of the logarithm function, because when the logarithm is applied to the scalar measurement equation, redundant 
-calibration is transformed into a linear problem \citep{Wieringa1992,Camps2003,Liu2010}. This approach is commenly referred to as \textsc{logcal}.
-We briefly discuss \textsc{logcal} in Appendix~\ref{sec:logcal}. The next improvement in redundant calibration was to perform a firt-order taylor expansion, which is equivalent to the Gauss-Newton (GN) algorithm \citep{Kurien2016}, of the measurement equation an then to solve for the
-perturbations of the model-parameters \citep{Liu2010}. The implementation of  this approach is called \textsc{lincal}. \textsc{lincal} is derived from first principals in Appendix~\ref{sec:lincal}. 
-\textsc{logcal} and \textsc{lincal} are both implemented in \textsc{omnical}\footnote{https://github.com/jeffzhen/omnical}, which is a layered redundant calibration pipeline \citep{Zheng2014,Ali2015}.
-The solutions of \textsc{logcal} are used as initial input for \textsc{lincal}, since the GN algorithm requires that its starting parameter guesses be in the vacinity 
+calibration is transformed into a linear problem \citep{Wieringa1992,Camps2003,Liu2010}. The implementation associated with this approach is commonly referred to as \textsc{logcal}.
+We briefly discuss \textsc{logcal} in Appendix~\ref{sec:logcal}. The next improvement in redundant calibration was to perform a firt-order taylor expansion, which is equivalent to the Gauss-Newton (GN) algorithm \citep{Kurien2016}, of the measurement equation and then to solve for the
+perturbations of the model-parameters \citep{Liu2010}. \citet{Liu2010} perform the first order Taylor expansion of the measurement equation by splitting the unknown parameters into their phase-and-amplitude
+components. The implementation of  this approach is called \textsc{lincal}. \textsc{lincal} is derived from first principals in Appendix~\ref{sec:lincal}. 
+Currently, redundant calibration is usually implemented using a layered algorithmic strategy. \textsc{logcal} and \textsc{lincal} are both implemented in \textsc{omnical}\footnote{https://github.com/jeffzhen/omnical}, which is a layered redundant calibration pipeline \citep{Zheng2014,Ali2015}.
+The solutions of \textsc{logcal} are used as initial input for \textsc{lincal}, since the GN algorithm requires that its starting parameter guesses be in the vicinity 
 of the solution.
+
+New instruments like LOFAR (Low Frequency Array) \citep{Noorishad2012}, PAPER (Precision Array for Probing the Epoch of Reionization) \citep{Ali2015} and HERA (Hydrogen Epoch of Reionization Array) \citep{deboer2015} have also recently sparked a renewed interest in redundant calibration. Using redundancy is especially advantageous when we are trying to detect the EoR (Epoch of Reionization) 21 cm signal,
+which is inherently quite faint \citep{Parsons2012}. Since redundant baselines make statistically independent measurements of the same $uv$-modes redundancy can greatly 
+improve the SNR (signal-to-noise ratio) of EoR detection experiments. This explains why PAPER and HERA, are highly redundant arrays, as they are both primarily used to detect the EoR 21 cm signal.
+
+\noindent
+\textbf{[GIANNI TO REWRITE AND EXTEND EOR SECTION]}
 
 Two ways of speeding up redundant calibration have also been proposed recently. The first technique makes use of the ADI method, in which we alternate between solving the gains, their conjugates and 
 the true observed visibilities \citep{Wijnholds2012,Marthi2014}. The second is to use the preconditioned conjugate gradient (PCG) method. PCG allows us to exploit the sparsity inherent in the redundant calibration problem, 
 to speed it up \citep{Liu2010}. A proper comparison between these two approaches has not been done before.
 
-New instruments like LOFAR (Low Frequency Array) \citep{Noorishad2012}, PAPER (Precision Array for Probing the Epoch of Reionization) \citep{Ali2015} and HERA (Hydrogen Epoch of Reionization Array) \citep{deboer2015} have recently sparked a renewed interest in redundant calibration. Using redundancy is especially advantageous when we are trying to detect the EoR (Epoch of Reionization) 21 cm signal,
-which is inherently quite faint \citep{Parsons2012}. Since redundant baselines make statistically independent measurements of the same $uv$-modes redundancy can greatly 
-improve the SNR (signal-to-noise ratio) of EoR detection experiments. This explains why PAPER and HERA, are highly redundant arrays, as they are both primarily used to detect the EoR 21 cm signal.
-[GIANNI TO REWRITE AND EXTEND EOR SECTION]
-
-In this paper we propose to use the complex framework introduced by \citet{Smirnov2015} instead of the traditional amplitude and phase approach used by \textsc{lincal}.
-We also propose to use the Levenberg-Marquardt gradient-based algorithm instead of the Gauss-Newton algorithm as it exhibits better convergence properties.
-In doing so the amount of layers that redundant calibration pipelines need are effectively reduced. We also compare two recent redundant calibration speedup algorithms
-with each other, namely ADI \citep{Marthi2014} and PCG \citep{Liu2010}. In this paper, we decided to mainly focus on the complex framework proposed by \citet{Smirnov2015} rather than the traditional phase and amplitude approach as it 
+In this paper we propose to use the complex framework introduced by \citet{Smirnov2015} instead of the traditional amplitude-and-phase approach used by \textsc{lincal}.
+We also propose to use the Levenberg-Marquardt (LM) gradient-based algorithm instead of the Gauss-Newton (GN) algorithm as it exhibits better convergence properties.
+Using the LM algorithm, reduces the number of algorithmic layers that are needed to perform redundant calibration. 
+We also compare two recent redundant calibration speedup algorithms with each other, namely the ADI \citep{Marthi2014} and PCG \citep{Liu2010} methods. In this paper, we decided to mainly focus on the complex framework proposed by \citet{Smirnov2015} rather than the traditional phase-and-amplitude approach as it 
 allows us to trivially prove that the ADI method proposed by \citep{Marthi2014} is merely a special case of the more general LM algorithm. Moreover, this framework also 
 allows us to show that the ADI method proposed by \citep{Marthi2014} can for all intents and purposes be renamed to redundant \textsc{StEfCal} \citep{Mitchell:MWA-cal,Salvini2014}. 
 
