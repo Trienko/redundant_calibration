@@ -1055,7 +1055,7 @@ It is in fact trivial to extend the ADI method presented in \citet{Salvini2014} 
 If we do so we are able to re-derive the redundant calibration algorithm presented in \citet{Marthi2014}. This implies that the fast redundant calibration algorithm presented in \citet{Marthi2014} is effectively redundant \textsc{StEfCal} (i.e. some kind of ADI method). 
 
 Recall, that \citet{Smirnov2015} showed that \textsc{StEfCal} can also be derived by approximating the $\bH$, associated with skymodel-based calibration, with 
-its diagonal. We will now use the diagonal approximation approach presented in \citet{Smirnov2015} to yet again re-derive the redundant calibration algorithm presented in \citet{Marthi2014}.
+its diagonal. To double check if our statement that the algorithm in \citet{Marthi2014} is in actual fact redundant \textsc{StEfCal} (i.e. some kind of ADI method) we will now use the diagonal approximation approach presented in \citet{Smirnov2015} to yet again re-derive the redundant calibration algorithm presented in \citet{Marthi2014}.
 
 Since the diagonal entries of the $\bH$, associated with redundant calibration, are more significant than its off-diagonal entries it makes 
 sense to try and approximate it with its diagonal (see Fig.~\ref{fig:hessian} and Eq.~\eqref{eq:red_H}).
@@ -1279,13 +1279,13 @@ Although the ADI method does execute faster than the PCG method it is far less r
 the diagonal approximation we make with ADI might not be accurate enough in general.
 
 Lastly, we showed how \citet{Marthi2014}, \citet{Salvini2014} and \citet{Smirnov2015} relate to each other (see Section~\ref{sec:red_c}). The ADI method associated with skymodel-based calibration (i.e. \textsc{StEfCal}) is presented
-in \citet{Salvini2014}. \citet{Smirnov2015} showed that it is possible to rederive this skymodel-based ADI method through complex optimization. In particular, they showed that if 
+in \citet{Salvini2014}. \citet{Smirnov2015} showed that it is possible to re-derive this skymodel-based ADI method through complex optimization. In particular, they showed that if 
 we approximate the $\bH$ associated with the LM algorithm with its diagonal then we can rederive the ADI update rules presented in \citet{Salvini2014}. 
-\citet{Marthi2014} applied the ADI method to the redundant use case. This fact is not immediatly clear when inspecting \citet{Marthi2014}. The ADI update rules presented \citet{Marthi2014} were derived by taking the partial derivatives of 
-the objective function towards the unknown parameters, setting the intermediate results to zero and then solving for the unknowns. In this paper we show that 
-these same ADI update rules can be derived using the diagonal approximation technique proposed in \citet{Smirnov2015}. The fact that we can use this diagonal approximation
-technique to derive these update rules imply that the algorithm presented in \citet{Marthi2014} is in fact the ADI method (i.e. redundant \textsc{StEfCal}). This same
-fact can be established by directly applying the skymodel-based ADI derivation presented in \citet{Salvini2014} to the redundant use case.
+\citet{Marthi2014} actually proposes to use the ADI method to perform redundant calibration. This fact is not immediately clear when superficially inspecting \citet{Marthi2014}. The redundant calibration algorithm presented in \citet{Marthi2014} was derived by taking the partial derivatives of 
+the objective function towards the unknown parameters, setting the intermediate results to zero and then solving for the unknowns. In Section~\ref{sec:red_c}, we showed that 
+this algorithm is in actual fact an extension of the skymodel-based ADI method presented in \citet{Salvini2014} to the redundant calibration use case (i.e. we showed that this algorithm is in actual fact redundant \textsc{StEfCal}).
+We also re-derived the aforementioned redundant calibration algorithm by applying the diagonal approximation approach presented in \citet{Smirnov2015}, which serves as yet another additional confirmation  
+that this algorithm is in fact redundant \textsc{StEfCal} (i.e. that it is some kind of ADI method).
 
 % fiducial initial guess 
 % 
