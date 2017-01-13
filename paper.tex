@@ -1009,12 +1009,12 @@ Initial guess: $\bz_0$ & $\bone$ & $\bone$\\
 %In Section~\ref{sec:adi} we show how the ADI method used for skymodel-based calibration relates to the redundant ADI method presented in \citet{Marthi2014}. 
 We start this section by briefly reviewing the ADI method as it pertains to skymodel-based calibration in Section~\ref{sec:sbc} \citep{Salvini2014,Smirnov2015}.
 
-In Section~\ref{sec:red_c}, we re-derive the fast redundant calibration algorithm presented in \citet{Marthi2014} using the complex framework proposed by \citet{Smirnov2015}. In \citet{Marthi2014} it is derived by taking the derivative of the 
-objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. When derived in this way, its relation to the recent works \citep{Salvini2014,Smirnov2015} are unclear.
-To elaborate a little, the conclusion that the algorithm presented in \citet{Marthi2014} is nothing more than a redundant extension of the skymodel-based ADI method (i.e. redundant \textsc{StEfCal}) is in actual fact not obvious either (something we only briefly mentioned in the introduction and then for the sake of simplicity and convenience chose to ignore until now) if the aforementioned 
-partial derivative strategy is used to derive it. In Section~\ref{sec:red_c}, we will, therefore, also explicitly show that 
-the redundant calibration algorithm presented in \citet{Marthi2014} is in actual fact nothing more than an ADI method and in doing so we will have justified the naming 
-convention we have used throughout the paper.
+In Section~\ref{sec:red_c}, we will show that the fast redundant calibration algorithm, that is presented in \citet{Marthi2014},
+is in fact nothing more than an extension of the skymodel-based ADI method, presented in \citet{Salvini2014}, to the redundant calibration use case (i.e. redundant \textsc{StEfCal}).
+In doing so we will justify the naming convention we have been using up until now.
+
+In Section~\ref{sec:adi_results}, we present some ADI simulation results. 
+%We will mainly accomplish this by using the complex framework proposed by \citet{Smirnov2015}.
 
 \subsubsection{Skymodel-based Calibration}
 \label{sec:sbc}
@@ -1048,7 +1048,16 @@ in Eq.~\eqref{eq:two_thrids} it is scaled by two thirds. Note the similarity bet
 
 \subsubsection{Redundant Calibration}
 \label{sec:red_c}
-Since the diagonal entries of the $\bH$ associated with redundant calibration are more significant than its off-diagonal entries it makes 
+In this section, we re-derive the fast redundant calibration algorithm presented in \citet{Marthi2014} using a different approach to the one presented in the paper itself. In \citet{Marthi2014}, the algorithm is derived by taking the derivative of the 
+objective function $\Lambda$ relative to $\bg$ and $\by$ and setting the result to naught. 
+
+It is in fact trivial to extend the ADI method presented in \citet{Salvini2014} to the redundant use case, a.k.a. we now alternate between solving for the antenna gains their conjugates and the true observed visibilities.
+If we do so we are able to re-derive the redundant calibration algorithm presented in \citet{Marthi2014}. This implies that the fast redundant calibration algorithm presented in \citet{Marthi2014} is effectively redundant \textsc{StEfCal} (i.e. some kind of ADI method). 
+
+Recall, that \citet{Smirnov2015} showed that \textsc{StEfCal} can also be derived by approximating the $\bH$, associated with skymodel-based calibration, with 
+its diagonal. We will now use the diagonal approximation approach presented in \citet{Smirnov2015} to yet again re-derive the redundant calibration algorithm presented in \citet{Marthi2014}.
+
+Since the diagonal entries of the $\bH$, associated with redundant calibration, are more significant than its off-diagonal entries it makes 
 sense to try and approximate it with its diagonal (see Fig.~\ref{fig:hessian} and Eq.~\eqref{eq:red_H}).
 If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}$ and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in Eq.~\eqref{eq:GN_update} we obtain
 \begin{equation}
@@ -1084,9 +1093,9 @@ y_{i}^{k+1} = \alpha \frac{\sum_{pq \in \mathcal{PQ}_i} \conj{g}_p^k g_q^k d_{pq
 The computational complexity of inverting $\widetilde{\bH}$ is $\mathbb{O}(P)$.
 
 Eq.~\eqref{eq:g_update} and Eq.~\eqref{eq:y_update} are the exact same iterative new parameter estimators derived by \citet{Marthi2014}. Also note that Eq.~\eqref{eq:g_update} is the fundamental
-gain estimator associated with \textsc{StEfCal}. We have therefore successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the fast redundant calibration method presented in 
-\citet{Marthi2014} and in doing so we have shown that this algorithm is in actual fact nothing more than the ADI method (i.e. redundant \textsc{StEfCal}), which justifies the naming convention we have been using for this method. We could also have shown this same result by using
-a more direct approach. We could simply have used the alternating strategy presented in the skymodel-based ADI paper itself \citep{Salvini2014}.
+gain estimator associated with skymodel-based \textsc{StEfCal}. We have, therefore, successfully used the diagonal approximation approach proposed by \citet{Smirnov2015} to re-derive the fast redundant calibration method presented in 
+\citet{Marthi2014}. %and in doing so we have confirmed shown that this algorithm is in actual fact nothing more than redundant \textsc{StEfCal}, i.e. some form of ADI method, justifying the naming convention we have been using for it.
+Re-deriving the algorithm presented in \citet{Marthi2014} in this way serves as a further confirmation that it is indeed nothing more than redundant \textsc{StEfCal} (i.e. some kind of ADI method). 
 
 The question now arises what value should we use for $\alpha$? In \citet{Marthi2014}, they propose 
 $\alpha = 0.3$. Although an exact mathematical proof for the optimal choice of $\alpha$ still eludes us, it is still possible to
@@ -1094,14 +1103,16 @@ venture a clever guess by studying what the choice of $\alpha$ is in the case of
 in the case of \textsc{StEFCal} (for even iterations); see Section~\ref{sec:sbc}. If we wish to mimic this behaviour for the redundant calibration use case we need to scale $\breve{\bz}$ by two thirds in Eq.~\eqref{eq:alpha} (see Eq.~\eqref{eq:two_thrids}) which implies that we should choose $\alpha$ equal to a third, which corresponds to a $\lambda$ equal to two.
 We used $\lambda$ equal to two in this paper.
 
-Optimality results of ADI were presented in \citet{Marthi2014}. We do not repeat their analysis here. We however, do present our own ADI results in Fig.~\ref{fig:prec_error} that confirm that the
+\subsubsection{ADI simulation results}
+\label{sec:adi_results}
+Optimality results of ADI were presented in \citet{Marthi2014}. We do not repeat their analysis here. We however, do present our own ADI results, in Fig.~\ref{fig:prec_error}, that confirm that the
 ADI method can accurately estimate the antenna gains and the observed visibilities at different SNR values. To quantity the exact error in our estimates we used the percentage error $\beta$ defined 
 as 
 \begin{equation}
 \label{eq:beta}
-\beta = \frac{\sum_{pq} |v_{pq} - \widehat{v}_{pq} |^2}{\sum_{pq} |v_{pq}|^2}.
+\beta = \frac{\|\bv - \widehat{\bv}\|_F^2}{\|\bv\|_F^2}.
 \end{equation}
-We have already defined $v_{pq}$ in Eq.~\eqref{eq:vec_definitions}. Moreover, in Eq.~\eqref{eq:beta}, $\widehat{v}_{pq}$ denotes the ADI estimate of $v_{pq}$.  
+We have already defined $\bv$ in Eq.~\eqref{eq:vec_definitions}. Moreover, in Eq.~\eqref{eq:beta}, $\widehat{\bv}$ denotes the ADI estimate of $\bv$.  
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
