@@ -1,0 +1,110 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amsfonts,amssymb,graphicx,subfigure,mathtools}
+\usepackage{amsmath}
+\usepackage{rotating}
+\usepackage{lscape}
+
+\newcommand{\conj}[1]{\overline{#1}}
+
+%MATRIX HELPER FUNCTIONS
+\newcommand\coolover[2]{\mathrlap{\smash{\overbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}^{\mbox{$#1$}}}}#2} 
+
+\newcommand\coolunder[2]{\mathrlap{\smash{\underbrace{\phantom{%
+    \begin{matrix} #2 \end{matrix}}}_{\mbox{$#1$}}}}#2}
+
+\newcommand\coolleftbrace[2]{%
+#1\left\{\vphantom{\begin{matrix} #2 \end{matrix}}\right.}
+
+\newcommand\coolrightbrace[2]{%
+\left.\vphantom{\begin{matrix} #1 \end{matrix}}\right\}#2}
+
+
+
+%opening
+\title{SPARC: SpArse Redundant Calibration}
+\author{T.L. Grobler}
+
+\begin{document}
+
+\maketitle
+
+%\begin{abstract}
+
+%\end{abstract}
+
+\begin{section}{Alternative derivation of Eq.}
+The basic StEfCal update step is equal to Eq. %\citet{Salvini2015}.
+Assume without any loss of generality that the array is in an east west regular grid. Furthermore, assume that $\boldsymbol{d}$ has been re-ordered to
+\begin{equation}
+\widetilde{\boldsymbol{d}} = \left[d{12},\cdots,d_{N-1,N},d_{13},\cdots,d_{N-2,N},\cdots,d_{1N}\right]^T 
+\end{equation}
+
+\begin{equation}
+\widetilde{\boldsymbol{d}} = 
+\begin{bmatrix} 
+d{12}\\
+\vdots\\
+d_{N-1,N}\\
+d_{13}\\
+\vdots\\
+d_{N-2,N}\\
+\vdots\\
+d_{1N}
+\end{bmatrix} 
+\end{equation}.
+Eq.~\eqref{} can now be rewritten as 
+\begin{equation}
+\widetilde{\boldsymbol{d}} = \boldsymbol{R}\boldsymbol{y}, 
+\end{equation}
+if we assume that $\boldsymbol{g}$ and its conjugate are known vectors. In Eq.~\eqref{},
+\begin{equation}
+\boldsymbol{R} = 
+\begin{bmatrix}
+g_1\conj{g}_2 & 0 & \cdots & 0\\
+g_2\conj{g}_3 & 0 & \cdots & 0\\
+\vdots & 0 & \cdots & 0\\
+g_{N-1}\conj{g}_N & 0 & \cdots & 0\\
+0 & g_1\conj{g}_3 & \cdots & 0\\
+0 & \vdots & \cdots & 0\\
+0 & g_{N-2}\conj{g}_N & \cdots & 0\\
+0 & 0 & \cdots & 0\\
+  & \vdots & \\
+0 & 0 & \cdots & g_1\conj{g}_N\\  
+\end{bmatrix}
+\end{equation}
+We can now determine $\boldsymbol{y}$ with
+\begin{equation}
+\boldsymbol{y} = (\boldsymbol{R}^H\boldsymbol{R})^{-1}\boldsymbol{R}^H\widehat{\boldsymbol{v}}, 
+\end{equation}
+where 
+\begin{equation}
+[\boldsymbol{R}^H\boldsymbol{R}]_{ij} = 
+\begin{cases}
+\sum_{rs\in\mathcal{RS}_i} |g_r|^2|g_s|^2 &\textrm{if}~i=j\\
+0&\textrm{otherwise}
+\end{cases}
+\end{equation}
+and
+\begin{equation}
+[\boldsymbol{R}^H\widehat{\boldsymbol{v}}]_i = \sum_{rs\in\mathcal{RS}_i} \conj{g}_r g_s d_{rs} 
+\end{equation}
+Substituting Eq and Eq into Eq we obtain
+the leftmost term in Eq (barring $\alpha$ of course).  
+\end{section}
+\begin{section}{Proof of Eq...}
+We have that
+\begin{equation}
+\lim_{N\rightarrow\infty} P^{\log_{P}(1-\gamma)} = 1-\gamma_{\infty},
+\end{equation}
+which is only possible if 
+\begin{equation}
+\lim_{N\rightarrow\infty} \log_{P}(1-\gamma) = 0,
+\end{equation}
+implying that $c_{\infty} = 2$.
+
+ 
+\end{section}
+\end{document}
+ 
