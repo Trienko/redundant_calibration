@@ -1107,7 +1107,8 @@ def plot_paper_layouts():
     print "s.L = ",s.L
     print "s.N = ",s.N
 
-    s = sim(layout="REG",order=100) #INSTANTIATE OBJECT
+    # Make a 100 for phi paper plot...
+    s = sim(layout="REG",order=10) #INSTANTIATE OBJECT
     s.generate_antenna_layout()
     s.plot_ant(title="REG")
     phi,zeta = s.calculate_phi(s.ant[:,0],s.ant[:,1])
@@ -1130,7 +1131,7 @@ def Gianni_freq_exp():
 
 if __name__ == "__main__":
    #example_usage()
-   #plot_paper_layouts()
-   Gianni_freq_exp()
+   plot_paper_layouts()
+   #Gianni_freq_exp()
    
 
