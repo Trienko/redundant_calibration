@@ -796,7 +796,7 @@ def plot_P():
     plt.xlabel(r'$N$ [antennas]')
     plt.ylabel(r'$P$')
     plt.legend(loc=5,prop={'size': 18})
-    plt.xlim([37,217])
+    plt.xlim([7,217])
     
     plt.grid('on')
 
