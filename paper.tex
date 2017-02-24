@@ -39,8 +39,8 @@
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
 \usepackage{graphicx}
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
+%\usepackage{algorithm}
+%\usepackage[noend]{algpseudocode}
 \usepackage{mathrsfs}
 
 \newcommand{\bz}{\bmath{z}}
@@ -55,6 +55,7 @@
 \newcommand{\bg}{\bmath{g}}
 \newcommand{\bd}{\bmath{d}}
 \newcommand{\bv}{\bmath{v}}
+\newcommand{\bu}{\bmath{u}}
 \newcommand{\bn}{\bmath{n}}
 \newcommand{\by}{\bmath{y}}
 \newcommand{\bJ}{\bmath{J}}
@@ -89,17 +90,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \title[Unknown]{Redundant calibration as a complex optimization problem}
-\author[A. V. Raveendran and A. N. Other]{A. V. Raveendran$^{1}$\thanks{E-mail:
-email@address (AVR); otheremail@otheraddress (ANO)} and A. N.
-Other$^{2}$\footnotemark[1]\thanks{This file has been amended to
-highlight the proper use of \LaTeXe\ code with the class file.
-These changes are for illustrative purposes and do not reflect the
-original paper by A. V. Raveendran.}\\
-$^{1}$Indian Institute of Astrophysics, Bangalore 560034, India\\
-$^{2}$Building, Institute, Street Address, City, Code, Country}
+\author[T.L.~Grobler et al.]{T.L.~Grobler$^{1}$\thanks{E-mail: email@address (AVR)}, G.~Bernardi$^{1,2}$, Z.S.~Ali$^{3}$?, C.L.~Carilli$^{4,5}$?, J.S.~Dillon$^{3}$?, A.~Liu$^{3}$?, \newauthor
+A.R.~Parsons$^{3,6}$? and O.M.~Smirnov$^{1,2}$?\\
+$^{1}$Department of Physics and Electronics, Rhodes University, PO Box 94, Grahamstown, 6140, South Africa\\
+$^{2}$SKA SA, 3rd Floor, The Park, Park Road, Pinelands, 7405, South Africa\\
+$^{3}$Dept. of Astronomy, University of California, Berkeley, CA 94720, USA\\
+$^{4}$National Radio Astronomy Obs., Socorro NM\\
+$^{5}$Cavendish Lab., Cambridge UK\\
+$^{6}$Radio Astronomy Lab., U. California, Berkeley CA 94720, USA}
 \begin{document}
 
-\date{Accepted 1988 December 15. Received 1988 December 14; in original form 1988 October 11}
+%\date{Accepted 1988 December 15. Received 1988 December 14; in original form 1988 October 11}
 
 \pagerange{\pageref{firstpage}--\pageref{lastpage}} \pubyear{2002}
 
@@ -108,15 +109,13 @@ $^{2}$Building, Institute, Street Address, City, Code, Country}
 \label{firstpage}
 
 \begin{abstract}
-In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. 
-We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework.
-We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton.
-The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration.
-It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration.
-We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating 
-direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. 
-We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method 
-and the Levenberg-Marquardt algorithm with one another.
+%In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
+Observations of the redshifted 21-cm line from the epoch of reionization have recently motivated the construction of low frequency radio arrays with highly redundant configurations that provide an alternative calibration strategy - ''redundant calibration" - and boosts sensitivity on specific scales. We show that redundant calibration can be formulated in the domain of complex functions of a complex variable. This framework reduces the 
+
+has driven advancements in the calibration of radio interferometers and 
+Calibration of the new generation of low frequency radio interferometers faces new challenges due to their very wide field of views 
+The construction of new radio interferometers, particularly operating at low frequencies and 
+In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
 \end{abstract}
 
 %that \textsc{lincal} is effectively the non-linear least-squares gradient-based Gauss-Newton algorithm. Therefore, an easy way to reduce the number of layers used in performing redundant calibration is to employ the Levenberg-Marquardt algorithm instead (which would improve the convergence properties of stock standard \textsc{lincal})
@@ -242,175 +241,70 @@ We end the paper with some final conclusions.
 %  \end{enumerate}
 %  
 %  We
- 
-\section{Preliminaries}
-\label{sec:preliminaries}
-There are two major pre-existing algorithms we use throughout this paper, namely the Conjugate Gradient (CG) method and the least-squares solver.
-We respectively discuss the CG method and least-squares in Section~\ref{sec:conj_grad} and Section~\ref{sec:ls}.
 
-\subsection{Conjugate Gradient Method}
-\label{sec:conj_grad}
-The CG method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
-reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear system. The CG method is generally used to solve
-\begin{equation}
-\label{eq:linear_system}
-\bb = \bA\bx,
-\end{equation}
-where $\bb\in\mathbb{C}^P$ is a known complex column vector of size $P$, $\bx\in\mathbb{C}^P$ is an unknown complex column vector with the same length as $\bb$, and $\bA\in\mathbb{C}^{P\times P}$ is a square positive-definite Hermitian matrix with the appropriate dimensions.  
-Moreover, using the CG method to solve Eq.~\eqref{eq:linear_system} will only be computationally advantageous if $\bA$ is also sparse (contain many zero entries).
-Using the iterative CG method to solve large sparse linear sytems was popularized by \citet{Reid1971}. A good tutorial on the CG method can be found in \citep{Shewchuk1994}.
-The iterative CG method is presented in Algorithm \ref{algo:CG}. 
+{\bf GB: ok here are my comments/questions.
+\begin{itemize}
+\item I think we wanna start with Section 2 being a short review of standard calibration but in the complex optimization framework. Therefore I would begin with section 3.1, following by section 2.2. In particular I think that the discussion of least squares should be connected to (current) eq. 15;
+\item we need more context for section 3.2. Why do we need to introduce a different indexing? This should be motivated. As it stands, I think it should remain where it is if we can make a connection to standard calibration, otherwise it should go in section 3.3;
+\item section 3.3 should merge with 4 where redundant calibration is introduced;
+\item section 3.5 goes together with the description of the simulations;
+\item section 4.1: I do not understand the definition in eq. 32. How is the ratio of two matrices defined? I also suggest to use the symbol $\equiv$ rather than $=$ for definitions throughout the paper;
+\item can section 4.2.2 be moved to the appendix? Or how much of it?
+\item section 5 should be called something like "Implementation"... In Oleg's paper he writes "Inverting $J^H J$ and separability"... I find it a little too direct, but we need to find something else as these are not yet "Results". I also suggest to revert the order in the way this is presented: we first show that the Hessian is almost diagonal (is this only true in the complex represntation?), then we derive ADI and show that is the same as Marthi \& Chengalur;
+\item I have not seen the simulations where you inserted a phase wrap and you calibrate it. Is there a reason why it is not included?
+\end{itemize}
+}
 
-%If $\bA$ is a square positive semi-definite Hermitian matrix, then the conjugate gradient method only converges if $\bb$ is in the column range of $\bA$ (cite Lu2016).
+% \subsection{Least Squares}
+% \label{sec:ls}
+% The method of nonlinear least squares is tantamount to solving the following optimization problem:  
+% \begin{equation}
+% \label{eq:least_squares}
+% \min_{\bzeta} \Lambda(\bzeta) = \min_{\bzeta} \|\brho\|_F^2 = \min_{\bzeta} \|\bdelta - \bnu(\bzeta)\|_F^2, 
+% \end{equation}
+% where $\Lambda$ is known as the objective function, $\brho$ is the residual vector, $\bdelta$ is the observed data vector, $\bnu$ is the model-predicted data vector and $\bzeta$ is the model-parameter vector that minimizes Eq.~\eqref{eq:least_squares}.
+% In Eq.~\eqref{eq:least_squares}, we assume that the optimization problem is real valued.
+% The main objective of least squares is to find the model-parameters which minimize the squared difference between the observed data and the model-predicted data.
+% 
+% The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient-type minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}. 
+% The GN update step is defined as
+% \begin{equation}
+%  \Delta \bzeta = (\bJ^T\bJ)^{-1} \bJ^T\brho,
+% \end{equation}
+% while the LM update takes the following form
+% \begin{equation}
+%  \Delta \bzeta = (\bJ^T\bJ+\lambda\bD)^{-1} \bJ^T\brho,
+% \end{equation}
+% where $\bJ$ is the Jacobian matrix (i.e. the derivative of the model $\bnu$ with respect to the parameter vector $\bzeta$), $\lambda$ denotes the 
+% damping factor and $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper, we denote 
+% matrix transposition with $(*)^T$.
+% These update steps can be used in an iterative manner to determine new estimates of $\bzeta$.
+% 
+% The gradient based minimization algorithms that are generally used to solve least squares problems (i.e. GN and LM) generally require the model $\bnu$ to be differentiable
+% towards each model parameter. When the least squares problem is complex it becomes less straightforward to apply these gradient based minimization methods, as
+% many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance, if the 
+% classical definition of differentiation is used then $\frac{\partial \conj{z}}{\partial z}$, where $z \in \mathbb{C}$, does not exist.
+% 
+% The only way to circumvent the differentiability conundrum associated with complex least square problems is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
+% The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+% 
+% Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
+% are defined to be 
+% \begin{align}
+% \label{eq:wir}
+% \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
+% \end{align}
+% Using the above definitions we can now easily compute the following:
+% \begin{align}
+% \frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
+% \end{align}
+% In this alternative approach we treat the complex parameters and their conjugates as separate variables.
 
-\begin{algorithm}
-\caption{Conjugate Gradient Method. Inputs: $\bA$, $\bb$, a starting value for $\bx$, maximum number of iterations $k_{\textrm{max}}$ and an error tolerance $\epsilon<1$ Output: $\bx$ the solution to Eq.~\eqref{eq:linear_system}. \citep{Shewchuk1994}.}\label{algo:CG}
-\begin{algorithmic}[1]
-\State $k \gets 0$
-\State $\br \gets \bb - \bA\bx$
-\State $\bp \gets \br$
-\State $\delta_{\textrm{new}} \gets \br^H\br$
-\State $\delta_0 \gets \delta_{\textrm{new}}$
-\While{$k\leq k_{\textrm{max}}$ and $\delta_{\textrm{new}} > \epsilon^2\delta_0$}
-\State $\alpha \gets \frac{\delta_{\textrm{new}}}{\bp^H\bA\bp}$
-\State $\bx \gets \bx + \alpha\bp$
-\State $\br \gets \br - \alpha\bA\bp$
-\State $\delta_{\textrm{old}} \gets \delta_{\textrm{new}}$ 
-\State $\delta_{\textrm{new}} \gets \br^H\br$
-\State $\beta \gets \frac{\delta_{\textrm{new}}}{\delta_{\textrm{old}}}$
-\State $\bp \gets \br + \beta\bp$
-\State $k \gets k + 1$
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
-\subsubsection{Computational Complexity}
-\citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
-\citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
-the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the spectral condition number of the matrix $\bA$.
-The mathematical definition of $\kappa(\bA)$ is
-\begin{equation}
-\label{eq:kappa}
-\kappa(\bA) = \frac{\lambda_{\textrm{max}}}{\lambda_{\textrm{min}}}, 
-\end{equation}
-where $\lambda_{\textrm{max}}$ and $\lambda_{\textrm{min}}$ respectively denote the largest and the smallest eigenvalue of $\bA$.
-Moreover, the most expensive operation that is conducted within each major loop of Algorithm~\ref{algo:CG} is the vector-matrix product $\bA\bp$, which has a complexity of $\mathbb{O}(m)$, where $m$ is the number of non-zero entries in $\bA$.
-The computational complexity of CG is therefore 
-\begin{equation}
-\label{eq:cg_bound}
-\mathbb{O}(\sqrt{\kappa}m). 
-\end{equation}
-It should now also be clear to the reader why the CG method is especially applicable to sparse linear systems. In sparse linear systems $m < P^2$.
-
-\subsubsection{Preconditioning}
-\label{sec:precon}
-Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix.
-We can now indirectly solve for $\bx$ by using 
-\begin{equation}
-\label{eq:prec}
-\bM^{-1}\bA\bx = \bM^{-1}\bb.
-\end{equation}
-If $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e. a good preconditioner lowers the condition number of a matrix which in turn increases the convergence speed 
-of CG (see Eq.~\eqref{eq:cg_bound}). In this paper, we denote matrix inversion with $(*)^{-1}$. The best possible choice of $\bM$ would therefore be $\bA$, which would lead to $\kappa$ becoming unity (as the largest and smallest eigenvalue of the identity matrix are equal to one).
-If $\kappa$ is one then Eq.~\eqref{eq:cg_bound} simplifies and becomes $\mathbb{O}(m)$. However, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
-In short, a good preconditioner $\bM$ must approximate $\bA$ fairly accurately. However, if it is not much less expensive to 
-compute the inverse of $\bM$ than that of $\bA$ we actually gain nothing (see Eq.~\eqref{eq:prec}).  
-
-If the diagonal entries of $\bA$ are much more significant than its off-diagonal entries then the 
-Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner is computed as follows:
-\begin{equation}
-\bM = \bA\odot\bI, 
-\end{equation}
-where $\bI$ is the identity matrix and $\odot$ denotes the Hadamard product. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
-
-\subsubsection{Normal Equation}
-\label{sec:normal}
-Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
-\begin{equation}
- \bb = \bB\bx,
-\end{equation}
-where $\bb\in\mathbb{C}^K$, $\bx\in\mathbb{C}^P$  and $\bB\in\mathbb{C}^{K \times P}$, with $K > P$. We can use the normal equation 
-\begin{equation}
-\label{eq:normal_equation}
-\bB^H\bB\bx = \bB^H\bb, 
-\end{equation}
-to estimate the $\bx$ that minimizes
-\begin{equation}
-\label{eq:norm_ls}
-\|\bb-\bB\bx\|_F^2. 
-\end{equation}
-In this paper, we denote the Hermitian transpose with $(*)^H$ and the Frobenius norm with $\|*\|_F$.
-
-There are a few important observations that we can make while inspecting Eq.~\eqref{eq:normal_equation}:
-\begin{enumerate}
-\item $\bB^H\bB$ is a square positive semi-definite Hermitian matrix by construction.
-\item $\bB^H\bb$ is in the column range of $\bB^H\bB$; this follows trivially from 
-\begin{equation}
-\bB^H\bb \in \mathcal{R}(\bB^H) \implies \bB^H\bb \in \mathcal{R}(\bB^H\bB).   
-\end{equation}
-\end{enumerate}
-In this paper, we denote the column range of a matrix $\bA$ with $\mathcal{R}(\bA)$.
-
-Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is a square positive-definite Hermitian matrix. The CG method actually has an even broader applicability: it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is a Hermitian positive semi-definite
-square matrix as long as $\bb$ is in the column range of $\bA$ \citep{Lu2015}. In light of \citet{Lu2015}, the two observations in the numbered list we presented in the previous paragraph imply that Eq.~\eqref{eq:normal_equation}
-can be solved by employing the CG method. The solution returned by CG is, however, only unique if $\bB^H\bB$ is positive-definite (invertible). The solution
-obtained by CG, whether it is unique or not, does minimize Eq.~\eqref{eq:norm_ls} in a least squares sense.
-
-Note that if $\bA$ is positive semi-definite, its smallest eigenvalue is zero. This implies that Eq.~\eqref{eq:kappa} is not defined. \citet{Lu2015} show that when $\bA$
-is a square positive semi-definite Hermitian matrix we do not use the spectral condition number to bound the convergence complexity of CG, but the general spectral condition
-number instead. The general spectral condition number is very similar to the spectral condition number; the only difference being that in Eq.~\eqref{eq:kappa} we replace  
-$\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue. 
-
-\subsection{Least Squares}
-\label{sec:ls}
-The method of nonlinear least squares is tantamount to solving the following optimization problem:  
-\begin{equation}
-\label{eq:least_squares}
-\min_{\bzeta} \Lambda(\bzeta) = \min_{\bzeta} \|\brho\|_F^2 = \min_{\bzeta} \|\bdelta - \bnu(\bzeta)\|_F^2, 
-\end{equation}
-where $\Lambda$ is known as the objective function, $\brho$ is the residual vector, $\bdelta$ is the observed data vector, $\bnu$ is the model-predicted data vector and $\bzeta$ is the model-parameter vector that minimizes Eq.~\eqref{eq:least_squares}.
-In Eq.~\eqref{eq:least_squares}, we assume that the optimization problem is real valued.
-The main objective of least squares is to find the model-parameters which minimize the squared difference between the observed data and the model-predicted data.
-
-The most standard way of solving Eq.~\eqref{eq:least_squares} is to use a gradient-type minimization algorithm. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}. 
-The GN update step is defined as
-\begin{equation}
- \Delta \bzeta = (\bJ^T\bJ)^{-1} \bJ^T\brho,
-\end{equation}
-while the LM update takes the following form
-\begin{equation}
- \Delta \bzeta = (\bJ^T\bJ+\lambda\bD)^{-1} \bJ^T\brho,
-\end{equation}
-where $\bJ$ is the Jacobian matrix (i.e. the derivative of the model $\bnu$ with respect to the parameter vector $\bzeta$), $\lambda$ denotes the 
-damping factor and $\bD$ is a diagonal matrix whose diagonal entries are equal to the diagonal entries of $\bJ^T\bJ$. In this paper, we denote 
-matrix transposition with $(*)^T$.
-These update steps can be used in an iterative manner to determine new estimates of $\bzeta$.
-
-The gradient based minimization algorithms that are generally used to solve least squares problems (i.e. GN and LM) generally require the model $\bnu$ to be differentiable
-towards each model parameter. When the least squares problem is complex it becomes less straightforward to apply these gradient based minimization methods, as
-many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance, if the 
-classical definition of differentiation is used then $\frac{\partial \conj{z}}{\partial z}$, where $z \in \mathbb{C}$, does not exist.
-
-The only way to circumvent the differentiability conundrum associated with complex least square problems is to recast our complex optimization problem in such a way that $\bnu$ becomes analytic in its argument.
-The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
-
-Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
-are defined to be 
-\begin{align}
-\label{eq:wir}
-\frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
-\end{align}
-Using the above definitions we can now easily compute the following:
-\begin{align}
-\frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
-\end{align}
-In this alternative approach we treat the complex parameters and their conjugates as separate variables.
-
-\section{Problem Statement}
+\section{Wirtinger Calibration}
 \label{sec:p_statement}
-In Section~\ref{sec:s_mes}, we present the scalar measurement equation. Next, we define some indexing functions in Section~\ref{sec:indexing}. The measurement 
-equation and the indexing functions from Section~\ref{sec:indexing} are then used in Section~\ref{sec:r_mes} to phrase redundant calibration as a least-squares problem, i.e. Eq.~\eqref{eq:least_squares_red}.
-We present the signal-to-noise ratio (SNR) definition we used in this paper in Section~\ref{sec:snr}. The limitations of this paper are discussed in Section~\ref{sec:scope}.
+%In Section~\ref{sec:s_mes}, we present the scalar measurement equation. Next, we define some indexing functions in Section~\ref{sec:indexing}. The measurement 
+%equation and the indexing functions from Section~\ref{sec:indexing} are then used in Section~\ref{sec:r_mes} to phrase redundant calibration as a least-squares problem, i.e. Eq.~\eqref{eq:least_squares_red}.
+%We present the signal-to-noise ratio (SNR) definition we used in this paper in Section~\ref{sec:snr}. The limitations of this paper are discussed in Section~\ref{sec:scope}.
 
 \subsection{Scalar Measurement Equation}
 \label{sec:s_mes}
@@ -429,11 +323,17 @@ The real and imaginary components of the thermal noise are normally distributed 
 \end{equation}
 Here, $T_{\textrm{sys}}$ is equal to the system temperature, $\Delta \nu$ is the observational bandwidth and $\tau$ is the integration time per visibility. 
 
-\subsection{Indexing Functions}
-\label{sec:indexing}
-In general there are two ways of indexing the true visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
-or we can use a single unique baseline index which we assign in numerical order to each composite index, assuming the composite indexes are arranged in standard baseline order.
-The composite indexes $pq$ are in standard baseline order when they are arranged as follow: $12, 13, 1N, 23\cdots$. Let 
+Eq.~\eqref{eq:vis_definition} can also be expressed in the following vector form 
+\begin{equation}
+\label{eq:vis_definition}
+\bd = \bv + \bn, 
+\end{equation}
+where 
+\begin{align}
+ \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= v_{pq}=g_p y_{pq} \conj{g_q},\nonumber\\
+ \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
+\end{align}
+The function $\alpha_{pq}$ maps composite antenna indexes to unique single indexes and is defined as
 \begin{equation}
 \alpha_{pq} =
 \begin{cases}
@@ -443,71 +343,108 @@ The composite indexes $pq$ are in standard baseline order when they are arranged
 0 & \textrm{otherwise}
 \end{cases}.
 \end{equation}
-We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.e. 
+For example,
 \begin{equation}
-12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B.
+\{\alpha_{12},\alpha_{13},\alpha_{1N},\alpha_{23},\cdots,\alpha_{N-1N}\} = \{1,2,N-1,N,\cdots,B\},
 \end{equation}
-We denote the number of baselines in the array with $B$, i.e. $B = \frac{N^2-N}{2}$.
+where $B$ denotes the number of baselines in the array, i.e. $B = \frac{N^2-N}{2}$. The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
 
-Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
-Let us now group all the baselines that measure the same $uv$-modes in a redundant array into the same redundant baseline group. Assigning the baselines of a redundant array to different redundant baseline groups has the advantage that it reduces the number of single index values we require. We now only require single index values for each redundant baseline group instead of a unique single index label for 
-each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
-$\phi_{pq} = 0$ if $p\geq q$. We can also define the following symmetric variant of $\phi_{pq}$:
+We can now formulate calibration as a least-squares problem:
 \begin{equation}
-\zeta_{pq} = 
-\begin{cases}
-\phi_{pq}~\textrm{if}~p \leq q\\
-\phi_{qp}~\textrm{if}~p>q
-\end{cases}.
-\end{equation} 
-It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
-It becomes increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. 
-We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
-functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
-that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given 
-array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry. The dimension of these geometry 
-matrices are $N\times N$. 
-
-\begin{figure*}
-\centering
-\subfigure[Hexagonal layout]
-{\includegraphics[width=0.32\textwidth]{./HEX_lay.pdf}\label{fig:HEX_lay}}
-\subfigure[Square layout]
-{\includegraphics[width=0.32\textwidth]{./SQR_lay.pdf}\label{fig:SQR_lay}}
-\subfigure[Regular east-west layout]
-{\includegraphics[width=0.32\textwidth]{./REG_lay.pdf}\label{fig:REG_lay}}
-
-\subfigure[Hexagonal: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./HEX_phi.pdf}\label{fig:HEX_phi}}
-\subfigure[Square: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
-\subfigure[Regular east-west: $\zeta_{pq}$]
-{\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
-\caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
-In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
-to construct the hexagonal layout, while 100 antennas where used in the square and east-west layouts. In the case of the east-west layout we only plot the positions of the first ten antennas. The maximal amount of redundant baseline groups that can be formed for 
-the hexagonal, square and east-west layouts are 165, 180 and 99 respectively.\label{fig:geometry_function}}
-\end{figure*}
-
-If the function $\phi_{pq}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline group index itself then it is possible 
-to calculate the unknown antenna index. This can be computed via the following two expressions:
-\begin{equation}
-\xi_{ij} = 
-\begin{cases}
-p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
-0~\textrm{otherwise}
-\end{cases},
+\label{eq:least_squares}
+\min_{\bg} \Lambda(\bg) = \min_{\bg} \|\br\|_F^2 = \min_{\bg} \|\bd - \bv(\bg)\|_F^2, 
 \end{equation}
-and
-\begin{equation}
-\psi_{ij} = 
-\begin{cases}
-q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
-0~\textrm{otherwise}
-\end{cases}.
-\end{equation}
-We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline group index are known, while we use $\psi_{ij}$ to obtain 
-a similar result: the second antenna index of the composite antenna pair. %\textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
+where $\bg =[g_1,\cdots,g_N]^T$.
+
+least squares problems are normally solved by using gradient based methods, like Gauss-Newton and Levenberg-Marquardt .
+
+
+\begin{align}
+ \bg &=[g_1,\cdots,g_N]^T, & \by &= [y_1,\cdots,y_L]^T,\nonumber\\
+ \bz &= [\bg^T,\by^T]^T. &  &\label{eq:parm_definitions}
+ \end{align}
+
+% \subsection{Indexing Functions}
+% \label{sec:indexing}
+% In general there are two ways of indexing the true visibilities associated with different baselines. We can use the composite index $pq$, which is the strategy that is followed in Eq.~\eqref{eq:vis_definition},
+% or we can use a single unique baseline index which we assign in numerical order to each composite index, assuming the composite indexes are arranged in standard baseline order.
+% The composite indexes $pq$ are in standard baseline order when they are arranged as follow: $12, 13, 1N, 23\cdots$. Let 
+% \begin{equation}
+% \alpha_{pq} =
+% \begin{cases}
+% (q-p) + (p-1)\left (N-\frac{1}{2}p \right ) & \textrm{if}~p<q\\
+% %B + (p-q) + (q-1)\left (N-\frac{1}{2}q \right )) & \textrm{if}~p>q\\
+% %B+q + \frac{1}{2}(p-1)(p-2) & \textrm{if}~p>q\\
+% 0 & \textrm{otherwise}
+% \end{cases}.
+% \end{equation}
+% We can use $\alpha_{pq}$ to map composite indexes to unique baseline indexes, i.e. 
+% \begin{equation}
+% 12,13,\cdots,1N,23,\cdots \xrightarrow{\alpha_{pq}} 1,2,3,\cdots,B.
+% \end{equation}
+% We denote the number of baselines in the array with $B$, i.e. $B = \frac{N^2-N}{2}$.
+% 
+% Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
+% Let us now group all the baselines that measure the same $uv$-modes in a redundant array into the same redundant baseline group. Assigning the baselines of a redundant array to different redundant baseline groups has the advantage that it reduces the number of single index values we require. We now only require single index values for each redundant baseline group instead of a unique single index label for 
+% each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
+% $\phi_{pq} = 0$ if $p\geq q$. We can also define the following symmetric variant of $\phi_{pq}$:
+% \begin{equation}
+% \zeta_{pq} = 
+% \begin{cases}
+% \phi_{pq}~\textrm{if}~p \leq q\\
+% \phi_{qp}~\textrm{if}~p>q
+% \end{cases}.
+% \end{equation} 
+% It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
+% It becomes increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. 
+% We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
+% functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
+% that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given 
+% array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry. The dimension of these geometry 
+% matrices are $N\times N$. 
+% 
+% \begin{figure*}
+% \centering
+% \subfigure[Hexagonal layout]
+% {\includegraphics[width=0.32\textwidth]{./HEX_lay.pdf}\label{fig:HEX_lay}}
+% \subfigure[Square layout]
+% {\includegraphics[width=0.32\textwidth]{./SQR_lay.pdf}\label{fig:SQR_lay}}
+% \subfigure[Regular east-west layout]
+% {\includegraphics[width=0.32\textwidth]{./REG_lay.pdf}\label{fig:REG_lay}}
+% 
+% \subfigure[Hexagonal: $\zeta_{pq}$]
+% {\includegraphics[width=0.33\textwidth]{./HEX_phi.pdf}\label{fig:HEX_phi}}
+% \subfigure[Square: $\zeta_{pq}$]
+% {\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
+% \subfigure[Regular east-west: $\zeta_{pq}$]
+% {\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
+% \caption{In the top panel we have three different redundant antenna layouts, namely a hexagonal (left), square (middle) and a regular east-west (right) layout. 
+% In the bottom panel we have the respective symmetric redundancy geometry functions for the layouts on the top panel. We used 91 antennas
+% to construct the hexagonal layout, while 100 antennas where used in the square and east-west layouts. In the case of the east-west layout we only plot the positions of the first ten antennas. The maximal amount of redundant baseline groups that can be formed for 
+% the hexagonal, square and east-west layouts are 165, 180 and 99 respectively.\label{fig:geometry_function}}
+% \end{figure*}
+% 
+% If the function $\phi_{pq}$ is known and one is given one of the two antenna indexes that together form a redundant baseline as well as the redundant baseline group index itself then it is possible 
+% to calculate the unknown antenna index. This can be computed via the following two expressions:
+% \begin{equation}
+% \xi_{ij} = 
+% \begin{cases}
+% p~\textrm{if}~\exists! ~ p \in \mathbb{N} ~ s.t. ~(\phi_{pi} = j)\\
+% 0~\textrm{otherwise}
+% \end{cases},
+% \end{equation}
+% and
+% \begin{equation}
+% \psi_{ij} = 
+% \begin{cases}
+% q~\textrm{if}~\exists! ~ q \in \mathbb{N} ~ s.t. ~(\phi_{iq} = j)\\
+% 0~\textrm{otherwise}
+% \end{cases}.
+% \end{equation}
+% We use $\xi_{ij}$ to retrieve the first antenna index of the composite antenna pair associated with a particular baseline, if the index of the first antenna in the composite antenna pair and the unique redundant baseline group index are known, while we use $\psi_{ij}$ to obtain 
+% a similar result: the second antenna index of the composite antenna pair. %\textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
+
+\section{Redundant Wirtinger Calibration}
 
 \subsection{Redundant Measurement Equation}
 \label{sec:r_mes}
@@ -1521,6 +1458,119 @@ Eq.~\eqref{eq:LINCAL_update} is used to iteratively determine a new estimate of 
 \bvarrho_{k+1} = \bvarrho_k + \Delta \bvarrho_k. 
 \end{equation}
 Note that we do not explicitly denote the $k$ index in Eq.~\eqref{eq:LINCAL_update}. We update our parameter vector until convergence is reached.   
+
+\subsection{Conjugate Gradient Method}
+\label{sec:conj_grad}
+The CG method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
+reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear system. The CG method is generally used to solve
+\begin{equation}
+\label{eq:linear_system}
+\bb = \bA\bx,
+\end{equation}
+where $\bb\in\mathbb{C}^P$ is a known complex column vector of size $P$, $\bx\in\mathbb{C}^P$ is an unknown complex column vector with the same length as $\bb$, and $\bA\in\mathbb{C}^{P\times P}$ is a square positive-definite Hermitian matrix with the appropriate dimensions.  
+Moreover, using the CG method to solve Eq.~\eqref{eq:linear_system} will only be computationally advantageous if $\bA$ is also sparse (contain many zero entries).
+Using the iterative CG method to solve large sparse linear sytems was popularized by \citet{Reid1971}. A good tutorial on the CG method can be found in \citep{Shewchuk1994}.
+The iterative CG method is presented in Algorithm \ref{algo:CG}. 
+
+%If $\bA$ is a square positive semi-definite Hermitian matrix, then the conjugate gradient method only converges if $\bb$ is in the column range of $\bA$ (cite Lu2016).
+
+%\begin{algorithm}
+%\caption{Conjugate Gradient Method. Inputs: $\bA$, $\bb$, a starting value for $\bx$, maximum number of iterations $k_{\textrm{max}}$ and an error tolerance $\epsilon<1$ Output: $\bx$ the solution to Eq.~\eqref{eq:linear_system}. \citep{Shewchuk1994}.}\label{algo:CG}
+%\begin{algorithmic}[1]
+%\State $k \gets 0$
+%\State $\br \gets \bb - \bA\bx$
+%\State $\bp \gets \br$
+%\State $\delta_{\textrm{new}} \gets \br^H\br$
+%\State $\delta_0 \gets \delta_{\textrm{new}}$
+%\While{$k\leq k_{\textrm{max}}$ and $\delta_{\textrm{new}} > \epsilon^2\delta_0$}
+%\State $\alpha \gets \frac{\delta_{\textrm{new}}}{\bp^H\bA\bp}$
+%\State $\bx \gets \bx + \alpha\bp$
+%\State $\br \gets \br - \alpha\bA\bp$
+%\State $\delta_{\textrm{old}} \gets \delta_{\textrm{new}}$ 
+%\State $\delta_{\textrm{new}} \gets \br^H\br$
+%\State $\beta \gets \frac{\delta_{\textrm{new}}}{\delta_{\textrm{old}}}$
+%\State $\bp \gets \br + \beta\bp$
+%\State $k \gets k + 1$
+%\EndWhile
+%\end{algorithmic}
+%\end{algorithm}
+
+\subsubsection{Computational Complexity}
+\citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
+\citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
+the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the spectral condition number of the matrix $\bA$.
+The mathematical definition of $\kappa(\bA)$ is
+\begin{equation}
+\label{eq:kappa}
+\kappa(\bA) = \frac{\lambda_{\textrm{max}}}{\lambda_{\textrm{min}}}, 
+\end{equation}
+where $\lambda_{\textrm{max}}$ and $\lambda_{\textrm{min}}$ respectively denote the largest and the smallest eigenvalue of $\bA$.
+Moreover, the most expensive operation that is conducted within each major loop of Algorithm~\ref{algo:CG} is the vector-matrix product $\bA\bp$, which has a complexity of $\mathbb{O}(m)$, where $m$ is the number of non-zero entries in $\bA$.
+The computational complexity of CG is therefore 
+\begin{equation}
+\label{eq:cg_bound}
+\mathbb{O}(\sqrt{\kappa}m). 
+\end{equation}
+It should now also be clear to the reader why the CG method is especially applicable to sparse linear systems. In sparse linear systems $m < P^2$.
+
+\subsubsection{Preconditioning}
+\label{sec:precon}
+Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix.
+We can now indirectly solve for $\bx$ by using 
+\begin{equation}
+\label{eq:prec}
+\bM^{-1}\bA\bx = \bM^{-1}\bb.
+\end{equation}
+If $\bM$ is a good preconditioner then $\kappa(\bM^{-1}\bA) \ll \kappa(\bA)$, i.e. a good preconditioner lowers the condition number of a matrix which in turn increases the convergence speed 
+of CG (see Eq.~\eqref{eq:cg_bound}). In this paper, we denote matrix inversion with $(*)^{-1}$. The best possible choice of $\bM$ would therefore be $\bA$, which would lead to $\kappa$ becoming unity (as the largest and smallest eigenvalue of the identity matrix are equal to one).
+If $\kappa$ is one then Eq.~\eqref{eq:cg_bound} simplifies and becomes $\mathbb{O}(m)$. However, if we knew the inverse of $\bA$ then obtaining $\bx$ would be trivial and there would be no need for the CG method in the first place. 
+In short, a good preconditioner $\bM$ must approximate $\bA$ fairly accurately. However, if it is not much less expensive to 
+compute the inverse of $\bM$ than that of $\bA$ we actually gain nothing (see Eq.~\eqref{eq:prec}).  
+
+If the diagonal entries of $\bA$ are much more significant than its off-diagonal entries then the 
+Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner is computed as follows:
+\begin{equation}
+\bM = \bA\odot\bI, 
+\end{equation}
+where $\bI$ is the identity matrix and $\odot$ denotes the Hadamard product. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
+
+\subsubsection{Normal Equation}
+\label{sec:normal}
+Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
+\begin{equation}
+ \bb = \bB\bx,
+\end{equation}
+where $\bb\in\mathbb{C}^K$, $\bx\in\mathbb{C}^P$  and $\bB\in\mathbb{C}^{K \times P}$, with $K > P$. We can use the normal equation 
+\begin{equation}
+\label{eq:normal_equation}
+\bB^H\bB\bx = \bB^H\bb, 
+\end{equation}
+to estimate the $\bx$ that minimizes
+\begin{equation}
+\label{eq:norm_ls}
+\|\bb-\bB\bx\|_F^2. 
+\end{equation}
+In this paper, we denote the Hermitian transpose with $(*)^H$ and the Frobenius norm with $\|*\|_F$.
+
+There are a few important observations that we can make while inspecting Eq.~\eqref{eq:normal_equation}:
+\begin{enumerate}
+\item $\bB^H\bB$ is a square positive semi-definite Hermitian matrix by construction.
+\item $\bB^H\bb$ is in the column range of $\bB^H\bB$; this follows trivially from 
+\begin{equation}
+\bB^H\bb \in \mathcal{R}(\bB^H) \implies \bB^H\bb \in \mathcal{R}(\bB^H\bB).   
+\end{equation}
+\end{enumerate}
+In this paper, we denote the column range of a matrix $\bA$ with $\mathcal{R}(\bA)$.
+
+Recall that we mentioned that in general we can only solve Eq.~\eqref{eq:linear_system} with CG if $\bA$ is a square positive-definite Hermitian matrix. The CG method actually has an even broader applicability: it can be used to solve Eq.~\eqref{eq:linear_system} even if $\bA$ is a Hermitian positive semi-definite
+square matrix as long as $\bb$ is in the column range of $\bA$ \citep{Lu2015}. In light of \citet{Lu2015}, the two observations in the numbered list we presented in the previous paragraph imply that Eq.~\eqref{eq:normal_equation}
+can be solved by employing the CG method. The solution returned by CG is, however, only unique if $\bB^H\bB$ is positive-definite (invertible). The solution
+obtained by CG, whether it is unique or not, does minimize Eq.~\eqref{eq:norm_ls} in a least squares sense.
+
+Note that if $\bA$ is positive semi-definite, its smallest eigenvalue is zero. This implies that Eq.~\eqref{eq:kappa} is not defined. \citet{Lu2015} show that when $\bA$
+is a square positive semi-definite Hermitian matrix we do not use the spectral condition number to bound the convergence complexity of CG, but the general spectral condition
+number instead. The general spectral condition number is very similar to the spectral condition number; the only difference being that in Eq.~\eqref{eq:kappa} we replace  
+$\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue.
 
 \section{Redundant \textsc{StEfCal} and the ADI method}
 \label{sec:red_stef_ADI}
