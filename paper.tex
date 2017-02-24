@@ -343,20 +343,28 @@ The function $\alpha_{pq}$ maps composite antenna indexes to unique single index
 0 & \textrm{otherwise}
 \end{cases}.
 \end{equation}
-For example,
+For example, the set
 \begin{equation}
-\{\alpha_{12},\alpha_{13},\alpha_{1N},\alpha_{23},\cdots,\alpha_{N-1N}\} = \{1,2,N-1,N,\cdots,B\},
+\{\alpha_{12},\alpha_{13},\cdots,\alpha_{1N},\alpha_{23},\cdots,\alpha_{N-1N}\}
 \end{equation}
-where $B$ denotes the number of baselines in the array, i.e. $B = \frac{N^2-N}{2}$. The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
+and the set
+\begin{equation}
+\{1,2,\cdots,N-1,N,\cdots,B\},
+\end{equation}
+are equal. We denote the number of baselines in an array with $B$, i.e. $B = \frac{N^2-N}{2}$. The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
 
 We can now formulate calibration as a least-squares problem:
 \begin{equation}
 \label{eq:least_squares}
 \min_{\bg} \Lambda(\bg) = \min_{\bg} \|\br\|_F^2 = \min_{\bg} \|\bd - \bv(\bg)\|_F^2, 
 \end{equation}
-where $\bg =[g_1,\cdots,g_N]^T$.
+where $\bd$ is the observed visibility vector, $\bv$ is the model predicted visibility vector and $\bg =[g_1,\cdots,g_N]^T$.
+In 
 
-least squares problems are normally solved by using gradient based methods, like Gauss-Newton and Levenberg-Marquardt .
+
+Least-square type problems are generally solved by using gradient based minimization algorithms. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
+To employ gradient based algorithms the objective function of a least-squares problem has to be differentiable with respect to the model parameters, which in the case of 
+Eq.~\ref{eq:least_squares} is 
 
 
 \begin{align}
