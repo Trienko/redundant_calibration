@@ -349,22 +349,55 @@ For example, the set
 \end{equation}
 and the set
 \begin{equation}
-\{1,2,\cdots,N-1,N,\cdots,B\},
+\{1,2,\cdots,N-1,N,\cdots,B\}
 \end{equation}
 are equal. We denote the number of baselines in an array with $B$, i.e. $B = \frac{N^2-N}{2}$. The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
 
-We can now formulate calibration as a least-squares problem:
+We can now formulate calibration as an optimization problem:
 \begin{equation}
 \label{eq:least_squares}
 \min_{\bg} \Lambda(\bg) = \min_{\bg} \|\br\|_F^2 = \min_{\bg} \|\bd - \bv(\bg)\|_F^2, 
 \end{equation}
-where $\bd$ is the observed visibility vector, $\bv$ is the model predicted visibility vector and $\bg =[g_1,\cdots,g_N]^T$.
-In 
+where $\bd$ is the observed visibility vector, $\bv$ is the model predicted visibility vector and $\bg =[g_1,\cdots,g_N]^T$. Closely inspecting Eq.~\eqref{eq:least_squares},
+we realize that it is in actual fact a least-squares problem, i.e. $\Lambda$ is the objective function, $\br$ is the residual vector, $\bd$ is the observed data vector, $\bv$ is the 
+model-predicted data vector and $\bg$ is the model-parameter vector that minimizes the objective function.
+
+The gradient-based minimization algorithms that are generally used to solve least squares problems generally require the model (in Eq.~\eqref{eq:least_squares} the model is denoted by $\bv$) to be differentiable
+towards each model parameter. In this paper we will be focusing on the following gradient-based minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
+When the least squares problem is complex it becomes less straightforward to apply these gradient-based minimization methods, as
+many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance, if the 
+classical definition of differentiation is used then $\frac{\partial \conj{z}}{\partial z}$, where $z \in \mathbb{C}$, does not exist.
+
+The only way to circumvent the differentiability conundrum associated with complex least square problems is to recast our complex optimization problem in such a way that $\bv$ becomes analytic in its argument.
+The standard way of achieving this is to divide the complex optimization problem into its real and imaginary parts and then to solve for the real and imaginary parts of the parameters separately.
+
+Recently, \citet{Sorber2012} proposed an alternative strategy, which involves the use of Wirtinger calculus \citep{Wirtinger1927}. The Wirtinger derivatives 
+are defined to be 
+\begin{align}
+\label{eq:wir}
+\frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ). 
+\end{align}
+Using the above definitions we can now easily compute the following:
+\begin{align}
+\frac{\partial z}{\partial z} & = 1, & \frac{\partial \conj{z}}{\partial z}&=0, & \frac{\partial z}{\partial \conj{z}} & = 0, & \frac{\partial \conj{z}}{\partial \conj{z}}&=1.
+\end{align}
+In this alternative approach we treat the complex parameters and their conjugates as separate variables.
+
+\citet{Smirnov2015} recently proposed to use the Wirtinger derivative to perform normal skymodel-based calibration. To achieve this we first recast Eq.~\eqref{eq:least_squares} to
+\begin{equation}
+\label{eq:least_squares_augmented}
+\min_{\breve{\bg}} \Lambda(\breve{\bg}) = \min_{\breve{\bg}} \|\breve{\br}\|_F^2 = \min_{\breve{\bg}} \|\breve{\bd} - \breve{\bv}(\breve{\bg})\|_F^2, 
+\end{equation}
+where $\breve{\br} = [\br^T,\conj{\br}^T]^T$, $\breve{\bd} = [\bd^T,\conj{\bd}^T]^T$, $\breve{\bv} = [\bv^T,\conj{\bv}^T]^T$ and $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$. 
 
 
-Least-square type problems are generally solved by using gradient based minimization algorithms. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
-To employ gradient based algorithms the objective function of a least-squares problem has to be differentiable with respect to the model parameters, which in the case of 
-Eq.~\ref{eq:least_squares} is 
+
+Least-squares problems are generally solved by using gradient based minimization algorithms. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
+
+
+To employ gradient based algorithms the objective function of a least-squares problem has to be differentiable with respect to the model parameters, which is not the case in 
+Eq.~\ref{eq:least_squares}. The most general way to deal with this difficulty is to split the least-squares problem into its real and imaginary parts and then to solve 
+for the real and imaginary parts of the model-parameter vector separately.
 
 
 \begin{align}
