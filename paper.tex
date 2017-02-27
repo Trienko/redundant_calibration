@@ -306,8 +306,8 @@ We end the paper with some final conclusions.
 %equation and the indexing functions from Section~\ref{sec:indexing} are then used in Section~\ref{sec:r_mes} to phrase redundant calibration as a least-squares problem, i.e. Eq.~\eqref{eq:least_squares_red}.
 %We present the signal-to-noise ratio (SNR) definition we used in this paper in Section~\ref{sec:snr}. The limitations of this paper are discussed in Section~\ref{sec:scope}.
 
-\subsection{Scalar Measurement Equation}
-\label{sec:s_mes}
+%\subsection{Scalar Measurement Equation}
+%\label{sec:s_mes}
 The observed visibility $d_{pq}$ measured by the baseline formed by antenna $p$ and $q$ is described by
 \begin{equation}
 \label{eq:vis_definition}
@@ -363,7 +363,7 @@ we realize that it is in actual fact a least-squares problem, i.e. $\Lambda$ is 
 model-predicted data vector and $\bg$ is the model-parameter vector that minimizes the objective function.
 
 The gradient-based minimization algorithms that are generally used to solve least squares problems generally require the model (in Eq.~\eqref{eq:least_squares} the model is denoted by $\bv$) to be differentiable
-towards each model parameter. In this paper we will be focusing on the following gradient-based minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
+towards each model parameter, i.e. these methods make use of a Jacobian matrix $\bJ$. In this paper we will be focusing on the following gradient-based minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
 When the least squares problem is complex it becomes less straightforward to apply these gradient-based minimization methods, as
 many complex functions are not analytic (no Taylor expansion around a fiducial point exists) and therefore not differentiable if the classic notion of differentiation is used. For instance, if the 
 classical definition of differentiation is used then $\frac{\partial \conj{z}}{\partial z}$, where $z \in \mathbb{C}$, does not exist.
@@ -383,27 +383,45 @@ Using the above definitions we can now easily compute the following:
 \end{align}
 In this alternative approach we treat the complex parameters and their conjugates as separate variables.
 
-\citet{Smirnov2015} recently proposed to use the Wirtinger derivative to perform normal skymodel-based calibration. To achieve this we first recast Eq.~\eqref{eq:least_squares} to
+\citet{Smirnov2015} recently proposed to use the Wirtinger derivatives to perform normal skymodel-based calibration. Eq.~\eqref{eq:least_squares} can be recast to
 \begin{equation}
 \label{eq:least_squares_augmented}
 \min_{\breve{\bg}} \Lambda(\breve{\bg}) = \min_{\breve{\bg}} \|\breve{\br}\|_F^2 = \min_{\breve{\bg}} \|\breve{\bd} - \breve{\bv}(\breve{\bg})\|_F^2, 
 \end{equation}
 where $\breve{\br} = [\br^T,\conj{\br}^T]^T$, $\breve{\bd} = [\bd^T,\conj{\bd}^T]^T$, $\breve{\bv} = [\bv^T,\conj{\bv}^T]^T$ and $\breve{\bg} = [\bg^T,\conj{\bg}^T]^T$. 
-
-
-
-Least-squares problems are generally solved by using gradient based minimization algorithms. In this paper we will be focusing on the following gradient minimization algorithms: GN and LM \citep{Levenberg1944,Marquardt1963}.
-
-
-To employ gradient based algorithms the objective function of a least-squares problem has to be differentiable with respect to the model parameters, which is not the case in 
-Eq.~\ref{eq:least_squares}. The most general way to deal with this difficulty is to split the least-squares problem into its real and imaginary parts and then to solve 
-for the real and imaginary parts of the model-parameter vector separately.
-
-
+The complex GN update step is:
+\begin{equation}
+\label{eq:GN_update}
+ \Delta \breve{\bg} = (\bJ^H\bJ)^{-1}\bJ^H\breve{\br},
+\end{equation}
+with 
+\begin{equation}
+\label{eq:Jacobian}
+\bJ = \begin{bmatrix}
+       \bmJ & \bmJ^*\\
+       \conj{\bmJ}^* & \conj{\bmJ} 
+      \end{bmatrix},
+\end{equation}
+and
 \begin{align}
- \bg &=[g_1,\cdots,g_N]^T, & \by &= [y_1,\cdots,y_L]^T,\nonumber\\
- \bz &= [\bg^T,\by^T]^T. &  &\label{eq:parm_definitions}
- \end{align}
+[\bmJ]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial g_i}, & [\bmJ^*]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial \conj{g}_i}. 
+\end{align}
+We refer to $\bJ$ as the Jacobian matrix. Note that the Wirtinger derivatives (see Eq.~\eqref{eq:wir}) are employed in Eq.~\eqref{eq:Jacobian}.
+The complex LM update rule is very similar, the major difference being a damping factor $\lambda$ is introduced:
+\begin{equation}
+\label{eq:LM_update}
+\Delta \breve{\bg} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
+\end{equation}
+where $\bD=\bI\odot\bJ^H\bJ$. We refer to $\bJ^H\bJ$ as the Hessian matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$. 
+
+Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} is used to iteratively update the 
+parameter vector $\breve{\bg}$:
+\begin{equation}
+\label{eq:update}
+\breve{\bg}_{k+1} = \breve{\bg}_{k} + \Delta \breve{\bg}_{k}. 
+\end{equation}
+The parameter vector is updated until convergence is reached. To improve readability we do not explicitly denote the iteration subscript $k$ in 
+Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
 % \subsection{Indexing Functions}
 % \label{sec:indexing}
@@ -486,9 +504,26 @@ for the real and imaginary parts of the model-parameter vector separately.
 % a similar result: the second antenna index of the composite antenna pair. %\textbf{NB::} I still need to plot $\zeta_{ij}$ for different antenna layouts.
 
 \section{Redundant Wirtinger Calibration}
+\label{sec:red_wirtinger}
 
-\subsection{Redundant Measurement Equation}
-\label{sec:r_mes}
+Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
+Let us now group all the baselines that measure the same $uv$-modes in a redundant array into the same redundant baseline group. Assigning the baselines of a redundant array to different redundant baseline groups has the advantage that it reduces the number of single index values we require. We now only require single index values for each redundant baseline group instead of a unique single index label for 
+each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
+$\phi_{pq} = 0$ if $p\geq q$. We can also define the following symmetric variant of $\phi_{pq}$:
+\begin{equation}
+\zeta_{pq} = 
+\begin{cases}
+\phi_{pq}~\textrm{if}~p \leq q\\
+\phi_{qp}~\textrm{if}~p>q
+\end{cases}.
+\end{equation} 
+It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
+It becomes increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. 
+We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
+functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
+that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given 
+array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry. The dimension of these geometry 
+matrices are $N\times N$.
 If the array is redundant and the function $\phi_{pq}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
 \begin{equation}
 \label{eq:vis_red}
