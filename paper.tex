@@ -505,11 +505,12 @@ Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
 
 \section{Redundant Wirtinger Calibration}
 \label{sec:red_wirtinger}
-
-Recall that redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
-Let us now group all the baselines that measure the same $uv$-modes in a redundant array into the same redundant baseline group. Assigning the baselines of a redundant array to different redundant baseline groups has the advantage that it reduces the number of single index values we require. We now only require single index values for each redundant baseline group instead of a unique single index label for 
-each baseline. Let $\phi_{pq}$ be the function that maps composite antenna pairs to the appropriate single redundant baseline group index. Note that $\phi_{pq}$ is not symmetric as 
-$\phi_{pq} = 0$ if $p\geq q$. We can also define the following symmetric variant of $\phi_{pq}$:
+Redundant baselines sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
+We can therefore group all the baselines that measure the exact same visibilities into the same redundant baseline group. We index redundant baseline 
+groups with single group indices instead of composite antenna pairs. Let $\phi_{pq}$ be the function that maps the composite antenna pair associated with a specific baseline 
+to the single group index of the redundant baseline group to which the baseline in question belongs, i.e. if baseline $pq$ and $rs$ are redundant then $\phi_{pq} = \phi_{rs}$.  
+The function $\phi_{pq}$ is not symmetric as 
+$\phi_{pq} = 0$ if $p\geq q$. We can define the following symmetric variant of $\phi_{pq}$:
 \begin{equation}
 \zeta_{pq} = 
 \begin{cases}
@@ -517,17 +518,10 @@ $\phi_{pq} = 0$ if $p\geq q$. We can also define the following symmetric variant
 \phi_{qp}~\textrm{if}~p>q
 \end{cases}.
 \end{equation} 
-It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
-It becomes increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. 
-We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
-functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
-that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given 
-array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry. The dimension of these geometry 
-matrices are $N\times N$.
-If the array is redundant and the function $\phi_{pq}$ is known we can rewrite Eq.~\eqref{eq:vis_definition} as
+If the array is redundant we can rewrite Eq.~\eqref{eq:vis_definition} as
 \begin{equation}
 \label{eq:vis_red}
-d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq}.
+d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq},
 \end{equation}
 Eq.~\eqref{eq:vis_red} can also be expressed in the following vector form 
 \begin{equation}
@@ -539,7 +533,17 @@ where
  \left [ \bd \right]_{\alpha_{pq}} &= d_{pq}, & \left [ \bv \right ]_{\alpha_{pq}} &= v_{pq}=g_p y_{\phi_{pq}} \conj{g_q},\nonumber\\
  \left [ \bn \right ]_{\alpha_{pq}} &= n_{pq}. &  &\label{eq:vec_definitions}
 \end{align}
-The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$).
+The vectors in Eq.~\eqref{eq:vec_definitions} are column vectors of size $B$ (i.e. $p<q$). 
+It is possible to construct a simple analytic expression for $\zeta_{pq}$ when our array is in an east-west regular configuration, namely $\zeta_{pq} = |q-p|$. 
+It becomes increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. 
+We will refer to $\zeta_{pq}$ as the symmetric geometric function. The empirically constructed symmetric geometry
+functions of three different redundant layouts are depicted in Fig.~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element 
+that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given 
+array layout. Alternatively, we can interpret the symmetric geometry functions in Fig.~\ref{fig:geometry_function} as geometry matrices. In this alternative paradigm, $\zeta_{pq}$ denotes a matrix entry. The dimension of these geometry 
+matrices are $N\times N$.
+
+
+
 
 We have now defined enough notation to enable us to formulate redundant calibration as a least-squares problem:
 \begin{equation}
@@ -890,7 +894,7 @@ Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we 
 % 
 % FIX TRANSPOSE PROBLEM
 
-\section{Results}
+\section{Comparing ADI and PCG}
 \label{sec:results}
 In Section~\ref{sec:main_sec} we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
 Eq.~\eqref{eq:LM_update} we see that the most expensive operation used by the GN and LM algorithms is the inversion of the Hessian, $\bH$. The most logical 
