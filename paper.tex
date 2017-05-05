@@ -111,11 +111,12 @@ $^{6}$Radio Astronomy Lab., U. California, Berkeley CA 94720, USA}
 \begin{abstract}
 %In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
 Observations of the redshifted 21-cm line from the epoch of reionization have recently motivated the construction of low frequency radio arrays with highly redundant configurations that provide an alternative calibration strategy - ''redundant calibration" - and boosts sensitivity on specific scales. We show that redundant calibration can be formulated in the domain of complex functions of a complex variable. This framework reduces the 
-
+\textbf{[GIANNI TO REWRITE AND FIX ABSTRACT]}
 has driven advancements in the calibration of radio interferometers and 
 Calibration of the new generation of low frequency radio interferometers faces new challenges due to their very wide field of views 
 The construction of new radio interferometers, particularly operating at low frequencies and 
 In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
+\textbf{[Could we add JS Kenyon and SJ Wijnholds to author list?]}
 \end{abstract}
 
 %that \textsc{lincal} is effectively the non-linear least-squares gradient-based Gauss-Newton algorithm. Therefore, an easy way to reduce the number of layers used in performing redundant calibration is to employ the Levenberg-Marquardt algorithm instead (which would improve the convergence properties of stock standard \textsc{lincal})
@@ -177,9 +178,9 @@ allows us to trivially prove that the ADI method proposed by \citep{Marthi2014} 
 %Moreover, this framework also 
 %allows us to show that the ADI method proposed by \citep{Marthi2014} can for all intents and purposes be renamed to redundant \textsc{StEfCal} \citep{Mitchell:MWA-cal,Salvini2014}. 
 
-We start the paper by presenting some useful preliminaries in Section~\ref{sec:preliminaries}. In Section~\ref{sec:p_statement}, we formulate redundant calibration 
-as a least squares problem, i.e. Eq~\eqref{eq:least_squares_red}. In Section~\ref{sec:main_sec} we use the complex framework proposed by \citet{Smirnov2015} to derive the GN and LM
-update rules (see Eq.~\eqref{eq:GN_update} to Eq.~\eqref{eq:update}), which we can use to solve Eq~\eqref{eq:least_squares_red}. In Section~\ref{sec:results}, we compare the computational complexity of two recently proposed redundant calibration speedup algorithms with one another.
+In Section~\ref{sec:sky_wirtinger}, we review the skymodel-based complex-and-conjugate calibration approach proposed by \citet{Smirnov2015}.
+In Section~\ref{sec:red_wirtinger}, we show that this same approach can also be used to perform redundant calibration.
+In Section~\ref{sec:results}, we compare the computational complexity of two recently proposed redundant calibration speedup algorithms with one another.
 We end the paper with some final conclusions.
 
 % Main contributions of the paper:
@@ -609,7 +610,7 @@ As already alluded to in Section~\ref{sec:sky_wirtinger}, we can solve Eq.~\eqre
 imaginary parts and then solve for the real and imaginary parts of the unknown parameters separately or we can employ the notion of Wirtinger derivatives. The former 
 approach is discussed in Section~\ref{sec:ri}, while the latter approach is described in Section~\ref{sec:w}. 
 
-\subsection{Real and imaginary approach}
+\subsection{Real and Imaginary Approach}
 \label{sec:ri}
 Using least-squares to solve complex problems can be problematic as $\bv$ needs to be analytic in its argument. In the case 
 of Eq.~\eqref{eq:least_squares_red}, \citet{Liu2010} circumvents this difficulty by 
@@ -629,7 +630,7 @@ In doing so the need to use $\textsc{logcal}$ before $\textsc{lincal}$ becomes s
 a computational advantage, as it is a very fast method to obtain a good starting solution, and would reduce the number of iterations needed by the LM algorithm.
 Proper experiments would need to be conducted to determine whether it is worth keeping $\textsc{logcal}$ in the algorithmic hierarchy. 
 
-\subsection{Complex Approach}
+\subsection{Wirtinger Approach}
 \label{sec:w}
 
 %\citet{Smirnov2015} recently proposed to use the Wirtinger derivative instead of the classic real and imaginary approach to perform normal skymodel-based calibration. We will now show
@@ -649,8 +650,8 @@ Analogous to \cite{Smirnov2015}, we recast Eq.~\eqref{eq:least_squares_red} to
 \min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
 where $\breve{\bz} = [\bz^T,\conj{\bz}^T]^T$. Eq.~\eqref{eq:least_squares_complex} is the complex conjugate augmented counterpart of Eq.~\eqref{eq:least_squares_red}.
-The fact that $\bv$ is now analytic in its argument has the immediate consequence: it becomes possible to apply complex GN
-and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
+%The fact that $\bv$ is now analytic in its argument has the immediate consequence: it becomes possible to apply complex GN
+%and complex LM to Eq.~\eqref{eq:least_squares_complex}. 
 
 \subsubsection{Complex GN and LM}
 \label{sec:complex_GN_LM}
@@ -686,17 +687,13 @@ The LM update rule is defined in a very similar way:
 \label{eq:LM_update}
 \Delta \breve{\bz} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
-
-As mentioned in Section We use Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} to iteratively update our 
+As was the case in Section~\ref{sec:sky_wirtinger}, we can now use Eq.~\eqref{eq:GN_update} or Eq.~\eqref{eq:LM_update} to iteratively update our 
 parameter vector as follows:
 \begin{equation}
 \label{eq:update}
 \breve{\bz}_{k+1} = \breve{\bz}_{k} + \Delta \breve{\bz}_{k}. 
 \end{equation}
-We update our parameter vector by using Eq.~\eqref{eq:update} until convergence is reached. To improve readability we do not explicitly denote the iteration subscript $k$ in 
-Eq.~\eqref{eq:GN_update} and Eq.~\eqref{eq:LM_update}.
-
-
+The analytic expressions for $\bJ$, $\bH$ and $\bJ^H\breve{\br}$ can be found in Appendix~\ref{sec:analytic}.
 
 \subsubsection{Simplifying GN}
 
@@ -736,7 +733,7 @@ Eq.~\eqref{eq:two_thrids} shows us that in the case of redundant calibration we 
 
 \section{Comparing ADI and PCG}
 \label{sec:results}
-In Section~\ref{sec:main_sec} we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
+In Section~\ref{sec:red_wirtinger} we discussed the complex GN and LM algorithms and how they relate to redundant calibration. If we inspect Eq.~\eqref{eq:GN_update} and 
 Eq.~\eqref{eq:LM_update} we see that the most expensive operation used by the GN and LM algorithms is the inversion of the Hessian, $\bH$. The most logical 
 way of speeding up the algorithm is to investigate whether we can do this inversion in some efficient way.
 
@@ -797,9 +794,7 @@ that was used did not alter the simulation results.
 The main flow of a single simulation is as follows. We created corrupted visibilities using the fixed simulation parameters presented in Table~\ref{tab:fixed_parm} and either one of the experimental setups summarized in Table~\ref{tab:ch_parm}. We then used per time-slot and channel redundant calibration, i.e. we use the LM algorithm, which in turn makes use of either the ADI or PCG method, to 
 estimate the gains and the true observed visibilities. Our initial parameter guess $\bz_0$ was chosen to be an all one vector. To obtain statistically significant results we performed, for both the ADI and PCG methods, multiple statistical independent simulations. 
 
-\subsubsection{Signal-to-noise Ratio}
-\label{sec:snr}
-The following SNR definition is used in this paper  
+Furthermore, the following SNR definition is used in this paper  
 \begin{equation}
 \label{}
 \textrm{SNR} = \frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}}, 
@@ -948,7 +943,7 @@ We obtain a similar result if we repeat the above procedure, only in this case w
 \end{align}
 The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
 expression of $\bJ^H\breve{\br}$, the only difference being that in Eq.~\eqref{eq:ab} the letter $r$ would be replaced by a $d$. If we substitute the analytic expression
-of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which is easily computed as the matrix is diagonal) into Eq.~\eqref{eq:alpha} we obtain the following two update rules:
+of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which can easily be constructed using Appendix~\ref{sec:analytic}) into Eq.~\eqref{eq:alpha} we obtain the following two update rules:
 \begin{equation}
 \label{eq:g_update}
 g_{i}^{k+1} = \alpha \frac{\sum_{j\neq i} g_j^k \widetilde{y}_{ij}^{~\!\!k} d_{ij}}{\sum_{j\neq i} |g_j^k|^2|y_{\zeta_{ij}}^k|^2} + (1-\alpha) g_i^k, 
@@ -1012,16 +1007,19 @@ predicted visibilities and the true predicted visibilities for different SNR val
 \subsection{Preconditioned Conjugate Gradient Method}
 \label{sec:pcg}
 In this section we investigate the computational complexity of the PCG method when applied to the redundant calibration problem. 
-As we mentioned in Section~\ref{sec:conj_grad} there are two factors which influence the computational complexity of the PCG method, namely the spectral condition number and the sparsity of the matrix we wish to invert (see Eq.~\eqref{eq:cg_bound}). 
+We briefly review the PCG method in Appendix~\ref{sec:conj_grad}. If the reader is not that familiar with the PCG method we encourage 
+the reader to briefly review Appendix~\ref{sec:conj_grad} before continuing with the paper. The PCG method can be used to efficiently invert Hermitian sparse 
+matrices, which is exactly the kind of matrix $\bH$ is (see Fig.~\ref{fig:hessian} and Eq.~\ref{eq:red_H}). As we mention in Appendix~\ref{sec:conj_grad} there are two factors which influence the computational complexity of the PCG method, namely the spectral condition number $\kappa$ and the sparsity of the matrix we wish to invert (see Eq.~\eqref{eq:cg_bound}). 
+
 We used a $\lambda$ value of two, implying we used Eq.~\eqref{eq:LM_update} instead of Eq.~\eqref{eq:GN_update} throughout this section.
-We discuss the spectral condition number and the sparsity of the modified Hessian $\bmH$, which is a non-singular matrix, in Section~\ref{sec:scn} and Section~\ref{sec:sparsity} respectively.
-It is interesting to note, that the Hessian $\bH$ itself is singular which means that if we are to use Eq.~\eqref{eq:GN_update} instead we would need to be able to invert a singular matrix. In Section~\ref{sec:normal},
-we showed that the PCG method would in fact be able to handle such a scenario.
+We investigate the spectral condition number and the sparsity of the modified Hessian $\bmH$, which is a non-singular matrix, in Section~\ref{sec:scn} and Section~\ref{sec:sparsity} respectively.
+It is interesting to note, that the Hessian $\bH$ itself is singular which means that if we are to use Eq.~\eqref{eq:GN_update} instead we would need to be able to invert a singular matrix. In Appendix~\ref{sec:normal},
+we mention that the PCG method would in fact also be able to pseudo-invert $\bH$ directly.
 
 \subsubsection{Spectral Condition Number}
 \label{sec:scn}
-In Section~\ref{sec:precon} we mentioned that the convergence properties of CG can be dramatically improved through preconditioning. Inspecting Fig.~\ref{fig:hessian} reveals that the Jacobian preconditioner
-is a good candidate for the redundant use case. In Fig.~\ref{fig:kappa} we see that this choice of preconditioner performs very well, the value of the spectral condition number $\kappa$
+In Appendix~\ref{sec:precon} we mentioned that the convergence properties of CG can be dramatically improved through preconditioning. Inspecting Fig.~\ref{fig:hessian}, reveals that the Jacobian preconditioner
+is a good candidate for the redundant use case. In Fig.~\ref{fig:kappa}, we see that this choice of preconditioner performs very well, the value of the spectral condition number $\kappa$
 becomes constant and independent of problem size, i.e. the number of antennas in the array. Preconditioning therefore effectively eliminates $\kappa$ from Eq.~\eqref{eq:cg_bound}. This result
 is confirmed by Fig.~\ref{fig:cg_itr}. Fig.~\ref{fig:cg_itr} shows us that the number of major iterations needed by the preconditioned conjugate gradient method to invert $\bmH$ is independent of the number of antennas in the array.
 Moreover, the number of major iterations required is also much smaller than the dimension of $\bmH$. 
@@ -1076,7 +1074,7 @@ In Fig.~\ref{fig:gamma}, we plot the empirically determined sparsity ratios for 
 the limit of the hexagonal and square layout curves, Fig.~\ref{fig:gamma} seems to indicate that they do exist. Moreover, we also plot the left most equation
 of Eq.~\eqref{eq:gamma} (red dashed line) and the right most equation of Eq.~\eqref{eq:gamma} (black dotted curve) in Fig.~\ref{fig:gamma}.  
 
-We can now use the sparsity factor to compute the order of the computational complexity of inverting $\bmH$ (assuming the effect of $\kappa$ is negliable) with
+We can now use the sparsity factor to compute the order of the computational complexity of inverting $\bmH$ (assuming the effect of $\kappa$ is negligible) with
 \begin{equation}
 P^{c} = (1 - \gamma)P^2.
 \end{equation}
@@ -1085,8 +1083,7 @@ Solving for $c$ we obtain
 c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2. \label{eq:c}
 \end{align}
 
-The evaluation of the limit in the rightmost equation of Eq.~\eqref{eq:c} is evaluated as follows: 
-note that
+The evaluation of the limit in the rightmost equation of Eq.~\eqref{eq:c} is evaluated as follows: note that
 \begin{equation}
 \label{eq:int_limit}
 \lim_{N\rightarrow\infty} P^{\log_{P}(1-\gamma)} = 1-\gamma_{\infty},
@@ -1389,7 +1386,7 @@ Eq.~\eqref{eq:LINCAL_update} is used to iteratively determine a new estimate of 
 \end{equation}
 Note that we do not explicitly denote the $k$ index in Eq.~\eqref{eq:LINCAL_update}. We update our parameter vector until convergence is reached.   
 
-\subsection{Conjugate Gradient Method}
+\section{Conjugate Gradient Method}
 \label{sec:conj_grad}
 The CG method was independently discovered by \citet{Hestenes1973} and \citet{Stiefel1952}. They later published a joint paper, which is now considered as the seminal
 reference on CG \citep{Hestenes1952}. The iterative CG method is used to solve a particular class of linear system. The CG method is generally used to solve
@@ -1425,7 +1422,7 @@ The iterative CG method is presented in Algorithm \ref{algo:CG}.
 %\end{algorithmic}
 %\end{algorithm}
 
-\subsubsection{Computational Complexity}
+\subsection{Computational Complexity}
 \citet{Kaniel1966} was able to determine convergence bounds for CG using Chebyshev polynomials. A much more in depth analysis of CG convergence can be found in
 \citep{Sluis1986}. As can be seen from Algorithm \ref{algo:CG}, the CG method makes use of a major outer loop (line 6 of Algorithm \ref{algo:CG}). It turns out that at worst 
 the number of major iterations that CG requires to converge\footnote{If the $\bA$-norm is used to calculate the error.} is proportional to $\sqrt{\kappa}$, where $\kappa$ is the spectral condition number of the matrix $\bA$.
@@ -1443,7 +1440,7 @@ The computational complexity of CG is therefore
 \end{equation}
 It should now also be clear to the reader why the CG method is especially applicable to sparse linear systems. In sparse linear systems $m < P^2$.
 
-\subsubsection{Preconditioning}
+\subsection{Preconditioning}
 \label{sec:precon}
 Preconditioning is a technique which allows us to improve the condition number of a matrix. Let $\bM$ be a positive-definite Hermitian matrix.
 We can now indirectly solve for $\bx$ by using 
@@ -1464,7 +1461,7 @@ Jacobian preconditioner is a good choice of $\bM$. The Jacobian preconditioner i
 \end{equation}
 where $\bI$ is the identity matrix and $\odot$ denotes the Hadamard product. Since the Jacobian preconditioner is a diagonal matrix its inverse can be obtained trivially.
 
-\subsubsection{Normal Equation}
+\subsection{Normal Equation}
 \label{sec:normal}
 Lets assume that instead of Eq.~\eqref{eq:linear_system} we have a more general linear system, i.e.
 \begin{equation}
@@ -1503,7 +1500,7 @@ number instead. The general spectral condition number is very similar to the spe
 $\lambda_{\textrm{min}}$ with $\lambda_{\textrm{min}}^+$, which denotes the smallest positive eigenvalue.
 
 
-\section{Redundant Wirtinger Calibration - $\bJ$ and $\bH$}
+\section{Redundant Wirtinger Calibration - $\bJ$, $\bH$ and $\bJ^H\breve{\br}$}
 \label{sec:analytic}
 If we apply the definition in Eq.~\eqref{eq:Jacobian} to Eq.~\eqref{eq:least_squares_complex} we obtain the following analytic result:
 \begin{equation}
