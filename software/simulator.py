@@ -503,7 +503,7 @@ class sim():
       num_sources - the amount of values to draw from the pareto distribution.
       plot - if true plot the distribution.
       '''
-      def generate_flux(self,a = 1.2,num_sources = 10,plot = False):
+      def generate_flux(self,a = 2,num_sources = 10000,plot = True):
           y = np.random.pareto(a, size=num_sources)
           if plot:
              count, bins, ignored = plt.hist(y, 100, normed=True)
@@ -1131,8 +1131,10 @@ def Gianni_freq_exp():
     plt.show() 
 
 if __name__ == "__main__":
+   s = sim(layout="REG",order=10)
+   s.generate_flux()
    #example_usage()
-   plot_paper_layouts()
+   #plot_paper_layouts()
    #Gianni_freq_exp()
    
 

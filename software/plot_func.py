@@ -728,7 +728,7 @@ def plot_kappa_itr_pres():
     plt.grid('on')
     plt.show()
 
-def plot_k():
+def plot_k_old():
     
     #N = np.array([7,19,37,61,91,108,169,217])
     matplotlib.rcParams.update({'font.size': 22})
@@ -773,6 +773,66 @@ def plot_k():
     plt.plot(N,k,lw=2.0,label='Theory',c='k')
     plt.plot(N1,diff1,lw=2.0,label='SNR=1000',c='b')
     plt.plot(N2,diff2,lw=2.0,label='SNR=5',c='g')
+    plt.xlabel(r'$N$ [antennas]')
+    plt.ylabel(r'# Iterations')
+    plt.legend(loc=5,prop={'size': 18})
+    plt.xlim([37,217])
+    
+    plt.grid('on')
+    
+    plt.show() 
+
+def plot_k_new():
+    
+    #N = np.array([7,19,37,61,91,108,169,217])
+    matplotlib.rcParams.update({'font.size': 22})
+
+    #N = np.arange(37,218)
+    
+    #P = 6*N - np.sqrt(12*N - 3) -1
+
+    #factor = P**(0.7) - 1
+
+    output = open("outerloop_1000.p", 'rb')
+    N1 = pickle.load(output)
+    outerloop_pcg_mean1 = pickle.load(output)
+    outerloop_pcg_std1 = pickle.load(output)
+    outerloop_stef_mean1 = pickle.load(output)
+    outerloop_stef_std1 = pickle.load(output)
+    
+    output.close()
+
+    N1 = N1[2:]
+    outerloop_pcg_mean1 = outerloop_pcg_mean1[2:]
+    outerloop_pcg_std1 = outerloop_pcg_std1[2:]
+    outerloop_stef_mean1 = outerloop_stef_mean1[2:]
+    outerloop_stef_std1 = outerloop_stef_std1[2:]
+    diff1 = outerloop_stef_mean1 - outerloop_pcg_mean1
+    
+    output = open("outerloop_5.p", 'rb')
+    N2 = pickle.load(output)
+    outerloop_pcg_mean2 = pickle.load(output)
+    outerloop_pcg_std2 = pickle.load(output)
+    outerloop_stef_mean2 = pickle.load(output)
+    outerloop_stef_std2 = pickle.load(output)
+    output.close()
+
+    N2 = N2[2:]
+    outerloop_pcg_mean2 = outerloop_pcg_mean2[2:]
+    outerloop_pcg_std2 = outerloop_pcg_std2[2:]
+    outerloop_stef_mean2 = outerloop_stef_mean2[2:]
+    outerloop_stef_std2 = outerloop_stef_std2[2:]
+    diff2 = outerloop_stef_mean2 - outerloop_pcg_mean2
+
+    P = 6*N2 - np.sqrt(12*N2 - 3) -1
+
+    factor = P**(0.7) - 1
+
+    delta_k = factor*(outerloop_pcg_mean2)
+
+    plt.semilogy(N2,delta_k,lw=2.0,label='Theory',c='k')
+    plt.semilogy(N1,diff1,lw=2.0,label='SNR=1000',c='b')
+    plt.semilogy(N2,diff2,lw=2.0,label='SNR=5',c='g')
     plt.xlabel(r'$N$ [antennas]')
     plt.ylabel(r'# Iterations')
     plt.legend(loc=5,prop={'size': 18})
@@ -1029,8 +1089,8 @@ if __name__ == "__main__":
    #plot_kappa_itr_pres()
    #plot_prec_err_paper()
    #plot_sparsity()
-   #plot_k()
-   plot_P()
+   plot_k_new()
+   #plot_P()
 
    #plot_kappa_itr(SNR=5)
    #plot_outer_loop(SNR=5)
