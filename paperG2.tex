@@ -137,15 +137,42 @@ The quest for the redshifted 21-cm line from the Epoch of Reionization (EoR) is 
 
 Redundant configurations have historically been abandoned because of their poor imaging performances as they measure only a limited number of spatial scales and, therefore, do not adequately sample the sky brightness distribution. For this very reason, however, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio modes for EoR measurements \citep[][]{Parsons2012,Dillon2015}.
 
-The second advantage of redundant array configurations is that they, by definition, they measure the same spatial scales {\bf (GB: perhaps worth having the Van cittert-Zernike theorem here?)} regardless of what the sky brightness distribution looks like. This means that the corruptions that are introduces by the instrument can be calibrated - up to some extent - without knowing anything about the sky brightness distribution \citep[][]{Noordam1982,Wieringa1992}. This property is particularly desirable for EoR observations as it mitigates errors introduced by an incomplete knowledge of the sky brightness distribution.
+The second advantage of redundant array configurations is that they, by definition, they measure the same spatial scales 
 
-In this paper we extend the stefcal calibration algorithm to the redundant use case using the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
-We also perform a proper computational analysis of the recently proposed (preconditioned conjugate gradient) PCG method when it is applied to the redundant calibration problem.
-We also compare these two approaches.
+{\bf (GB: perhaps worth having the Van cittert-Zernike theorem here?)} 
 
-present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. With respect to current algorithms, it is more robust to initial conditions, it is comparatively fast and {\bf ?????...}. We also present an analysis of its computational complexity showing that the LM algorithm shows better convergence properties than the GN currently used \cite{Zheng14}.
+{\bf (TLG: Leave the decision to Gianni.)}
 
-The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015,Kurien2016} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we test the algorithm performances in Section~\ref{sec:results} and we conclude in Section\ref{sec:conclusions}.
+regardless of what the sky brightness distribution looks like. This means that the corruptions that are introduces by the instrument can be calibrated - up to some extent - without knowing anything about the sky brightness distribution \citep[][]{Noordam1982,Wieringa1992}. This property is particularly desirable for EoR observations as it mitigates errors introduced by an incomplete knowledge of the sky brightness distribution.
+
+%In this paper we extend the stefcal calibration algorithm to the redundant use case using the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
+%We also perform a proper computational analysis of the recently proposed (preconditioned conjugate gradient) PCG method when it is applied to the redundant calibration problem.
+%We also compare these two approaches.
+
+{\bf (TLG: I have only modified the paragraph below in the introduction to try and point out the point of the paper. I hope this makes 
+more sense now given the the restructuring GB suggested.)}
+
+In this paper we present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
+With respect to current algorithms, it is more robust to initial conditions, while remaining comparatively fast. We also show 
+that given certain approximations this new algorithm reduces to the redundant calibration equivalent of the StEfCal algorithm \citep{Salvini2014}.
+In this paper we will refer to this simplified version of the new algorithm as redundant StEfCal. We also 
+investigate the speed-up that the preconditioned conjugate gradient (PCG) method provides if it is employed by the new algorithm \citep{Liu2010}.
+A comparison between the computational complexity of the optimized new algorithm and redundant StEfCal is also performed.
+
+{\bf (TLG: The following papers on redundant calibration has to be cited in the paper \citep{Noorishad2012} and Sievers2017. It was previously given in the 
+intro and was subsequently removed in the previous iteration made by GB. Unsure were they now belong.)}
+
+
+
+%Redundant StEfCal is much faster 
+%than WRC. 
+%We also investigate the speed-up that is achievable by employing
+%Moreover, a proper computational complexity comparison is made between redundant StEfCal and the recently proposed  when applied to the redundant calibration problem is conducted.
+%With respect to current algorithms, it is more robust to initial conditions, it is comparatively fast and {\bf ?????...}. 
+%We also compare these two approaches.
+%We also present an analysis of its computational complexity showing that the LM algorithm shows better convergence properties than the GN currently used \cite{Zheng14}.
+
+The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we test the algorithm performances in Section~\ref{sec:results} and we conclude in Section\ref{sec:conclusions}.
 
 %
 %
@@ -309,7 +336,7 @@ The paper is organized as follows: we review the complex calibration formalism b
 \section{Wirtinger calibration}
 \label{sec:sky_wirtinger}
 
-In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a baseline formed by antenna $p$ and $q$ are always ``corrupted" by the non-ideal response of the receiver, which is often incorporated into a single, receiver-based complex number $g$. The observed visibility $d_{pq}$ is given therefore by \citep{ME1,ME2,RRIME1}
+In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a baseline formed by antenna $p$ and $q$ are always ``corrupted" by the non-ideal response of the receiver, which is often incorporated into a single, receiver-based complex number $g$. The observed visibility $d_{pq}$ is therefore given by \citep{ME1,ME2,RRIME1}
 \begin{equation}
 \label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g_q} \, y_{pq} + n_{pq},
@@ -541,6 +568,12 @@ to $\alpha=\frac{1}{2}$) we obtain the even parameter update step of \textsc{StE
 Alternating between solving and fixing different sets of parameters (which is exactly what \textsc{StEFCal} does) is in general referred to 
 as the alternating direction implicit method (ADI). The \textsc{StEFCal} algorithm reduces the computational complexity of calibration from $\mathbb{O}(N^3)$ to $\mathbb{O}(N^2)$.
 
+{\bf (GB: Trienko, I am not sure about where to place the paragraph below till the end of the subsection... probably because I'm not sure what ``even" and ``odd" \textsc{StEfCal} steps are... can we add the GN step after equation~\ref{eq:stef_lambda}???)}
+
+{\bf (TLG: I have rewritten the above to make the odd and even stefcal steps more clear. I have also move the GN simplified equation before the 
+stefcal explanation. GB to rewrite.)}
+
+
 %A special case of solutions referred to as the alternating direction implicit \citep[ADI,][]{Salvini2014} algorithm is obtained by choosing $\lambda = 0$ \citep{Smirnov2015}. In particular, this choice of $\lambda$ is the parameter estimation step of the \textsc{StEfCal} algorithm \citep{Mitchell:MWA-cal,Salvini2014}, the most used implementation of ADI algorithms.  
 %{\bf (GB: Trienko, I am not sure about where to place the paragraph below till the end of the subsection... probably because I'm not sure what ``even" and ``odd" \textsc{StEfCal} steps are... can we add the GN step after equation~\ref{eq:stef_lambda}???)}
 %On the other hand, if we choose $\lambda$ equal to one (which corresponds
@@ -667,16 +700,31 @@ where
  \bz &= [\bg^T,\by^T]^T, &  &\label{eq:parm_definitions}
  \end{align}
 where the number of model parameters to be solved of is now $P = 2(N+L)$, since redundant calibration is a complex problem.
+{\bf (GB: is the following important? I thought it could be removed...) We plot $L$ and $P$ for two different geometric layouts in Fig~\ref{fig:pl}.
+The analytic expressions for the red and the blue curve in Fig.~\ref{fig:ln} are \citep{Camps2003}
+\begin{equation}
+L = 2N-\frac{1}{2}\sqrt{12N-3}-\frac{1}{2} 
+\end{equation}
+and
+\begin{equation}
+L = N - 1 
+\end{equation}
+respectively.}
+
+{\bf (TLG: Done.)}
+
 %The number of model parameters that we need to solve for in equation~\ref{eq:least_squares_red} is $P = 2(N+L)$, since redundant calibration is a complex problem.
 
-% \subsection{Limitations}
-% \label{sec:scope}
-% We only deal with per-timeslot and frequency channel calibration. No solution smoothing  
-% is applied between the different timeslots and channels. The reader interested in this is referred to \citep{Zheng2014}. 
-% Moreover, we do not explicitly deal with any of the degeneracies normally associated with redundant calibration \citep{Zheng2014,Kurien2016}. Similar to the approach taken in \citep{Marthi2014}, we assume that the degeneracies present in the redundant calibration solutions are removed with a final round of skymodel-based calibration.
+{\bf (TLG: This section got removed during a previous edit. It needs to be put back somewhere????)}
+
+\subsection{Limitations}
+ \label{sec:scope}
+ We only deal with per-timeslot and frequency channel calibration. No solution smoothing  
+ is applied between the different timeslots and channels. The reader interested in this is referred to \citep{Zheng2014}. 
+ Moreover, we do not explicitly deal with any of the degeneracies normally associated with redundant calibration \citep{Zheng2014,Kurien2016}. Similar to the approach taken in \citep{Marthi2014}, we assume that the degeneracies present in the redundant calibration solutions are removed with a final round of skymodel-based calibration.
 
 As mentioned in Section~\ref{sec:sky_wirtinger}, equation~\ref{eq:least_squares_red} can be solved by splitting the problem into its real and
-imaginary parts and then solve for the real and imaginary parts of the unknown parameters separately \citep{Wieringa1992,Liu2010,Zheng2014}. In Appendix~\ref{sec:lincal} we review this approach.
+imaginary parts and then solve for the real and imaginary parts of the unknown parameters separately \citep{Wieringa1992,Liu2010,Zheng2014}. In Appendix~\ref{sec:logcal} and~\ref{sec:lincal} we review this approach.
 %As already alluded to in Section~\ref{sec:sky_wirtinger}, we can solve equation~\ref{eq:least_squares_red} in one of two ways. We can split the problem into its real and imaginary parts and then solve for the real and imaginary parts of the unknown parameters separately or we can employ the notion of Wirtinger derivatives. The former approach is discussed in Section~\ref{sec:ri}, while the latter approach is described in Section~\ref{sec:w}. 
 %
 %\subsection{Real and Imaginary Approach}
@@ -817,13 +865,18 @@ derivative of the objective function $\Lambda$ relative to the elements of $\bg$
 for the unknown parameters. The above two equations can also be derived using the ADI method. Please see Appendix~\ref{sec:red_stef_ADI} for the details. We will refer to the above parameter update steps as redundant \textsc{StEFCal} in the remainder of the 
 paper.   
 
-%{\bf (GB: derived in which way? It would e useful to say in order to differentiate from us)}.
+{\bf (GB: derived in which way? It would be useful to say in order to differentiate from us)}.
+{\bf (TLG: Added)}.
 
 The choice of $\alpha$ is somewhat unconstrained. 
 In this paper we chose $\alpha=\frac{1}{3}$ (i.e. $\lambda = 2$) and we based our decision on the choice of $\alpha$ in the 
 case of classic \textsc{StEFCal}. In the case of \textsc{StEFCal}, $\alpha = \frac{1}{2}$ (for even iterations),
 which results in the last term of equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} being equal. 
 When $\alpha=\frac{1}{3}$, the last term of equation~\ref{eq:two_thrids} and equation~\ref{eq:alpha} are equal.
+
+{\bf (GB: is this true? TRIENKO, I MANAGED TO REACH ONLY TILL THIS POINT. I THINK IT IS TIME I HAND THIS BACK TO YOU AND YOU MAKE AN EFFORT TO TIE IT UP. i THINK WE CAN GO FROM HERE TO A MINOR REVISION NEXT TIME)}
+{\bf (TLG: tried to rephrase is it clear now?}
+
 
 %In this paper we follow the same choice done in \textsc{StEFCal}, leading to $\alpha = 1/3$. The following simulations show this choice to be appropriate {\bf (GB: is this true? TRIENKO, I MANAGED TO REACH ONLY TILL THIS POINT. I THINK IT IS TIME I HAND THIS BACK TO YOU AND YOU MAKE AN EFFORT TO TIE IT UP. i THINK WE CAN GO FROM HERE TO A MINOR REVISION NEXT TIME)} 
 
