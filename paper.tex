@@ -127,12 +127,11 @@ $^{7}$Radio Astronomy Lab., U. California, Berkeley CA 94720, USA}
 
 \begin{abstract}
 Observations of the redshifted 21-cm line from the epoch of reionization have recently motivated the construction of low 
-frequency radio arrays with highly redundant configurations that provide an alternative calibration strategy - 
-''redundant calibration" - and boosts sensitivity on specific spatial scales. In this paper we formulate 
-calibration of redundant interferometric arrays as a complex optimization problem \citep[i.e.,][]{Smirnov2015}. 
-We then solve this optimization problem via the Levenberg-Marquardt algorithm. This calibration approach is more 
-robust to initial conditions than current algorithms and, leveraging on an approximate matrix inversion, allows for further optimization and an efficient implementation (``redundant \textsc{StEfCal}"). We also investigated the use of the preconditioned conjugate gradient method as an alternative optimization strategy, instead of 
-an approximate matrix inverse, but found that its computational performance is not competitive with respect to ``redundant \textsc{StEfCal}". The efficient implementation of this new algorithm is made publicly available.
+frequency radio arrays with highly redundant configurations. These configurations provide an alternative calibration strategy - 
+''redundant calibration" - and boosts sensitivity on specific spatial scales. In this paper, we formulate 
+calibration of redundant interferometric arrays as a complex optimization problem {\bf SJK: suggests removing citation} \citep[i.e.,][]{Smirnov2015}. 
+We solve this optimization problem via the Levenberg-Marquardt algorithm. This calibration approach is more 
+robust to initial conditions than current algorithms and, by leveraging an approximate matrix inversion, allows for further optimization and an efficient implementation (``redundant \textsc{StEfCal}"). {\bf (SJK: ...boasts competitive [big O notation here] scaling. We coin the term "redundant StEfCal" for our algorithm and implementation)}.  We also investigated using the preconditioned conjugate gradient method as an alternative to the approximate matrix inverse, but found that its computational performance is not competitive with respect to ``redundant \textsc{StEfCal}". The efficient implementation of this new algorithm is made publicly available.
 %The construction of new radio interferometers, particularly operating at low frequencies and In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
 \end{abstract}
 
@@ -144,22 +143,22 @@ instrumentation: interferometers -- methods: data analysis -- methods: numerical
 \section{Introduction}
 The quest for the redshifted 21-cm line from the Epoch of Reionization (EoR) is a frontier of modern observational cosmology and has motivated the construction of a series of new interferometric arrays operating at low frequencies over the last decade. EoR measurements are challenging because of the intrinsic faintness of the cosmological signal \citep[see, for instance,][for recent reviews]{Furlanetto2016,McQuinn2016} buried underneath foreground emission which is a few orders of magnitude brighter than the EoR anywhere in the sky \citep[e.g.,][]{Bernardi2009,Bernardi2010,Ghosh2012,Dillon2014,Parsons2014}. 
 %and that can be separated by leveraging only on the different spectral properties (citations needed!!!). 
-As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exquisite interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}, unless arrays are deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that they measure many times the same sky brightness emission. Leveraging on this property, redundancy is a promising path to achieve high accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. Moreover, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deploment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
+As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exceptional interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}, unless arrays are deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that multiple baselines measure the same sky brightness emission. Leveraging this property, redundancy is a promising path to achieve highly accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. Moreover, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deploment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
 
-In this paper we present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
+In this paper we, present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
 With respect to current algorithms, it is more robust to initial conditions, while remaining comparatively fast. We also show that given certain approximations this new algorithm reduces to the redundant calibration equivalent of the \textsc{StEfCal} algorithm \citep{Salvini2014}.
 %In this paper we will refer to this simplified version of the new algorithm as redundant StEfCal. 
 We investigate the speed-up that the preconditioned conjugate gradient (PCG) method provides if it is employed by the new algorithm \citep{Liu2010}.
 A comparison between the computational complexity of the optimized new algorithm and redundant StEfCal is also performed.
 
-The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we conclude in Section~\ref{sec:conclusions}.
+The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we presnt our conclusions in Section~\ref{sec:conclusions}.
 
 %\section{Skymodel-based Wirtinger Calibration}
 %\section{Calibration described through the Wirtinger formalism}
 \section{Wirtinger calibration}
 \label{sec:sky_wirtinger}
 
-In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a baseline formed by antenna $p$ and $q$ are always ``corrupted" by the non-ideal response of the receiver, which is often incorporated into a single, receiver-based complex number $g$. The observed visibility $d_{pq}$ is therefore given by \citep{ME1,ME2,RRIME1}
+In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a baseline formed by antenna $p$ and $q$ are always ``corrupted" by the non-ideal response of the receiver, which is often incorporated into a single, receiver-based complex number $g$ (i.e. an antenna gain). The observed visibility $d_{pq}$ is therefore given by \citep{ME1,ME2,RRIME1}
 \begin{equation}
 \label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g_q} \, y_{pq} + n_{pq},
@@ -196,18 +195,22 @@ The function $\alpha_{pq}$ therefore maps composite antenna indexes to unique si
 \end{equation}
 The vectors in equation~\ref{eq:vec_linear_definitions} are column vectors of size $B$ (i.e. $p<q$).
 
+{\bf JSK: I would introduce the alpha quantity on its own before attaching it as an index in the definition of d. The reason for this is that eq. 4 and 5 seem very complicated without first understanding the meaning of alpha. Could have a paragraph starting ``In order to express equation 1 in vector form, we first introduce $\alpha$ which maps...''}
+
+{\bf TLG: Was like this earlier, got changed during the edits. GB let me know if it should be changed back.}
+
 Radio interferometric calibration aims to determine the best estimate of $\bg = [g_1,g_2,\cdots,g_N]^T$ in order to correct the data and, following equation~\ref{eq:vis_linear_definition}, can be formulated as a non linear least-squares optimization problem:
 \begin{equation}
 \label{eq:least_squares}
 \min_{\bg} \Lambda(\bg) = \min_{\bg} \|\br\|_F^2 = \min_{\bg} \|\bd - \bv(\bg)\|_F^2, 
 \end{equation}
-where $\Lambda$ is the objective function, $\br$ is the residual vector and $\|\cdot\|_F$ denotes the Frobenius norm. In standard interferometric calibration, $y_{pq}$ is assumed to be known at some level, for instance through the observation of previously known calibration sources. The knowledge of $y_{pq}$ is often named ``sky model".
+where $\Lambda$ is the objective function, $\br$ is the residual vector and $\|\cdot\|_F$ denotes the Frobenius norm. In standard interferometric calibration, $y_{pq}$ is assumed to be known at some level, for instance through the observation of previously known calibration sources. 
 
-The gradient-based minimization algorithms that are generally used to solve non-linear least-squares problems are generally solved by using gradient-based minimization algorithms (i.e. Gauss--Newton -- GN -- or Levenberg--Marquardt -- LM) that require the model ($\bv$ in equation~\ref{eq:least_squares}) to be differentiable towards each parameter. 
+Non-linear least-squares problems are generally solved by using gradient-based minimization algorithms (i.e. Gauss--Newton (GN) -- or Levenberg--Marquardt (LM)) that require the model ($\bv$ in equation~\ref{eq:least_squares}) to be differentiable towards each parameter. 
 When the least squares problem is complex, it becomes less straightforward to apply these gradient-based minimization methods, as
 many complex functions are not differentiable if the classic notion of differentiation is used, i.e. $\frac{\partial \conj{z}}{\partial z}$ does not exist if $z \in \mathbb{C}$.
 
-In order to circumvent the differentiability conundrum associated with complex least squares problems, standard interferometric calibration divides the complex optimization problem into its real and imaginary parts and solves for the real and imaginary parts of the unknown model parameters separately. \citet{Smirnov2015} showed, however, that this approach is not needed if complex calculus \citep{Wirtinger1927} is directly adopted. The Wirtinger derivatives are defined as:
+In order to circumvent the differentiability conundrum associated with complex least squares problems, standard interferometric calibration divides the complex optimization problem into its real and imaginary parts and solves for the real and imaginary parts of the unknown model parameters separately. \citet{Smirnov2015} showed, however, that this approach is not needed if complex calculus \citep{Wirtinger1927} is directly adopted {\bf JSK: employed}. The Wirtinger derivatives are defined as:
 \begin{align}
 \label{eq:wir}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ), 
@@ -245,12 +248,12 @@ and
 [\bmJ]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial g_i}, & [\bmJ^*]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial \conj{g}_i}. 
 \end{align}
 
-The complex LM update is very similar, the major difference being a damping factor $\lambda$ is introduced:
+The complex LM update is very similar, the major difference being the introduction of a damping parameter, $\lambda$:
 \begin{equation}
 \label{eq:LM_update_skymodel}
 \Delta \breve{\bg} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
-where $\bD=\bI\odot\bJ^H\bJ$. In this paper, the identity matrix is denoted by $\bI$. Moreover, the Hadamard product and the Hermition transpose are denoted by $\odot$ and $(\cdot)^H$. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
+where $\bD=\bI\odot\bJ^H\bJ$. In this paper, the identity matrix is denoted by $\bI$. Moreover, the Hadamard product and the Hermition transpose are denoted by $\odot$ and $(\cdot)^H$ respectively. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
 We will refer to $\bJ^H\bJ$ as the Hessian matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$ throughout this paper. 
 
 Equation~\ref{eq:GN_update_skymodel} or~\ref{eq:LM_update_skymodel} can now be used iteratively to update the parameter vector $\breve{\bg}$:
@@ -270,20 +273,35 @@ In the case of the GN algorithm, the parameter update step simplifies and become
 \citet{Smirnov2015} realized that the diagonal entries of the Hessian matrix $\bH$ are much more significant than its off-diagonal entries, i.e. $\bH$ is nearly diagonal. By approximating $\bH$ by its diagonal and substituting the approximate Hessian matrix the LM parameter update step becomes \citep{Smirnov2015}:
 \begin{align}
 \breve{\bg}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bg}_k, \nonumber \\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bg}_k, 
+ &= \rho \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\rho)\breve{\bg}_k, 
 \label{eq:stef_alpha}  
 \end{align}
-where $\alpha = \frac{1}{1+\lambda}$. Note that equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} are   
+where $\rho = \frac{1}{1+\lambda}$. Note that equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} are   
 not dependent on $\breve{\br}$. 
 
 Interestingly enough, if $\lambda = 0$ we obtain the odd parameter update step of \textsc{StEfCal}\footnote{$k\in\{0,2,\cdots\}$}, and if $\lambda=1$ (which corresponds
-to $\alpha=\frac{1}{2}$) we obtain the even parameter update step of \textsc{StEfCal}\footnote{$k\in\{1,3,\cdots\}$} \citep[\textsc{StEfCal},][]{Mitchell:MWA-cal,Salvini2014}. In the \textsc{StEfCal} algorithm, the measurement equation, equation~\ref{eq:vis_definition}, is linearized by assuming that the gains are known, but that their conjugates are not. Under this assumption, the system of equations become linear and the conjugates of the gains can be obtained straightforwardly. Starting from the latest value of the gain conjugates, an updated estimate of the gains can be obtained and the succession continues until convergence is reached.
-Alternating between solving and fixing different sets of parameters (which is exactly what \textsc{StEfCal} does) is in general referred to 
-as the alternating direction implicit method (ADI). The \textsc{StEfCal} algorithm reduces the computational complexity of calibration from $O(N^3)$ to $O(N^2)$.
+to $\rho=\frac{1}{2}$) we obtain the even parameter update step of \textsc{StEfCal}\footnote{$k\in\{1,3,\cdots\}$} \citep[\textsc{StEfCal},][]{Mitchell:MWA-cal,Salvini2014}. In the \textsc{StEfCal} algorithm, the measurement equation (equation~\ref{eq:vis_definition}) is linearized by assuming that the gains are known, but that their conjugates are not. Under this assumption, the system of equations become linear and the conjugates of the gains can be obtained in a straightforward manner. Starting from the latest value of the gain conjugates, an updated estimate of the gains can be obtained iteratively until convergence is reached.
+Alternating between solving and fixing different sets of parameters (which is exactly what \textsc{StEfCal} does) is referred to 
+as the alternating direction implicit (ADI) method. The \textsc{StEfCal} algorithm reduces the computational complexity of calibration from $O(N^3)$ to $O(N^2)$.
 
 \section{Redundant Wirtinger Calibration}
 \label{sec:red_wirtinger}
-Interferometric baselines are named redundant when they sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. It is convenient to group redundant visibilities together and label each group using a single index rather than using their antenna pairs as in equation~\ref{eq:vis_definition}. We introduce a function $\phi_{pq}$ that maps the antenna pair associated with a specific baseline to the single group index of the redundant baseline group that includes the baseline in question, i.e. if baseline $pq$ and $rs$ are redundant then $\phi_{pq} = \phi_{rs}$. The function $\phi_{pq}$ is not symmetric as $\phi_{pq} = 0$ if $p \geq q$. Equation~\ref{eq:vis_definition} can be re-written for a redundant array as:
+Interferometric baselines are redundant when they sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
+A redundant array layout allows us to solve for the unknown observed visibilities themselves in
+addition to the antenna gains (see equation \ref{eq:vec_linear_definitions}). This is true, since in the case of a redundant layout equation \ref{eq:vec_linear_definitions} is already an overdetermined 
+system (there is no need to first predict visibilities from a pre-existing skymodel). 
+
+{\bf SJK: I feel there needs to be some additional emphasis placed on the fact that the model visibilities are a solvable parameter. I found a great deal of emphasis is placed on the redundancy, but not why that redundancy is so crucial to the solution procedure.}
+{\bf TLG: Added paragraph, above, GB want to phrase it better??}
+
+%When we employ a redundant array, we dramatically reduce the number 
+%of unknowns (assuming we have no prior knowledge of the sky). If our array is redundant enough we reduce
+%the number of unknowns to such an extent that we are able
+%to solve for  Redundant calibration is the
+%procedure by which we estimate both the unknown observed
+%visibilities and the antenna gains.
+
+It is convenient to group redundant visibilities together and label each group using a single index rather than using their antenna pairs as in equation~\ref{eq:vis_definition}. We introduce a function $\phi$ that maps the antenna pair associated with a specific baseline to its corresponding redundant baseline group, i.e. if baseline $pq$ and $rs$ are redundant then $\phi_{pq} = \phi_{rs}$ (implying they belong to the same group). The function $\phi_{pq}$ is not symmetric as $\phi_{pq} = 0$ if $p \geq q$. Equation~\ref{eq:vis_definition} can be re-written for a redundant array as:
 \begin{equation}
 \label{eq:vis_red}
 d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq},
@@ -304,7 +322,7 @@ We also introduce the following symmetric variant of $\phi_{pq}$:
 \end{cases},
 \end{equation} 
 and we will refer to $\zeta_{pq}$ as the symmetric geometric function.
-It is possible to construct a simple analytic expression for $\zeta_{pq}$ for an east-west regular array, i.e. $\zeta_{pq} = |q-p|$. It becomes, however, increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. The empirically constructed symmetric geometry functions of three different redundant layouts are displayed in Figure~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the maximal number of unique redundant baseline groups which can be formed for a given array layout. 
+It is possible to construct a simple analytic expression for $\zeta_{pq}$ for an east-west regular array, i.e. $\zeta_{pq} = |q-p|$. It becomes, however, increasingly difficult to construct analytic expressions of $\zeta_{pq}$ for more complicated array layouts. The empirically constructed symmetric geometry functions of three different redundant layouts are displayed in Figure~\ref{fig:geometry_function}. We denote the range of $\zeta_{pq}$ with $\mathcal{R}(\zeta_{pq})$. The maximal element that $\zeta_{pq}$ can ascertain is denoted by $L$ and can be interpreted as the greatest number of unique redundant baseline groups which can be formed for a given array layout. 
 
 \begin{figure*}
 \centering
@@ -321,9 +339,9 @@ It is possible to construct a simple analytic expression for $\zeta_{pq}$ for an
 {\includegraphics[width=0.33\textwidth]{./SQR_phi.pdf}\label{fig:SQR_phi}}
 \subfigure[Regular east-west: $\zeta_{pq}$]
 {\includegraphics[width=0.33\textwidth]{./REG_phi.pdf}\label{fig:REG_phi}}
-\caption{Three different redundant antenna layouts: hexagonal (top left), square (top middle) and regular east-west (top right) with their respective symmetric redundancy geometry functions $\zeta_{pq}$ (bottom panels). We used 91 antennas to construct the hexagonal layout, while 100 antennas were used in the square and east-west layouts. In the case of the east-west layout we only plot the positions of the first ten antennas. The maximal amount of redundant baseline groups $L$ that can be formed for 
-the hexagonal, square and east-west layouts are 165, 180 and 99 respectively. The analytic expressions of $L$ for an hexagonal, square and east-west layout is $L = 2N-\frac{1}{2}\sqrt{12N-3}-\frac{1}{2}$,
-$L=2N-2\sqrt{N}$ and $L=N-1$.\label{fig:geometry_function}}
+\caption{Three different redundant antenna layouts: hexagonal (top left), square (top middle) and regular east-west (top right) with their associated symmetric redundancy geometry functions $\zeta_{pq}$ (bottom panels). We used 91 antennas to construct the hexagonal layout, while 100 antennas were used in the square and east-west layouts. In the case of the east-west layout we only plot the positions of the first ten antennas. The maximal amount of redundant baseline groups $L$ that can be formed for 
+the hexagonal, square and east-west layouts are 165, 180 and 99 respectively. The analytic expressions of $L$ for an hexagonal, square and east-west layout are $L = 2N-\frac{1}{2}\sqrt{12N-3}-\frac{1}{2}$,
+$L=2N-2\sqrt{N}$ and $L=N-1$ respectively.\label{fig:geometry_function}}
 \end{figure*}
 
 We can now formulate redundant calibration as a least-squares problem:
@@ -384,7 +402,7 @@ respectively. As in Section~\ref{sec:sky_wirtinger}, equation~\ref{eq:GN_update}
 \breve{\bz}_{k+1} = \breve{\bz}_{k} + \Delta \breve{\bz}_{k}. 
 \end{equation}
 The analytic expressions for $\bJ$, $\bH$ and $\bJ^H\breve{\br}$ can be found in Appendix~\ref{sec:analytic}.
-Appendix~\ref{sec:analytic} also contain two useful identities, involving $\bJ$ and $\bH$. 
+Appendix~\ref{sec:analytic} also contains two useful identities involving $\bJ$ and $\bH$. 
 
 In the case of the GN algorithm we can simplify equation~\ref{eq:update} even further. Replacing $\breve{\br}$ with $\breve{\bd}-\breve{\bv}$ in equation~\ref{eq:GN_update} results in
 \begin{equation}
@@ -415,7 +433,7 @@ contain many zero-entries. Note that the locations of the zero-entries are depen
 \label{fig:hessian}} 
 \end{figure*}
 
-Figure~\ref{fig:hessian} shows that the Hessian matrix $\bH$ is nearly diagonal and sparse for both a regular and hexagonal layout considered. We therefore follow the approach of \citet{Smirnov2015} and approximate the Hessian matrix $\bH$ with its diagonal. If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}=\bH\odot\bI$ and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in equation~\ref{eq:GN_update} we obtain:
+Figure~\ref{fig:hessian} shows that the Hessian matrix $\bH$ is nearly diagonal and sparse for both the regular east-west and hexagonal layouts we considered. We therefore follow the approach of \citet{Smirnov2015} and approximate the Hessian matrix $\bH$ with its diagonal. If we substitute $\bJ^H\bJ$ with $\widetilde{\bH}=\bH\odot\bI$ and replace $\breve{\br}$ with $\breve{\bd} - \breve{\bv}$ in equation~\ref{eq:GN_update} we obtain:
 \begin{equation}
 \label{eq:appr_GN}
  \Delta \breve{\bz} \approx \widetilde{\bH}^{-1}\bJ^H(\breve{\bd}-\breve{\bv})
@@ -428,50 +446,50 @@ which leads to
 \begin{equation}
  \breve{\bz}_{k+1} \approx \widetilde{\bH}^{-1}\bJ^H\breve{\bd}.
 \end{equation}
-We obtain a similar result if we repeat the above procedure, only in this case we use equation~\ref{eq:LM_update} instead. Thus,
+Using equation equation~\ref{eq:LM_update}, we follow the same procedure and obtain a similar result for LM
 \begin{align}
 \breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
- &= \alpha \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\alpha)\breve{\bz}_k. \label{eq:alpha}  
+ &= \rho \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\rho)\breve{\bz}_k. \label{eq:alpha}  
 \end{align}
 The analytic expression of $\bJ^H\breve{\bd}$ will be very similar to the analytic 
 expression of $\bJ^H\breve{\br}$, the only difference being that in equation~\ref{eq:ab} the letter $r$ would be replaced by a $d$. If we substitute the analytic expression
 of $\bJ^H\breve{\bd}$ and $\widetilde{\bH}^{-1}$ (which can easily be constructed using Appendix~\ref{sec:analytic}) into equation~\ref{eq:alpha} we obtain the following two update rules:
 \begin{equation}
 \label{eq:g_update}
-g_{i}^{k+1} = \alpha \frac{\sum_{j\neq i} g_j^k \widetilde{y}_{ij}^{~\!\!k} d_{ij}}{\sum_{j\neq i} |g_j^k|^2|y_{\zeta_{ij}}^k|^2} + (1-\alpha) g_i^k, 
+g_{i}^{k+1} = \rho \frac{\sum_{j\neq i} g_j^k \widetilde{y}_{ij}^{~\!\!k} d_{ij}}{\sum_{j\neq i} |g_j^k|^2|y_{\zeta_{ij}}^k|^2} + (1-\rho) g_i^k, 
 \end{equation}
 and
 \begin{equation}
 \label{eq:y_update}
-y_{i}^{k+1} = \alpha \frac{\sum_{rs \in \mathcal{RS}_i} \conj{g}_r^k g_s^k d_{rs}}{\sum_{rs \in \mathcal{RS}_i}|g_r^k|^2|g_s^k|^2} + (1-\alpha) y_i^k. 
+y_{i}^{k+1} = \rho \frac{\sum_{rs \in \mathcal{RS}_i} \conj{g}_r^k g_s^k d_{rs}}{\sum_{rs \in \mathcal{RS}_i}|g_r^k|^2|g_s^k|^2} + (1-\rho) y_i^k. 
 \end{equation}
-The the index set $\mathcal{RS}_i$ and the quantity $\widetilde{y}_{ij}$ is defined in equation~\ref{eq:RS} and equation~\ref{eq:y_tilde}, respectively. 
+The the index set $\mathcal{RS}_i$ and the quantity $\widetilde{y}_{ij}$ are defined in equation~\ref{eq:RS} and equation~\ref{eq:y_tilde}, respectively. 
 The computational complexity of inverting $\widetilde{\bH}$ is $O(P)$. We note that equation~\ref{eq:g_update} is the gain estimator associated with \textsc{StEfCal}.
 
 Equation~\ref{eq:g_update} and~\ref{eq:y_update} were obtained by \citet{Marthi2014} by taking the derivative of the objective function $\Lambda$ relative to the elements of $\bg$ and $\by$, setting the intermediate results to zero and then solving for the unknown parameters (i.e. using the gradient descent algorithm). 
 We note that their derivation is less general. The LM algorithm has better convergence properties than gradient descent and 
 encompasses the gradient descent algorithm as a special case. In Appendix~\ref{sec:red_stef_ADI} we show that equation~\ref{eq:g_update} and~\ref{eq:y_update} can also be derived using the ADI method. 
-For this reason, we refer to the code implementation of the pseudo LM calibration scheme, derived above (equation~\ref{eq:g_update} and~\ref{eq:y_update}), as redundant \textsc{StEfCal}, throughout the rest of the paper.
+For this reason, we refer to the implementation of the pseudo-LM calibration scheme derived above equation~\ref{eq:g_update} and~\ref{eq:y_update} as redundant \textsc{StEfCal} throughout the rest of the paper.
 
-The choice of the $\alpha$ parameter is somewhat unconstrained. In this paper we chose $\alpha$ by adopting the same strategy that is used by \textsc{StEfCal} and \citet{Marthi2014},
-i.e. we chose $\alpha$ to be equal to a $\frac{1}{3}$ ($\lambda = 2$). We also carried out simulations to validate this choice.
-%In the case of \textsc{StEfCal}, $\alpha = \frac{1}{2}$ (for even iterations), which results in the last term of equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} being equal. When $\alpha=\frac{1}{3}$, the last term of equation~\ref{eq:two_thrids} and equation~\ref{eq:alpha} are equal.
+The choice of the $\rho$ parameter is somewhat unconstrained. In this paper we chose $\rho$ by adopting the same strategy that is used by \textsc{StEfCal} and \citet{Marthi2014},
+i.e. we chose $\rho$ to be equal to a $\frac{1}{3}$ ($\lambda = 2$). We also carried out simulations to validate this choice.
+%In the case of \textsc{StEfCal}, $\rho = \frac{1}{2}$ (for even iterations), which results in the last term of equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} being equal. When $\rho=\frac{1}{3}$, the last term of equation~\ref{eq:two_thrids} and equation~\ref{eq:alpha} are equal.
 
-We generated a sky model that comprises of 100 flat spectrum sources distributed over a 3$^{\circ}$ by 3$^{\circ}$ sky 
-patch centred. The flux density of each source was drawn from a power law distribution with a slope of 2 and the source position drawn from a uniform distribution. 
+We generated a sky model that comprised of 100 flat spectrum sources distributed over a 3$^{\circ}$ by 3$^{\circ}$ sky 
+patch. The flux density of each source was drawn from a power law distribution with a slope of 2 and the source position were drawn from a uniform distribution. 
 We also made use of multiple fictitious telescope layouts each one having a hexagonal geometry (see the left upper image of Figure~\ref{fig:geometry_function} for an example layout). The largest hexagonal array that we used has 217 antennas, with a minimum and maximum baseline of of 20~m and 320~m respectively.
 
-We "corrupted" visibilities by applying gain errors (Table~\ref{tab:gain_parm}) and calibrated the corrupted visibilities using redundant \textsc{StEfCal}. Solutions were independently derived for each time-step and channel for five realizations. 
+We corrupted visibilities by applying gain errors (Table~\ref{tab:gain_parm}) and calibrated the corrupted visibilities using redundant \textsc{StEfCal}. Solutions were independently derived for each time-step and channel for five realizations. 
 
 \begin{table*}
 \centering
 \caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to time-slots or channels. We either
-performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequencey channels (see Table~\ref{tab:ch_parm}). Moreover, $c$ in the left most column denotes the speed of light.
+performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequency channels (see Table~\ref{tab:ch_parm}). Moreover, $c$ in the left most column denotes the speed of light.
 We adopted a sinusoidal error model as well as phase slope across frequency that mimics a real case of physical delays between different antennas.
-It is worth pointing out the following. In the first model, we model a gain error with amplitude around one and an additional phase error. In 
+In the first model, we model a gain error with amplitude around one and an additional phase error. In 
 the second model we chose $A$ in such a way that we do not unintentionally produce a zero gain value. For the third model 
 the value of $\tau$ was chosen so that the amount of phase wraps that occur across the observing band is restricted to a realistic number.
-{\bf (GB: we need a final better description of the models, but we can work this out later).}}
+{\bf (GB: we need a final better description of the models, but we can work this out later).} {\bf SJK: Agree with Gianni here - this caption needs a rework. The descriptions of the models are a bit clumsy.}}
 \begin{tabular}{|c c c c|} 
 \hline
 Number tag & 1 & 2 & 3\\
@@ -511,7 +529,7 @@ Num. timeslots & 1 & 50\\
 \label{tab:ch_parm}
 \end{table}
 
-The simulated visibilities included a noise term. The purpose of which is to produce a certain SNR in the simulated
+The simulated visibilities included a noise term, the purpose of which was to produce a certain SNR in the simulated
 visibilities. We made use of the following definition of \citep[SNR, ][]{Liu2010,Marthi2014}:  
 \begin{equation}
 \label{}
@@ -519,7 +537,7 @@ visibilities. We made use of the following definition of \citep[SNR, ][]{Liu2010
 \end{equation}
 where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baseline.
 
-Figure~\ref{fig:prec_error} show the simulation results as a function of SNR and number of antennas. The accuracy of our solutions is quantified through the percentage error
+Figure~\ref{fig:prec_error} shows the simulation results as a function of SNR and number of antennas. The accuracy of our solutions is quantified through the percentage error
 \begin{equation}
 \label{eq:beta}
 \beta = \frac{\|\bv - \widehat{\bv}\|_F^2}{\|\bv\|_F^2},
@@ -531,7 +549,7 @@ The error magnitude follows the expected behaviour, i.e., it decreases as a func
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./prec_error.pdf} 
-\caption{We plot the percentage error $\beta$ between the simulated visibilitied and the visibilities solved for by redundant \textsc{StEfCal} for different SNR values as a function of the number of antennas in the array $N$.}
+\caption{We plot the percentage error $\beta$ between the simulated visibilities and the visibilities solved for by redundant \textsc{StEfCal} for different SNR values as a function of the number of antennas ($N$) in the array.}
 \label{fig:prec_error}
 \end{figure}
 
@@ -542,23 +560,23 @@ The error magnitude follows the expected behaviour, i.e., it decreases as a func
 conjugate gradient method \citep{Hestenes1952}, which would be computationally advantageous, since the Hessian matrix associated 
 with redundant calibration (see Figure~\ref{fig:hessian}) is sparse \citep{Reid1971}. In this section we study the computational complexity
 of the conjugate gradient (CG) method when it is used to invert the modified Hessian matrix (see equation~\ref{eq:LM_update}), 
-in particular when preconditioning is used (i.e. the PCG method). Interestingly, emperical tests suggests that the unmodified Hessian itself is singular. It is therefore important to mention here, that the CG method 
-can pseudo invert the unmodified Hessian as well, i.e. the CG method can be directly applied to equation~\ref{eq:GN_update}, since the Hessian is a positive semi-definite Hermition matrix and the vector $\bJ^H\breve{\br}$ is an element of its column range \citep{Lu2015}.
+in particular when preconditioning is used (i.e. the PCG method). Interestingly, empirical tests suggest that the unmodified Hessian itself is singular. It is therefore important to mention, that the CG method 
+can pseudo invert the unmodified Hessian as well, i.e. the CG method can be directly applied to equation~\ref{eq:GN_update}, because the Hessian is a positive semi-definite Hermitian matrix and the vector $\bJ^H\breve{\br}$ is an element of its column range \citep{Lu2015}.
 
 %(see also Appendix~\ref{sec:conj_grad}). 
 
-The computational complexity of CG is  
+The computational complexity of the CG method is  
 \begin{equation}
 \label{eq:cg_bound}
 O(\sqrt{\kappa}m), 
 \end{equation}
-where $m$ denotes the number of non-zero entries and $\kappa$ denotes the spectral 
+where $m$ denotes the number of non-zero entries in and $\kappa$ denotes the spectral 
 condition number of the matrix which is to be inverted. The spectral condition number $\kappa$ of the matrix $\bA$ is defined as:
 \begin{equation}
 \label{eq:kappa}
 \kappa(\bA) = \frac{\iota_{\textrm{max}}}{\iota_{\textrm{min}}}, 
 \end{equation}
-where $\iota_{\textrm{max}}$ and $\iota_{\textrm{min}}$ respectively denote the largest and the smallest eigenvalue of $\bA$.
+where $\iota_{\textrm{max}}$ and $\iota_{\textrm{min}}$ denote the largest and the smallest eigenvalue of $\bA$ respectively.
 
 Preconditioning is a technique used to improve the spectral condition number of a matrix. Let us consider a generic system of linear equations 
 \begin{equation}
@@ -590,7 +608,7 @@ We generated simulated (i.e. corrupted) visibilities according to models describ
 %
 %{\bf (TLG2: Setup 2 was the setup I used initially. The parameters I used was influenced by arrays I was accustomed to at that point, like WSRT. Later on as you became more involved you suggested setup 1 (and even later still gain model 3) as it is more realistic for redundant low-frequency arrays. Redoing the red stefcal sims with these parameters did not influence the results though if memory serves me right -- not sure if I still have the old results though to confirm. We never redid the sims with PCG as the sims took quite a bit of time (much longer than unvectorized red stefcal, which as we know takes quite a long time) and there would ultimately be now difference in result, the calibration algorithm's speed does not depend on the observational frequency etc... Moreover, Fig. 5 is completely independent of the chosen simulated parameters as it depends only on the analytic expression of the Hessian. Not sure how to phrase or explain the different setups in the paper, as I would like to avoid redoing the simulations at this stage, except if the referee actually requests this. PLEASE HELP HERE. UNSURE HOW TO MOTIVATE OR EXPLAIN THE SETUPS. NOT SURE WHERE SUCH A DISCUSSION BELONGS.)}
 We used the complex LM-algorithm described in Section~\ref{sec:red_wirtinger} to calibrate the corrupted visibilities. To invert the modified
-Hessian we used the CG method, with and without a preconditioner. We made use of the Jacobian preconditioner. 
+Hessian we used the CG method, with and without a Jacobian preconditioner. 
 Figure~\ref{fig:kappa} shows us that preconditioning reduces the condition number of $\bmH$ to a small constant value and therefore effectively eliminates
 it from equation~\ref{eq:cg_bound}, i.e. equation~\ref{eq:cg_bound} reduces to
 \begin{equation}
@@ -615,21 +633,28 @@ dimension of $\bmH$.
 % V_R_3.pdf: 585x441 pixel, 72dpi, 20.64x15.56 cm, bb=0 0 585 441
 \subfigure[Iterations required before and after Preconditioning]{\includegraphics[width=0.47\textwidth]{./cg_itr.pdf}\label{fig:cg_itr}}
 \caption{The graphs presented here were generated using the simulations discussed in Section~\ref{sec:red_wirtinger}. Left: spectral condition number $\kappa$ of the modified Hessian $\bmH$ as a function of $N$, before (magenta and red curves) and after (blue curve) preconditioning, at different SNR values. Right: number of major iterations required by the conjugate 
-gradient method to invert $\bmH$ as a function of the number of antennas $N$ in the array, before (magenta and red curves) and after preconditioning (blue and green curves), at different SNR values. Both plots show that the Jacobian preconditioner definitely speed up the conjugate gradient method. \label{fig:kappa_itr}} 
+gradient method to invert $\bmH$ as a function of the number of antennas $N$ in the array, before (magenta and red curves) and after preconditioning (blue and green curves), at different SNR values. Both plots show that the Jacobian preconditioner definitely speeds up the conjugate gradient method. \label{fig:kappa_itr}} 
 \end{figure*}
 
 %The graphs presented here were generated using the second experimental setup in Table~\ref{tab:ch_parm}.
 
-Let us now shift our attention towards the remaining factor $m$. To get a usefull idea of the computational complexity of CG, we must relate $m$ and $P$. This can be achieved by utilizing the modified Hessian's measure of sparsity $\gamma$:   
+Let us now shift our attention towards the remaining factor $m$. To get a useful idea of the computational complexity of CG, we must relate $m$ and $P$. This can be achieved by utilizing the modified Hessian's measure of sparsity $\gamma$:   
 \begin{equation}
  \gamma = \left (1 - \frac{m}{P^2} \right ),
 \end{equation}
-where $m$ is the number of non-zero entries in $\bmH$  and $P^2$ is total number of matrix elements.
+where $m$ is the number of non-zero entries in $\bmH$  and $P^2$ is total number of matrix elements. 
 
 For a regular east-west geometric configuration the sparsity and the asymptotic sparsity of $\bmH$ can be derived analytically:
 \begin{align}
 \gamma &= \frac{5N^2-7N+3}{8N^2-8N+2} & \gamma_{\infty} &= \lim_{N\rightarrow \infty}\gamma = \frac{5}{8} \label{eq:gamma}. 
 \end{align}
+
+{\bf SJK: What does this mean? I feel the notation of this aymptotic quantity needs a little more explanation. I can be inferred from the maths, but I think a brief qualitative description would be good.}
+{\bf TLG: Started to add an in depth description. I find the description actually adding confusion and thus removed it. See Latex for added paragraph, just below comment.}
+%The sparsity of a matrix is defined as the ratio
+%obtained by dividing the zero-entries of a matrix by the total amount of entries in the matrix. The asymptotic sparsity 
+%of a class of matrix is obtained by computing the sparsity of this class of matrices as their dimension tends to infinity.
+
 For more complicated array layouts, however, there is no straightforward analytical solution and we empirically determined the sparsity ratios for three different geometric layouts as a function of the number antennas in the array (see Figure~\ref{fig:gamma}). 
 
 It now follows that 
@@ -642,7 +667,7 @@ which leads to
 \begin{align}
 c &= \log_{P}(1 - \gamma) + 2 & c_{\infty} &= \lim_{N\rightarrow \infty} c = 2. \label{eq:c}
 \end{align}
-The computational complexity is therefore asymptotically bounded by $O(P^2)$, although it converges very slowly to its asymptotic value, and in general is equal to $O(P^{c})$, where $c \sim 1.7$ in the case of an hexagonal geometric layout with $N < 200$ (see Figure~\ref{fig:c}).
+The computational complexity is therefore asymptotically bounded by $O(P^2)$, although it converges very slowly to its asymptotic value, and in general is equal to $O(P^{c})$ (with $c<2$). In the case of an hexagonal geometric layout with $N < 200$ we have that $c \sim 1.7$ (see Figure~\ref{fig:c}).
 
 \begin{figure*}
 \centering
@@ -654,12 +679,12 @@ The computational complexity is therefore asymptotically bounded by $O(P^2)$, al
 \end{figure*}
 
 We are now finally able to compare the computational complexity of redundant \textsc{StEfCal} and the PCG method. Redundant \textsc{StEfCal} is computationally inexpensive as it just needs to invert a diagonal matrix, however, the PCG inversion is accurate and, therefore, may require fewer iterations, ultimately leading to a faster convergence. 
-We computed the theoretical number of redundant \textsc{StEfCal} iterations $\Delta k$, in excess of the number of LM (implementing PCG) iterations required, for LM to outperform redundant \textsc{StEfCal}
+We computed the theoretical number of redundant \textsc{StEfCal} iterations $\Delta k$ in excess of the number of LM (implementing PCG) iterations required for LM to outperform redundant \textsc{StEfCal}
 \begin{align}
 \label{eq:k} 
- (k+\Delta k)P >& \, kP^c, & \Delta k >& \, k(P^{c-1}-1),
+ (k+\Delta k)P >& \, kP^c, & \Delta k >& \, k(P^{c-1}-1).
 \end{align}
-and compared it to the empirically obtained average excess number of iterations. The results are displayed in Figure~\ref{fig:out_diff} which shows that redundant \textsc{StEfCal} outperforms the PCG method. We note that, in this comparison, we have only taken into account the cost of inverting $\bmH$ and ignored the cost of preconditioning. 
+We then compared $\Delta k$ with the empirically obtained average excess number of iterations. The results are displayed in Figure~\ref{fig:out_diff} which shows that redundant \textsc{StEfCal} outperforms the PCG method. We note that, in this comparison, we have only taken into account the cost of inverting $\bmH$ and ignored the cost of preconditioning. 
 %The PCG method is still useful in practice as it would be more straightforward to apply it to other calibration use cases 
 %
 %{\bf (GB: what do you mean with this statements? Which cases?)}.
@@ -685,10 +710,10 @@ In this paper we have formulated the calibration of redundant interferometric ar
 We also showed that the LM parameter update step can be simplified to obtain an ADI type of algorithm \citep[][]{Salvini2014,Marthi2014}.
 Our code implementation of this algorithm (redundant \textsc{StEfCal}) is publicly available at 
 \url{https://github.com/Trienko/heracommissioning/blob/master/code/stef.py}. 
-We note that, in its current implementation, redundant \textsc{StEfCal} does not solve for the degeneracies inherent to redundant calibration  \citep{Zheng2014,Kurien2016} which will be the subject of future work. Compared to current redundant calibration algorithms, redundant \textsc{StEfCal} is more robust to inital conditions and allows for an easier, massive parallelization. 
+We note that, in its current implementation, redundant \textsc{StEfCal} does not solve for the degeneracies inherent to redundant calibration  \citep{Zheng2014,Kurien2016} which will be the subject of future work. Compared to current redundant calibration algorithms, redundant \textsc{StEfCal} is more robust to inital conditions and allows for easier parallelization. 
 
-We investigated the computational cost of redundant \textsc{StEfCal} and compared it with the performance of the PCG method (approach suggested by \cite{Liu2010}).
-We found that, although the PCG method method greatly improves the speed of redundant calibration, it still significant underperforms in comparison to redundant \textsc{StEfCal}.
+We investigated the computational cost of redundant \textsc{StEfCal} and compared it with the performance of the PCG method (as suggested by \cite{Liu2010}).
+We found that, although the PCG method method greatly improves the speed of redundant calibration, it still significantly underperforms when compared to redundant \textsc{StEfCal}.
 
 The characteristics of redundant \textsc{StEfCal} make it an appealing calibration algorithm for large redundant arrays like HERA \citep{deboer2017}, CHIME \citep{Bandura2014}, HIRAX \citep{Newburgh2016} or even hybrid arrays like the MWA \citep{Tingay2013} in its updated phase.
 
@@ -1145,7 +1170,7 @@ and
 \label{eq:RHd}
 [\boldsymbol{J}^H\widetilde{\boldsymbol{d}}]_i = \sum_{rs\in\mathcal{RS}_i} \conj{g}_r g_s d_{rs}. 
 \end{equation}
-Substituting equation~\ref{eq:RHR} and equation~\ref{eq:RHd} into equation~\ref{eq:y_final} and simplifying the result leads to the leftmost term in equation~\ref{eq:y_update} (if we bar $\alpha$ and consider 
+Substituting equation~\ref{eq:RHR} and equation~\ref{eq:RHd} into equation~\ref{eq:y_final} and simplifying the result leads to the leftmost term in equation~\ref{eq:y_update} (if we bar $\rho$ and consider 
 only the $i$-th entry of $\by$).
 \label{lastpage}
 \end{document}
