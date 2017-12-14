@@ -129,9 +129,9 @@ $^{7}$Radio Astronomy Lab., U. California, Berkeley CA 94720, USA}
 Observations of the redshifted 21-cm line from the epoch of reionization have recently motivated the construction of low 
 frequency radio arrays with highly redundant configurations. These configurations provide an alternative calibration strategy - 
 ''redundant calibration" - and boosts sensitivity on specific spatial scales. In this paper, we formulate 
-calibration of redundant interferometric arrays as a complex optimization problem {\bf SJK: suggests removing citation} \citep[i.e.,][]{Smirnov2015}. 
+calibration of redundant interferometric arrays as a complex optimization problem. 
 We solve this optimization problem via the Levenberg-Marquardt algorithm. This calibration approach is more 
-robust to initial conditions than current algorithms and, by leveraging an approximate matrix inversion, allows for further optimization and an efficient implementation (``redundant \textsc{StEfCal}"). {\bf (SJK: ...boasts competitive [big O notation here] scaling. We coin the term "redundant StEfCal" for our algorithm and implementation)}.  We also investigated using the preconditioned conjugate gradient method as an alternative to the approximate matrix inverse, but found that its computational performance is not competitive with respect to ``redundant \textsc{StEfCal}". The efficient implementation of this new algorithm is made publicly available.
+robust to initial conditions than current algorithms and, by leveraging an approximate matrix inversion, allows for further optimization and an efficient implementation (``redundant \textsc{StEfCal}"). We also investigated using the preconditioned conjugate gradient method as an alternative to the approximate matrix inverse, but found that its computational performance is not competitive with respect to ``redundant \textsc{StEfCal}". The efficient implementation of this new algorithm is made publicly available.
 %The construction of new radio interferometers, particularly operating at low frequencies and In this paper we show that instead of splitting our redundant calibration problem into its phase-and-amplitude components (the more traditional approach) we can treat the complex unknown model parameters and their complex conjugates as separate unknowns. We also derive the Levenberg-Maquardt and Gauss-Newton update steps associated with this alternative parameter-and-conjugate framework. We focus more on the Levenberg-Maquardt algorithm in this paper as it exhibits better convergence properties when compared to Gauss-Newton. The Gauss-Newton algorithm is currently the de facto standard that is being used to perform redundant calibration. It is common practice to implement redundant calibration via a hierarchical algorithmic strategy. Using the Levenberg-Maquardt algorithm, therefore, reduces the number of algorithmic layers that are needed to perform redundant calibration. We also compare two previously proposed methods to accelerate redundant calibration, namely the alternating direction implicit method and the preconditioned conjugate gradient method. We found that the alternating direction implicit method outperforms the preconditioned conjugate gradient method. However, the preconditioned conjugate gradient method is more robust as it is more straightforward to adapt to other calibration use cases. We make use of the parameter-and-conjugate framework in this paper, rather than the more traditional amplitude-and-phase approach as it makes it trivial to relate the alternating direction implicit method and the Levenberg-Marquardt algorithm with one another.
 \end{abstract}
 
@@ -143,13 +143,13 @@ instrumentation: interferometers -- methods: data analysis -- methods: numerical
 \section{Introduction}
 The quest for the redshifted 21-cm line from the Epoch of Reionization (EoR) is a frontier of modern observational cosmology and has motivated the construction of a series of new interferometric arrays operating at low frequencies over the last decade. EoR measurements are challenging because of the intrinsic faintness of the cosmological signal \citep[see, for instance,][for recent reviews]{Furlanetto2016,McQuinn2016} buried underneath foreground emission which is a few orders of magnitude brighter than the EoR anywhere in the sky \citep[e.g.,][]{Bernardi2009,Bernardi2010,Ghosh2012,Dillon2014,Parsons2014}. 
 %and that can be separated by leveraging only on the different spectral properties (citations needed!!!). 
-As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exceptional interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}, unless arrays are deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that multiple baselines measure the same sky brightness emission. Leveraging this property, redundancy is a promising path to achieve highly accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. Moreover, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deploment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
+As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exceptional interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}, unless arrays are deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that multiple baselines measure the same sky brightness emission. Leveraging this property, redundancy is a promising path to achieve highly accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. Moreover, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deployment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
 
 In this paper we, present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
 With respect to current algorithms, it is more robust to initial conditions, while remaining comparatively fast. We also show that given certain approximations this new algorithm reduces to the redundant calibration equivalent of the \textsc{StEfCal} algorithm \citep{Salvini2014}.
 %In this paper we will refer to this simplified version of the new algorithm as redundant StEfCal. 
 We investigate the speed-up that the preconditioned conjugate gradient (PCG) method provides if it is employed by the new algorithm \citep{Liu2010}.
-A comparison between the computational complexity of the optimized new algorithm and redundant StEfCal is also performed.
+A comparison between the computational complexity of the optimized new algorithm and redundant \textsc{StEfCal} is also performed.
 
 The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we presnt our conclusions in Section~\ref{sec:conclusions}.
 
@@ -195,10 +195,6 @@ The function $\alpha_{pq}$ therefore maps composite antenna indexes to unique si
 \end{equation}
 The vectors in equation~\ref{eq:vec_linear_definitions} are column vectors of size $B$ (i.e. $p<q$).
 
-{\bf JSK: I would introduce the alpha quantity on its own before attaching it as an index in the definition of d. The reason for this is that eq. 4 and 5 seem very complicated without first understanding the meaning of alpha. Could have a paragraph starting ``In order to express equation 1 in vector form, we first introduce $\alpha$ which maps...''}
-
-{\bf TLG: Was like this earlier, got changed during the edits. GB let me know if it should be changed back.}
-
 Radio interferometric calibration aims to determine the best estimate of $\bg = [g_1,g_2,\cdots,g_N]^T$ in order to correct the data and, following equation~\ref{eq:vis_linear_definition}, can be formulated as a non linear least-squares optimization problem:
 \begin{equation}
 \label{eq:least_squares}
@@ -210,7 +206,7 @@ Non-linear least-squares problems are generally solved by using gradient-based m
 When the least squares problem is complex, it becomes less straightforward to apply these gradient-based minimization methods, as
 many complex functions are not differentiable if the classic notion of differentiation is used, i.e. $\frac{\partial \conj{z}}{\partial z}$ does not exist if $z \in \mathbb{C}$.
 
-In order to circumvent the differentiability conundrum associated with complex least squares problems, standard interferometric calibration divides the complex optimization problem into its real and imaginary parts and solves for the real and imaginary parts of the unknown model parameters separately. \citet{Smirnov2015} showed, however, that this approach is not needed if complex calculus \citep{Wirtinger1927} is directly adopted {\bf JSK: employed}. The Wirtinger derivatives are defined as:
+In order to circumvent the differentiability conundrum associated with complex least squares problems, standard interferometric calibration divides the complex optimization problem into its real and imaginary parts and solves for the real and imaginary parts of the unknown model parameters separately. \citet{Smirnov2015} showed, however, that this approach is not needed if complex calculus \citep{Wirtinger1927} is adopted. The Wirtinger derivatives are defined as:
 \begin{align}
 \label{eq:wir}
 \frac{\partial}{\partial z} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} -  i \frac{\partial}{\partial y} \right ),&\frac{\partial}{\partial \conj{z}} &= \frac{1}{2}\left ( \frac{\partial}{\partial x} +  i \frac{\partial}{\partial y} \right ), 
@@ -289,10 +285,7 @@ as the alternating direction implicit (ADI) method. The \textsc{StEfCal} algorit
 Interferometric baselines are redundant when they sample the exact same visibilities in the $uv$-plane, i.e. if baseline $pq$ and $rs$ are redundant then $y_{pq} = y_{rs}$. 
 A redundant array layout allows us to solve for the unknown observed visibilities themselves in
 addition to the antenna gains (see equation \ref{eq:vec_linear_definitions}). This is true, since in the case of a redundant layout equation \ref{eq:vec_linear_definitions} is already an overdetermined 
-system (there is no need to first predict visibilities from a pre-existing skymodel). 
-
-{\bf SJK: I feel there needs to be some additional emphasis placed on the fact that the model visibilities are a solvable parameter. I found a great deal of emphasis is placed on the redundancy, but not why that redundancy is so crucial to the solution procedure.}
-{\bf TLG: Added paragraph, above, GB want to phrase it better??}
+system even before having predicted visibilities from a pre-existing skymodel. 
 
 %When we employ a redundant array, we dramatically reduce the number 
 %of unknowns (assuming we have no prior knowledge of the sky). If our array is redundant enough we reduce
@@ -446,7 +439,7 @@ which leads to
 \begin{equation}
  \breve{\bz}_{k+1} \approx \widetilde{\bH}^{-1}\bJ^H\breve{\bd}.
 \end{equation}
-Using equation equation~\ref{eq:LM_update}, we follow the same procedure and obtain a similar result for LM
+Using equation~\ref{eq:LM_update}, we follow the same procedure and obtain a similar result for LM
 \begin{align}
 \breve{\bz}_{k+1} &\approx \frac{1}{1+\lambda}\widetilde{\bH}^{-1}\bJ^H\breve{\bd} + \frac{\lambda}{1+\lambda} \breve{\bz}_k,\label{eq:lambda}\\
  &= \rho \widetilde{\bH}^{-1}\bJ^H\breve{\bd} + (1-\rho)\breve{\bz}_k. \label{eq:alpha}  
@@ -468,16 +461,17 @@ The computational complexity of inverting $\widetilde{\bH}$ is $O(P)$. We note t
 
 Equation~\ref{eq:g_update} and~\ref{eq:y_update} were obtained by \citet{Marthi2014} by taking the derivative of the objective function $\Lambda$ relative to the elements of $\bg$ and $\by$, setting the intermediate results to zero and then solving for the unknown parameters (i.e. using the gradient descent algorithm). 
 We note that their derivation is less general. The LM algorithm has better convergence properties than gradient descent and 
-encompasses the gradient descent algorithm as a special case. In Appendix~\ref{sec:red_stef_ADI} we show that equation~\ref{eq:g_update} and~\ref{eq:y_update} can also be derived using the ADI method. 
-For this reason, we refer to the implementation of the pseudo-LM calibration scheme derived above equation~\ref{eq:g_update} and~\ref{eq:y_update} as redundant \textsc{StEfCal} throughout the rest of the paper.
+encompasses the gradient descent algorithm as a special case. In Appendix~\ref{sec:red_stef_ADI} we show that equation~\ref{eq:g_update} and~\ref{eq:y_update} can also be derived using the ADI method.
+For this reason, we refer to the implementation of the pseudo-LM calibration scheme derived above, i.e. equation~\ref{eq:g_update} and~\ref{eq:y_update}, as redundant \textsc{StEfCal} throughout the rest of the paper.
+Interestingly, \citet{Marthi2014} were not the first to make use of the ADI method to perform redundant calibration, a slower alternative ADI based calibration algorithm is presented in \citet{Wijnholds2012}.
 
 The choice of the $\rho$ parameter is somewhat unconstrained. In this paper we chose $\rho$ by adopting the same strategy that is used by \textsc{StEfCal} and \citet{Marthi2014},
 i.e. we chose $\rho$ to be equal to a $\frac{1}{3}$ ($\lambda = 2$). We also carried out simulations to validate this choice.
 %In the case of \textsc{StEfCal}, $\rho = \frac{1}{2}$ (for even iterations), which results in the last term of equation~\ref{eq:one_half} and equation~\ref{eq:stef_alpha} being equal. When $\rho=\frac{1}{3}$, the last term of equation~\ref{eq:two_thrids} and equation~\ref{eq:alpha} are equal.
 
 We generated a sky model that comprised of 100 flat spectrum sources distributed over a 3$^{\circ}$ by 3$^{\circ}$ sky 
-patch. The flux density of each source was drawn from a power law distribution with a slope of 2 and the source position were drawn from a uniform distribution. 
-We also made use of multiple fictitious telescope layouts each one having a hexagonal geometry (see the left upper image of Figure~\ref{fig:geometry_function} for an example layout). The largest hexagonal array that we used has 217 antennas, with a minimum and maximum baseline of of 20~m and 320~m respectively.
+patch. The flux density of each source was drawn from a power law distribution with a slope of 2 and the source position was drawn from a uniform distribution. 
+We also made use of multiple fictitious telescope layouts each one having a hexagonal geometry (see the left upper image of Figure~\ref{fig:geometry_function} for an example layout). The largest hexagonal array that we used has 217 antennas, with a minimum and maximum baseline of 20~m and 320~m respectively.
 
 We corrupted visibilities by applying gain errors (Table~\ref{tab:gain_parm}) and calibrated the corrupted visibilities using redundant \textsc{StEfCal}. Solutions were independently derived for each time-step and channel for five realizations. 
 
@@ -485,11 +479,10 @@ We corrupted visibilities by applying gain errors (Table~\ref{tab:gain_parm}) an
 \centering
 \caption{The gain error models used in this paper. We have used the symbol $x$ here as a proxy as it can either refer to time-slots or channels. We either
 performed our simulations over multiple time-slots and one frequency channel or one timeslot and multiple frequency channels (see Table~\ref{tab:ch_parm}). Moreover, $c$ in the left most column denotes the speed of light.
-We adopted a sinusoidal error model as well as phase slope across frequency that mimics a real case of physical delays between different antennas.
+We adopted a sinusoidal error model, similar to the sinusoidal error models used within \textsc{MeqTrees} \citep{Noordam2010}, as well as a phase slope across frequency which mimics a real case of physical delays between different antennas.
 In the first model, we model a gain error with amplitude around one and an additional phase error. In 
-the second model we chose $A$ in such a way that we do not unintentionally produce a zero gain value. For the third model 
-the value of $\tau$ was chosen so that the amount of phase wraps that occur across the observing band is restricted to a realistic number.
-{\bf (GB: we need a final better description of the models, but we can work this out later).} {\bf SJK: Agree with Gianni here - this caption needs a rework. The descriptions of the models are a bit clumsy.}}
+the second model we chose $A$ in such a way that we do not unintentionally produce nonsensical gain values, i.e. a zero gain value. For the third model 
+the value of $\tau$ was chosen so that the amount of phase wraps that occur across the observing band is restricted to a realistic number.}
 \begin{tabular}{|c c c c|} 
 \hline
 Number tag & 1 & 2 & 3\\
@@ -604,7 +597,7 @@ If $\bA$ is a nearly diagonal matrix, the Jacobian preconditioner is a natural c
 
 In order to quantify the effectiveness of the CG method in redundant calibration, we investigate the spectral condition number and the sparsity of the modified Hessian $\bmH$ (i.e. $\lambda = 2$).
 
-We generated simulated (i.e. corrupted) visibilities according to models described in Table~\ref{tab:ch_parm} {\bf (GB: we need some more explanation of the simulations... next round)}. 
+We generated simulated (i.e. corrupted) visibilities according to models described in Table~\ref{tab:gain_parm}. 
 %
 %{\bf (TLG2: Setup 2 was the setup I used initially. The parameters I used was influenced by arrays I was accustomed to at that point, like WSRT. Later on as you became more involved you suggested setup 1 (and even later still gain model 3) as it is more realistic for redundant low-frequency arrays. Redoing the red stefcal sims with these parameters did not influence the results though if memory serves me right -- not sure if I still have the old results though to confirm. We never redid the sims with PCG as the sims took quite a bit of time (much longer than unvectorized red stefcal, which as we know takes quite a long time) and there would ultimately be now difference in result, the calibration algorithm's speed does not depend on the observational frequency etc... Moreover, Fig. 5 is completely independent of the chosen simulated parameters as it depends only on the analytic expression of the Hessian. Not sure how to phrase or explain the different setups in the paper, as I would like to avoid redoing the simulations at this stage, except if the referee actually requests this. PLEASE HELP HERE. UNSURE HOW TO MOTIVATE OR EXPLAIN THE SETUPS. NOT SURE WHERE SUCH A DISCUSSION BELONGS.)}
 We used the complex LM-algorithm described in Section~\ref{sec:red_wirtinger} to calibrate the corrupted visibilities. To invert the modified
@@ -648,10 +641,6 @@ For a regular east-west geometric configuration the sparsity and the asymptotic 
 \begin{align}
 \gamma &= \frac{5N^2-7N+3}{8N^2-8N+2} & \gamma_{\infty} &= \lim_{N\rightarrow \infty}\gamma = \frac{5}{8} \label{eq:gamma}. 
 \end{align}
-
-{\bf SJK: What does this mean? I feel the notation of this aymptotic quantity needs a little more explanation. I can be inferred from the maths, but I think a brief qualitative description would be good.}
-{\bf TLG: Started to add an in depth description. I find the description actually adding confusion and thus removed it. See Latex for added paragraph, just below comment.}
-%The sparsity of a matrix is defined as the ratio
 %obtained by dividing the zero-entries of a matrix by the total amount of entries in the matrix. The asymptotic sparsity 
 %of a class of matrix is obtained by computing the sparsity of this class of matrices as their dimension tends to infinity.
 
@@ -713,11 +702,15 @@ Our code implementation of this algorithm (redundant \textsc{StEfCal}) is public
 We note that, in its current implementation, redundant \textsc{StEfCal} does not solve for the degeneracies inherent to redundant calibration  \citep{Zheng2014,Kurien2016} which will be the subject of future work. Compared to current redundant calibration algorithms, redundant \textsc{StEfCal} is more robust to inital conditions and allows for easier parallelization. 
 
 We investigated the computational cost of redundant \textsc{StEfCal} and compared it with the performance of the PCG method (as suggested by \cite{Liu2010}).
-We found that, although the PCG method method greatly improves the speed of redundant calibration, it still significantly underperforms when compared to redundant \textsc{StEfCal}.
+We found that, although the PCG method greatly improves the speed of redundant calibration, it still significantly underperforms when compared to redundant \textsc{StEfCal}.
 
 The characteristics of redundant \textsc{StEfCal} make it an appealing calibration algorithm for large redundant arrays like HERA \citep{deboer2017}, CHIME \citep{Bandura2014}, HIRAX \citep{Newburgh2016} or even hybrid arrays like the MWA \citep{Tingay2013} in its updated phase.
 
 \section*{Acknowledgements}
+This work is based upon research supported by the South
+African Research Chairs Initiative of the Department of Sci-
+ence and Technology and National Research Foundation.
+
 G.B. acknowledges support from the Royal Society and the Newton Fund under grant NA150184. This work is based on the research supported in part by the National Research Foundation of South Africa (grant No. 103424). This research is supported by the South African Research Chairs Initiative of the Department of Science and Technology and National Research Foundation,
 
 
@@ -727,7 +720,7 @@ G.B. acknowledges support from the Royal Society and the Newton Fund under grant
 
 \appendix
 
-{\bf (GB: We need to bring back the logcal and lincal derivation using the geometric function.)}
+%{\bf (GB: We need to bring back the logcal and lincal derivation using the geometric function.)}
 %{\bf (TLG: I have removed logcal and lincal as well as the PCG section. My main concern about this is that the aim of these sections was to show off the usefulness of the geometry function, it simplifies, at least from a mathematecial perspective, the derivation of the older algorithms. This insight has now been lost. On the other hand keeping them and trying to make them fit, which may cause further delays, at this point simply no longer seems worht the effort. I have incorporated the remaining ideas left in the PCG section into the main text.)}.
 %
 % \section{\textsc{LOGCAL}}
