@@ -98,7 +98,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\title[Complex redundant calibration]{Redundant calibration as a complex optimization problem}
-\title[Redundant interferometric calibration as a complex optimization problem]{Redundant calibration as a complex optimization problem}
+\title[Redundant calibration and Complex Optimization]{Redundant interferometric calibration as a complex optimization problem}
 %\author[T.L.~Grobler et al.]{T.L.~Grobler$^{1}$\thanks{E-mail: email@address (AVR)}, G.~Bernardi$^{1,2}$, Z.S.~Ali$^{3}$?, C.L.~Carilli$^{4,5}$?, J.S.~Dillon$^{3}$?, A.~Liu$^{3}$?, \newauthor
 %A.R.~Parsons$^{3,6}$? and O.M.~Smirnov$^{1,2}$?\\
 %$^{1}$Department of Physics and Electronics, Rhodes University, PO Box 94, Grahamstown, 6140, South Africa\\
@@ -142,13 +142,29 @@ instrumentation: interferometers -- methods: data analysis -- methods: numerical
 \section{Introduction}
 The quest for the redshifted 21-cm line from the Epoch of Reionization (EoR) is a frontier of modern observational cosmology and has motivated the construction of a series of new interferometric arrays operating at low frequencies over the last decade. EoR measurements are challenging because of the intrinsic faintness of the cosmological signal \citep[see, for instance,][for recent reviews]{Furlanetto2016,McQuinn2016} buried underneath foreground emission which is a few orders of magnitude brighter than the EoR anywhere in the sky \citep[e.g.,][]{Bernardi2009,Bernardi2010,Ghosh2012,Dillon2014,Parsons2014}. 
 %and that can be separated by leveraging only on the different spectral properties (citations needed!!!). 
-As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exceptional interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}, unless arrays are deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that multiple baselines measure the same sky brightness emission. Leveraging this property, redundancy is a promising path to achieve highly accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. Moreover, redundant configurations provide a sensitivity boost on a selected sample of spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deployment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
+As miscalibrated foreground emission leads to artifacts that can jeopardize the EoR signal \citep[e.g.,][]{grobler2014,barry2016,ewall-wice2016}, an exceptional interferometric calibration is required. Such calibration needs an accurate knowledge of both the sky emission and the instrumental response \citep[e.g.,][]{Smirnov2011c}.
+A skymodel is required for standard calibration as it would be an ill-posed problem if one tries to directly solve for all of the unknowns, i.e. the antenna gains and the uncorrupted 
+visibilities, without first attempting to simplify the calibration problem. When the uncorrupted visibilities, however, are predicted from a predefined skymodel the problem becomes solvable.
+In contrast, if an array is deployed in a redundant configuration, i.e. with receiving elements placed on regular grids so that multiple baselines measure the same sky brightness emission,
+we circumvent the need for a skymodel altogether. This is true, since redundancy leads to fewer unknowns (i.e. number of unique 
+$uv$-modes) and if the array is redundant enough it reduces the number of unknowns to such an extend that the calibration problem becomes solvable without having to predict the uncorrupted visibilities from a skymodel. Redundancy, therefore, is a promising path to achieve highly accurate interferometric calibration \citep[][]{Noordam1982,Wieringa1992,Pearson1984,Liu2010,Noorishad2012,Marthi2014,Sievers2017}. 
+Moreover, redundant configurations provide a sensitivity boost on particular spatial scales that can be tuned to be the highest signal--to--noise ratio (SNR) EoR modes \citep[][]{Parsons2012,Dillon2016}. These reasons motivated the design and deployment of EoR arrays in redundant configurations like the MIT-EoR \citep{Zheng2014}, the Precision Array to Probe the Epoch of Reionization \citep[PAPER,][]{Ali2015} and the Hydrogen Epoch of Reionization Array \citep[HERA,][]{deboer2017}. 
 
 In this paper we, present a new algorithm to calibrate redundant arrays based on the complex optimization formalism recently introduced by \cite{Smirnov2015}. 
 With respect to current algorithms, it is more robust to initial conditions, while remaining comparatively fast. We also show that given certain approximations this new algorithm reduces to the redundant calibration equivalent of the \textsc{StEfCal} algorithm \citep{Salvini2014}.
 %In this paper we will refer to this simplified version of the new algorithm as redundant StEfCal. 
 We investigate the speed-up that the preconditioned conjugate gradient (PCG) method provides if it is employed by the new algorithm \citep{Liu2010}.
 A comparison between the computational complexity of the optimized new algorithm and redundant \textsc{StEfCal} is also performed.
+
+A summary of the notation that is used within the paper is presented in 
+Table~\ref{tab:glossary}. We also discuss the overset notation used within the paper in a bit more detail below:
+\begin{enumerate}
+ \item $\widetilde{x}$ -- This notation is used to denote a new scalar value which was derived from the scalar $x$ using a proper mathematical definition.  
+ \item $\conj{x}$ -- This notation denotes the conjugation of its operand (the conjugation of $x$). For the readers convenience we will redefine this operator when it is
+ first used witin the paper.
+ \item $\widehat{x}$ -- This notation denotes that the quantity is an estimated value.
+ \item $\breve{\mathbf{x}}$ -- This notation denotes an augmented vector, i.e. $\breve{\mathbf{x}} = [\mathbf{x}^T,\conj{\mathbf{x}}^T]^T$. 
+\end{enumerate}
 
 The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we presnt our conclusions in Section~\ref{sec:conclusions}.
 
@@ -157,12 +173,89 @@ The paper is organized as follows: we review the complex calibration formalism b
 \section{Wirtinger calibration}
 \label{sec:sky_wirtinger}
 
+\begin{table}
+\centering
+\caption{Notation and frequently used symbols.}
+\begin{tabular}{|l l|} 
+\hline
+$x$, $\mathbf{x}$ and $\mathbf{X}$ & scalar, vector and matrix\\
+$\mathbb{N}$ & set of natural numbers\\
+$\mathbb{C}$ & set of complex numbers\\
+$\bI$ & Identity matrix\\
+$\alpha_{pq}$, $\phi_{pq}$, $\zeta_{pq}$, $\xi_{pq}$ and & indexing functions\\
+$\psi_{pq}:\mathbb{N}^2\rightarrow\mathbb{N}$ &\\
+$\conj{(*)}$ & conjugation of operand\\
+$(*)^{2}$ & square operand\\
+$\|*\|_F$ & Frobenius norm\\
+$(*)^{-1}$ & Matrix inversion\\
+$\odot$ & Hadamard product\\
+&(element-wise product)\\
+$(*)^H$ & Hermitian transpose\\
+$(*)^T$ & Matrix transpose\\
+$<*>_x$ & averaging in x\\
+$\frac{\partial}{\partial z}$ & Wirtinger derivative\\
+$\widetilde{x}$ & a new quantity derived from $x$\\
+$\widehat{x}$ & estimated quantity\\
+$\breve{\mathbf{x}}$ & augmented vector $[\mathbf{x}^T,\conj{\mathbf{x}}^T]^T$\\
+$i$ & $\sqrt{-1}$\\
+$N$,$B$,$L$ and $P$ & number of antennas, baselines,\\
+&redundant groups and parameters\\
+$\bd$, $\bv$, $\bg$, $\by$, $\br$ and $\bn$& data, predicted, antenna,\\
+&true visibility, residual\\
+&and noise vector.\\ 
+$\bz$ & $\bz = [\bg^T,\by^T]^T$\\
+$\Lambda$ & objective function\\
+$\lambda$ and $\rho$ & damping factor and $\rho = \frac{1}{1+\lambda}$\\
+$\bJ$ & Jacobian matrix\\
+$\bH$ & $\bJ^H\bJ$ (Hessian matrix)\\
+$\bmH$ & modified Hessian matrix\\
+$[\mathbf{X}]_{ij}$& element $ij$ of matrix $\mathbf{X}$\\
+$x_{ij}$ & composite antenna index\\
+$x_i$ & antenna or redundant group index\\
+$x^k$ & iteration number\\
+$\bM$ & preconditioner matrix\\
+$m$ & number of non-zero entries\\
+&in a matrix\\
+$\kappa$ & spectral condition number\\
+&of a matrix\\
+$\gamma$ & sparsity factor of a matrix\\
+$\Delta x$ & parameter update\\
+\hline
+\end{tabular}
+\label{tab:glossary}
+\end{table}
+
+\begin{table}
+\centering
+\caption{The dimensions of the Jacobian matrices, and their respective sub-matrices, defined in Section~\ref{sec:sky_wirtinger} and Section~\ref{sec:red_wirtinger}.}
+\begin{tabular}{|c c|} 
+\hline
+Matrix & Dimension\\
+\hline
+\hline
+\multicolumn{2}{c}{Wirtinger Calibration}\\
+\hline
+$\bJ$ & $2B \times 2N$ \\
+$\bmJ_1$ & $B \times N$\\
+$\bmJ_2$ & $B \times N$\\
+\hline
+\hline
+\multicolumn{2}{c}{Redundant Wirtinger Calibration}\\
+\hline
+$\bJ$ & $2B \times P$ \\
+$\bmJ_1$ & $B \times (N+L)$\\
+$\bmJ_2$ & $B \times (N+L)$\\
+\hline
+\end{tabular}
+\label{tab:matrix_dimensions_main}
+\end{table}
+
 In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a baseline formed by antenna $p$ and $q$ are always ``corrupted" by the non-ideal response of the receiver, which is often incorporated into a single, receiver-based complex number $g$ (i.e. an antenna gain). The observed visibility $d_{pq}$ is therefore given by \citep{ME1,ME2,RRIME1}
 \begin{equation}
 \label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g_q} \, y_{pq} + n_{pq},
 \end{equation}
-where $\conj{(*)}$ indicates conplex conjugation and $n_{pq}$ is the thermal noise component. 
+where $\conj{(*)}$ indicates complex conjugation and $n_{pq}$ is the thermal noise component. 
 The real and imaginary components of the thermal noise are normally distributed with a mean of zero and a
 standard deviation $\sigma$:
 \begin{equation}
@@ -192,7 +285,9 @@ The function $\alpha_{pq}$ therefore maps composite antenna indexes to unique si
 \begin{equation}
 \{\alpha_{12},\alpha_{13},\cdots,\alpha_{N-1N}\} = \{1,2,\cdots,B\} 
 \end{equation}
-The vectors in equation~\ref{eq:vec_linear_definitions} are column vectors of size $B$ (i.e. $p<q$).
+The vectors in equation~\ref{eq:vec_linear_definitions} are column vectors of size $B$ (i.e. $p<q$). It is important to point out here that 
+all of the mathematical definitions in this paper assumes that we are only considering composite indices belonging to the set $\{rs|r<s\}$. Fore the sake of mathematical 
+completeness, however, $\alpha_{pq}$ is defined for composite indices which do not belong to this set.   
 
 Radio interferometric calibration aims to determine the best estimate of $\bg = [g_1,g_2,\cdots,g_N]^T$ in order to correct the data and, following equation~\ref{eq:vis_linear_definition}, can be formulated as a non linear least-squares optimization problem:
 \begin{equation}
@@ -233,23 +328,28 @@ with
 \begin{equation}
 \label{eq:Jacobian_skymodel}
 \bJ = \begin{bmatrix}
-       \bmJ & \bmJ^*\\
-       \conj{\bmJ}^* & \conj{\bmJ} 
+       \bmJ_1 & \bmJ_2\\
+       \conj{\bmJ}_2 & \conj{\bmJ}_1 
       \end{bmatrix},
 \end{equation}
 and
 \begin{align}
 \label{eq:jac_entries}
-[\bmJ]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial g_i}, & [\bmJ^*]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial \conj{g}_i}. 
+[\bmJ_1]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial g_i}, & [\bmJ_2]_{\alpha_{pq},i} &= \frac{\partial v_{pq}}{\partial \conj{g}_i}. 
 \end{align}
+The matrix $\bJ$ is generally referred to as the Jacobian\footnote{a matrix composed of first-order partial derivatives} matrix. 
 
 The complex LM update is very similar, the major difference being the introduction of a damping parameter, $\lambda$:
 \begin{equation}
 \label{eq:LM_update_skymodel}
 \Delta \breve{\bg} = (\bJ^H\bJ + \lambda\bD)^{-1}\bJ^H\breve{\br},
 \end{equation}
-where $\bD=\bI\odot\bJ^H\bJ$. In this paper, the identity matrix is denoted by $\bI$. Moreover, the Hadamard product and the Hermition transpose are denoted by $\odot$ and $(\cdot)^H$ respectively. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
-We will refer to $\bJ^H\bJ$ as the Hessian matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$ throughout this paper. 
+where $\bD=\bI\odot\bJ^H\bJ$. 
+
+In this paper, we use single subscript indices (e.g. $i$) to refer to a specific antenna (or as will become apparent later a specific redundant group) and composite subscript indices (e.g. $pq$) to refer to 
+a specific baseline. If these indices appear in the definition of matrix elements then their allowed ranges are determined by the dimension of the matrix that 
+is being defined (see Table~\ref{tab:matrix_dimensions_main}). Furthermore, the identity matrix is denoted by $\bI$. Moreover, the Hadamard\footnote{element-wise product} product and the Hermition transpose are denoted by $\odot$ and $(\cdot)^H$ respectively \citep{Liu2008}. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
+We will refer to $\bJ^H\bJ$ as the Hessian\footnote{a square matrix composed of second-order partial derivatives} matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$ throughout this paper \citep{Madsen:LM}. 
 
 Equation~\ref{eq:GN_update_skymodel} or~\ref{eq:LM_update_skymodel} can now be used iteratively to update the parameter vector $\breve{\bg}$:
 \begin{equation}
@@ -293,7 +393,9 @@ system even before having predicted visibilities from a pre-existing skymodel.
 %procedure by which we estimate both the unknown observed
 %visibilities and the antenna gains.
 
-It is convenient to group redundant visibilities together and label each group using a single index rather than using their antenna pairs as in equation~\ref{eq:vis_definition}. We introduce a function $\phi$ that maps the antenna pair associated with a specific baseline to its corresponding redundant baseline group, i.e. if baseline $pq$ and $rs$ are redundant then $\phi_{pq} = \phi_{rs}$ (implying they belong to the same group). The function $\phi_{pq}$ is not symmetric as $\phi_{pq} = 0$ if $p \geq q$. Equation~\ref{eq:vis_definition} can be re-written for a redundant array as:
+It is convenient to group redundant visibilities together and label each group using a single index rather than using their antenna pairs as in equation~\ref{eq:vis_definition}. We introduce a function $\phi$ that maps the antenna pair associated with a specific baseline to its corresponding redundant baseline group, i.e. if baseline $pq$ and $rs$ are redundant then $\phi_{pq} = \phi_{rs}$ (implying they belong to the same group). 
+To be exact, $\phi$ maps the composite index $pq$ to its group index only if $pq\in\{rs|r\leq s\}$. If $pq\notin\{rs|r\leq s\}$ then the 
+composite index $pq$ is mapped to zero. The function $\phi_{pq}$ is, therefore, not symmetric. Equation~\ref{eq:vis_definition} can be re-written for a redundant array as:
 \begin{equation}
 \label{eq:vis_red}
 d_{pq} = g_{p}\conj{g_q}y_{\phi_{pq}} + n_{pq},
@@ -346,7 +448,8 @@ where
  \bg &=[g_1,\cdots,g_N]^T, & \by &= [y_1,\cdots,y_L]^T,\nonumber\\
  \bz &= [\bg^T,\by^T]^T. &  &\label{eq:parm_definitions}
  \end{align}
-The number of model parameters to be solved for is now $P = 2(N+L)$, since redundant calibration is a complex problem.
+The number of model parameters to be solved for is now $P = 2(N+L)$, since redundant calibration is a complex problem. Note that equation~\ref{eq:least_squares_red} is only solvable 
+(i.e. the array is redundant enough) if $L+N \leq B$.
 
 In literature, equation~\ref{eq:least_squares_red} is solved by splitting the problem into its real and imaginary parts. The real and imaginary parts of the unknown parameters are then solved for separately \citep{Wieringa1992,Liu2010,Zheng2014}. 
 Currently, the above is achieved by using the real-valued GN algorithm \citep{Kurien2016}. 
@@ -356,28 +459,43 @@ We, instead, intend to formulate the redundant calibration problem using Wirting
 \min_{\breve{\bz}} \|\breve{\br}\| = \min_{\breve{\bz}} \|\breve{\bd} - \breve{\bv}(\breve{\bz})\|, 
 \end{equation}
 where $\breve{\bz} = [\bz^T,\conj{\bz}^T]^T$. 
+
+\begin{figure}
+\includegraphics[width=0.47\textwidth]{./flow_diagram.pdf}
+\caption{A flow chart representing the procedure one would follow to partially construct the Jacobian matrix (i.e. $\bmJ$) associated with Wirtinger redundant calibration. \label{fig:flow_chart}}
+\end{figure}
+%\cite{Liu2008}\cite{Madsen:LM}
+
 We derive the complex Jacobian associated with equation~\ref{eq:least_squares_complex} to be:
 \begin{equation}
 \label{eq:Jacobian}
 \bJ = \begin{bmatrix}
-       \bmJ & \bmJ^*\\
-       \conj{\bmJ}^* & \conj{\bmJ} 
+       \bmJ_1 & \bmJ_2\\
+       \conj{\bmJ}_2 & \conj{\bmJ}_1 
       \end{bmatrix},
 \end{equation}
 where 
 \begin{equation}
-[\bmJ]_{\alpha_{pq},i} = \begin{cases} 
+\label{eq:j1}
+[\bmJ_1]_{\alpha_{pq},i} = \begin{cases} 
      \frac{\partial v_{pq}}{\partial g_i} & \textrm{if}~i\leq N \\
      \frac{\partial v_{pq}}{\partial y_{i-N}} & \textrm{otherwise}  
 \end{cases}, %, & \bmJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
 \end{equation}
 and
 \begin{equation}
-[\bmJ^*]_{\alpha_{pq},i} = \begin{cases} 
+\label{eq:j2}
+[\bmJ_2]_{\alpha_{pq},i} = \begin{cases} 
      \frac{\partial v_{pq}}{\partial \conj{g}_i} & \textrm{if}~i\leq N \\
      \frac{\partial v_{pq}}{\partial \conj{y}_{i-N}} & \textrm{otherwise}  
 \end{cases}. %, & \bmJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
 \end{equation}
+
+Note that we employ the same subscript indexing notation that we used in Section~\ref{sec:sky_wirtinger} in equation~\ref{eq:j1} and equation~\ref{eq:j2}.
+To further aid the reader in understanding this indexing notation we refer him/her to Figure~\ref{fig:flow_chart} which depicts a flow diagram of the matrix construction procedure 
+with which $\bmJ_1$ can be constructed. The range of values the indexes in equation~\ref{eq:j1} and equation~\ref{eq:j2} can attain should also 
+be clear to the reader after having inspected Figure~\ref{fig:flow_chart} and Table~\ref{tab:matrix_dimensions_main}. 
+
 We can now calculate the GN and LM updates to be 
 \begin{equation}
 \label{eq:GN_update}
@@ -521,13 +639,19 @@ Num. timeslots & 1 & 50\\
 \label{tab:ch_parm}
 \end{table}
 
-The simulated visibilities included a noise term, the purpose of which was to produce a certain SNR in the simulated
-visibilities. We made use of the following definition of \citep[SNR, ][]{Liu2010,Marthi2014}:  
+Note that our simulations are almost ideal as we did not include a primary beam response, nor did we incorporate time and frequency smearing into our simulation.
+
+We also did not explicitly define our noise in terms of the integration time, channel bandwidth and $T_{\textrm{sys}}$, we instead
+follow the same approach described in \citep{Liu2010,Marthi2014} and make use of the definition of SNR to introduce noise into our visibilities. 
+We use the following definition of 
+\citep[SNR, ][]{Liu2010,Marthi2014}:  
 \begin{equation}
-\label{}
+\label{eq:SNR}
 \textrm{SNR} = 10\log \left (\frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}} \right ), 
 \end{equation}
-where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baseline.
+where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baseline. It should be pointed out, however, that by producing visibilities with different SNR values you are 
+effectively either changing your integration time or your channel bandwidth or both (assuming a single $T_{\textrm{sys}}$ value for your instrument). The reason we decided to also adopt
+equation~\ref{eq:SNR} is that it has become standard practice to present the accuracy of parameter estimation algorithms as a function of SNR.
 
 Figure~\ref{fig:prec_error} shows the simulation results as a function of SNR and number of antennas. The accuracy of our solutions is quantified through the percentage error
 \begin{equation}
@@ -548,7 +672,7 @@ The error magnitude follows the expected behaviour, i.e., it decreases as a func
 
 \section{Preconditioned Conjugate Gradient Method}
 \label{sec:pcg}
-\citet{Liu2010} suggested that the speed of convergence of redundant calibration could be optimized using the 
+\citet{Liu2010} suggested that the execution speed of redundant calibration could be reduced using the 
 conjugate gradient method \citep{Hestenes1952}, which would be computationally advantageous, since the Hessian matrix associated 
 with redundant calibration (see Figure~\ref{fig:hessian}) is sparse \citep{Reid1971}. In this section we study the computational complexity
 of the conjugate gradient (CG) method when it is used to invert the modified Hessian matrix (see equation~\ref{eq:LM_update}), 
@@ -705,10 +829,16 @@ We found that, although the PCG method greatly improves the speed of redundant c
 
 The characteristics of redundant \textsc{StEfCal} make it an appealing calibration algorithm for large redundant arrays like HERA \citep{deboer2017}, CHIME \citep{Bandura2014}, HIRAX \citep{Newburgh2016} or even hybrid arrays like the MWA \citep{Tingay2013} in its updated phase.
 
+\section{Future Outlook}
+We plan to apply redundant \textsc{StEfCal} to HERA data in the near future. The reason for applying redundant \textsc{StEfCal} to real data is two-fold. First, we wish to validate the theoretical computational
+complexity of redundant \textsc{StEfCal} (derived earlier in the paper). Second, we would like to test whether it could be used to calibrate HERA in near-realtime. 
+We are also interested in paralyzing our current implementation and to see how much can be gained by doing so. We would also like to 
+conduct a perturbation analyses, similar to the one conducted by \cite{Liu2010}, to estimate the error which is introduced into our 
+estimated gains and visibilities when the array contains baselines which are not perfectly redundant. We are also interested in quantifying 
+the error which is introduced into the estimated gains and visibilities because of differing primary beam patterns between array elements \citep{Noorishad2012}. 
+
 \section*{Acknowledgements}
 This work is based upon research supported by the South African Research Chairs Initiative of the Department of Science and Technology and National Research Foundation. GB acknowledges support from the Royal Society and the Newton Fund under grant NA150184. This work is based on the research supported in part by the National Research Foundation of South Africa (grant No. 103424).
-
-
 
 \bibliographystyle{mn2e}
 \bibliography{paper}
@@ -1109,11 +1239,11 @@ $\bzero$ & $L \times L$\\
 
 \section{ADI}
 \label{sec:red_stef_ADI}
-The basic skymodel-based \textsc{StEfCal} update step is equal to  the leftmost term in equation~\ref{eq:g_update} (barring $\alpha$) \citep{Salvini2014}.
+The basic skymodel-based \textsc{StEfCal} update step is equal to  the leftmost term in equation~\ref{eq:g_update} (barring $\rho$) \citep{Salvini2014}.
 Assume without any loss of generality that the array is in an east-west regular grid. Furthermore, assume that $\boldsymbol{d}$ (see equation~\ref{eq:vis_linear_definition}) has been re-ordered 
 and that the result of this re-ordering is the following
 \begin{equation}
-\widetilde{\boldsymbol{d}} = \left[d{12},\cdots,d_{N-1,N},d_{13},\cdots,d_{N-2,N},\cdots,d_{1N}\right]^T .
+\widetilde{\boldsymbol{d}} = \left[d_{12},\cdots,d_{N-1,N},d_{13},\cdots,d_{N-2,N},\cdots,d_{1N}\right]^T .
 \end{equation}
 The vector $\widetilde{\bn}$ should be interpreted in a similar manner.
 
