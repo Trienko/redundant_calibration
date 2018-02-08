@@ -39,8 +39,8 @@
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
 \usepackage{graphicx}
-%\usepackage{algorithm}
-%\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \usepackage{mathrsfs}
 \usepackage{url}
 
@@ -166,7 +166,7 @@ Table~\ref{tab:glossary}. We also discuss the overset notation used within the p
  \item $\breve{\mathbf{x}}$ -- This notation denotes an augmented vector, i.e. $\breve{\mathbf{x}} = [\mathbf{x}^T,\conj{\mathbf{x}}^T]^T$. 
 \end{enumerate}
 
-The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we presnt our conclusions in Section~\ref{sec:conclusions}.
+The paper is organized as follows: we review the complex calibration formalism by \citet{Smirnov2015} in Section~\ref{sec:sky_wirtinger}, we extend it to the redundant case in Section~\ref{sec:red_wirtinger}, we present some computational complexity results in Section~\ref{sec:pcg} and we present our conclusions in Section~\ref{sec:conclusions}.
 
 %\section{Skymodel-based Wirtinger Calibration}
 %\section{Calibration described through the Wirtinger formalism}
@@ -184,15 +184,16 @@ $\mathbb{C}$ & set of complex numbers\\
 $\bI$ & Identity matrix\\
 $\alpha_{pq}$, $\phi_{pq}$, $\zeta_{pq}$, $\xi_{pq}$ and & indexing functions\\
 $\psi_{pq}:\mathbb{N}^2\rightarrow\mathbb{N}$ &\\
-$\conj{(*)}$ & conjugation of operand\\
-$(*)^{2}$ & square operand\\
-$\|*\|_F$ & Frobenius norm\\
-$(*)^{-1}$ & Matrix inversion\\
+$\conj{x}$ & conjugation\\
+$\conj{\mathbf{x}},\conj{\mathbf{X}}$ & element-wise conjugation\\
+$x^{2}$ & square\\
+$\|\mathbf{x}\|_F$ & Frobenius norm\\
+$\mathbf{X}^{-1}$ & Matrix inversion\\
 $\odot$ & Hadamard product\\
 &(element-wise product)\\
-$(*)^H$ & Hermitian transpose\\
-$(*)^T$ & Matrix transpose\\
-$<*>_x$ & averaging in x\\
+$\mathbf{X}^H$ & Hermitian transpose\\
+$\mathbf{x}^T,\mathbf{X}^T$ & Transpose\\
+$<\mathbf{x}>_x$ & averaging over $x$\\
 $\frac{\partial}{\partial z}$ & Wirtinger derivative\\
 $\widetilde{x}$ & a new quantity derived from $x$\\
 $\widehat{x}$ & estimated quantity\\
@@ -255,7 +256,7 @@ In a radio interferometer, the true sky visibilities $y_{pq}$ measured by a base
 \label{eq:vis_definition}
 d_{pq} = g_{p}\conj{g_q} \, y_{pq} + n_{pq},
 \end{equation}
-where $\conj{(*)}$ indicates complex conjugation and $n_{pq}$ is the thermal noise component. 
+where $\conj{\conj{x}}$ indicates complex conjugation and $n_{pq}$ is the thermal noise component. 
 The real and imaginary components of the thermal noise are normally distributed with a mean of zero and a
 standard deviation $\sigma$:
 \begin{equation}
@@ -286,15 +287,16 @@ The function $\alpha_{pq}$ therefore maps composite antenna indexes to unique si
 \{\alpha_{12},\alpha_{13},\cdots,\alpha_{N-1N}\} = \{1,2,\cdots,B\} 
 \end{equation}
 The vectors in equation~\ref{eq:vec_linear_definitions} are column vectors of size $B$ (i.e. $p<q$). It is important to point out here that 
-all of the mathematical definitions in this paper assumes that we are only considering composite indices belonging to the set $\{rs|r<s\}$. Fore the sake of mathematical 
-completeness, however, $\alpha_{pq}$ is defined for composite indices which do not belong to this set.   
+all of the mathematical definitions in this paper assumes that we are only considering composite indices belonging to the set $\{rs|r<s\}$. For the sake of mathematical 
+completeness, however, $\alpha_{pq}$ is defined for composite indices which do not belong to this set. Also note that, while the indexing function $\alpha_{pq}$ does not attain 
+the value zero in practice the zero indexing value does play a very important role in some of the definitions used within this paper (see for example Eq.~\ref{eq:D_mat}).
 
 Radio interferometric calibration aims to determine the best estimate of $\bg = [g_1,g_2,\cdots,g_N]^T$ in order to correct the data and, following equation~\ref{eq:vis_linear_definition}, can be formulated as a non linear least-squares optimization problem:
 \begin{equation}
 \label{eq:least_squares}
 \min_{\bg} \Lambda(\bg) = \min_{\bg} \|\br\|_F^2 = \min_{\bg} \|\bd - \bv(\bg)\|_F^2, 
 \end{equation}
-where $\Lambda$ is the objective function, $\br$ is the residual vector and $\|\cdot\|_F$ denotes the Frobenius norm. In standard interferometric calibration, $y_{pq}$ is assumed to be known at some level, for instance through the observation of previously known calibration sources. 
+where $\Lambda$ is the objective function, $\br$ is the residual vector and $\|\mathbf{x}\|_F$ denotes the Frobenius norm. In standard interferometric calibration, $y_{pq}$ is assumed to be known at some level, for instance through the observation of previously known calibration sources. 
 
 Non-linear least-squares problems are generally solved by using gradient-based minimization algorithms (i.e. Gauss--Newton (GN) -- or Levenberg--Marquardt (LM)) that require the model ($\bv$ in equation~\ref{eq:least_squares}) to be differentiable towards each parameter. 
 When the least squares problem is complex, it becomes less straightforward to apply these gradient-based minimization methods, as
@@ -348,7 +350,7 @@ where $\bD=\bI\odot\bJ^H\bJ$.
 
 In this paper, we use single subscript indices (e.g. $i$) to refer to a specific antenna (or as will become apparent later a specific redundant group) and composite subscript indices (e.g. $pq$) to refer to 
 a specific baseline. If these indices appear in the definition of matrix elements then their allowed ranges are determined by the dimension of the matrix that 
-is being defined (see Table~\ref{tab:matrix_dimensions_main}). Furthermore, the identity matrix is denoted by $\bI$. Moreover, the Hadamard\footnote{element-wise product} product and the Hermition transpose are denoted by $\odot$ and $(\cdot)^H$ respectively \citep{Liu2008}. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
+is being defined (see Table~\ref{tab:matrix_dimensions_main}). Furthermore, the identity matrix is denoted by $\bI$. Moreover, the Hadamard\footnote{element-wise product} product and the Hermition transpose are denoted by $\odot$ and $\mathbf{X}^H$ respectively \citep{Liu2008}. Note the use of the Wirtinger derivatives in equation~\ref{eq:jac_entries}.
 We will refer to $\bJ^H\bJ$ as the Hessian\footnote{a square matrix composed of second-order partial derivatives} matrix $\bH$ and to $\bJ^H\bJ + \lambda\bD$ as the modified Hessian matrix $\bmH$ throughout this paper \citep{Madsen:LM}. 
 
 Equation~\ref{eq:GN_update_skymodel} or~\ref{eq:LM_update_skymodel} can now be used iteratively to update the parameter vector $\breve{\bg}$:
@@ -462,9 +464,11 @@ where $\breve{\bz} = [\bz^T,\conj{\bz}^T]^T$.
 
 \begin{figure}
 \includegraphics[width=0.47\textwidth]{./flow_diagram.pdf}
-\caption{A flow chart representing the procedure one would follow to partially construct the Jacobian matrix (i.e. $\bmJ$) associated with Wirtinger redundant calibration. \label{fig:flow_chart}}
+\caption{A flow chart representing the procedure one would follow to partially construct the Jacobian matrix (i.e. $\bmJ_1$) associated with Wirtinger redundant 
+calibration. The red circle represents the start of the flow diagram. The blue circle represents the end of the diagram. Blue diamonds denote loop 
+conditionals, while green diamonds denote simple conditionals. The diagram elements following the red arrows just below a loop conditional element all form part 
+of the main body of the loop which has the loop conditional of the aforementioned loop conditional element in its definition. The pseudocode associated with this flow diagram is given in Algorithm 1. \label{fig:flow_chart}}
 \end{figure}
-%\cite{Liu2008}\cite{Madsen:LM}
 
 We derive the complex Jacobian associated with equation~\ref{eq:least_squares_complex} to be:
 \begin{equation}
@@ -491,8 +495,32 @@ and
 \end{cases}. %, & \bmJ^* &= \frac{\partial \bv}{\partial \conj{\bz}}. 
 \end{equation}
 
+\begin{algorithm}
+\caption{Constructing $\bmJ_1$}\label{euclid}
+\begin{algorithmic}[1]
+\State $p \gets 1$
+\While {$p\leq N$}
+\State $q \gets p + 1$
+\While {$q\leq N$}
+\State $\alpha  \gets (q-p) + (p-1)\left (N-\frac{1}{2} \right )$
+\State $i \gets 1$
+\While {$i\leq (N + L)$}
+\If {$i \leq N$}
+\State $\bmJ_1[\alpha,i] \gets \frac{\partial v_{pq}}{\partial g_i}$
+\Else
+\State $\bmJ_1[\alpha,i] \gets \frac{\partial v_{pq}}{\partial y_{i-N}}$
+\EndIf
+\State $i\gets i + 1$
+\EndWhile
+\State $q \gets q + 1$
+\EndWhile
+\State $p \gets p + 1$
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
 Note that we employ the same subscript indexing notation that we used in Section~\ref{sec:sky_wirtinger} in equation~\ref{eq:j1} and equation~\ref{eq:j2}.
-To further aid the reader in understanding this indexing notation we refer him/her to Figure~\ref{fig:flow_chart} which depicts a flow diagram of the matrix construction procedure 
+To further aid the reader in understanding this indexing notation we refer him/her to Figure~\ref{fig:flow_chart} (also see Algorithm 1) which depicts a flow diagram of the matrix construction procedure 
 with which $\bmJ_1$ can be constructed. The range of values the indexes in equation~\ref{eq:j1} and equation~\ref{eq:j2} can attain should also 
 be clear to the reader after having inspected Figure~\ref{fig:flow_chart} and Table~\ref{tab:matrix_dimensions_main}. 
 
@@ -649,7 +677,7 @@ We use the following definition of
 \label{eq:SNR}
 \textrm{SNR} = 10\log \left (\frac{<\bv\odot\conj{\bv}>_{\nu,t,pq}}{<\bn\odot\conj{\bn}>_{\nu,t,pq}} \right ), 
 \end{equation}
-where $<*>_{\nu,t,pq}$ denotes averaging over frequency, time and baseline. It should be pointed out, however, that by producing visibilities with different SNR values you are 
+where $<\mathbf{x}>_{\nu,t,pq}$ denotes averaging over frequency, time and baseline. It should be pointed out, however, that by producing visibilities with different SNR values you are 
 effectively either changing your integration time or your channel bandwidth or both (assuming a single $T_{\textrm{sys}}$ value for your instrument). The reason we decided to also adopt
 equation~\ref{eq:SNR} is that it has become standard practice to present the accuracy of parameter estimation algorithms as a function of SNR.
 
@@ -822,7 +850,7 @@ In this paper we have formulated the calibration of redundant interferometric ar
 We also showed that the LM parameter update step can be simplified to obtain an ADI type of algorithm \citep[][]{Salvini2014,Marthi2014}.
 Our code implementation of this algorithm (redundant \textsc{StEfCal}) is publicly available at 
 \url{https://github.com/Trienko/heracommissioning/blob/master/code/stef.py}. 
-We note that, in its current implementation, redundant \textsc{StEfCal} does not solve for the degeneracies inherent to redundant calibration  \citep{Zheng2014,Kurien2016} which will be the subject of future work. Compared to current redundant calibration algorithms, redundant \textsc{StEfCal} is more robust to inital conditions and allows for easier parallelization. 
+We note that, in its current implementation, redundant \textsc{StEfCal} does not solve for the degeneracies inherent to redundant calibration  \citep{Zheng2014,Kurien2016,dillon2017} which will be the subject of future work. Compared to current redundant calibration algorithms, redundant \textsc{StEfCal} is more robust to inital conditions and allows for easier parallelization. 
 
 We investigated the computational cost of redundant \textsc{StEfCal} and compared it with the performance of the PCG method (as suggested by \cite{Liu2010}).
 We found that, although the PCG method greatly improves the speed of redundant calibration, it still significantly underperforms when compared to redundant \textsc{StEfCal}.
@@ -832,7 +860,7 @@ The characteristics of redundant \textsc{StEfCal} make it an appealing calibrati
 \section{Future Outlook}
 We plan to apply redundant \textsc{StEfCal} to HERA data in the near future. The reason for applying redundant \textsc{StEfCal} to real data is two-fold. First, we wish to validate the theoretical computational
 complexity of redundant \textsc{StEfCal} (derived earlier in the paper). Second, we would like to test whether it could be used to calibrate HERA in near-realtime. 
-We are also interested in paralyzing our current implementation and to see how much can be gained by doing so. We would also like to 
+We are also interested in parallelizing our current implementation and to see how much can be gained by doing so. We would also like to 
 conduct a perturbation analyses, similar to the one conducted by \cite{Liu2010}, to estimate the error which is introduced into our 
 estimated gains and visibilities when the array contains baselines which are not perfectly redundant. We are also interested in quantifying 
 the error which is introduced into the estimated gains and visibilities because of differing primary beam patterns between array elements \citep{Noorishad2012}. 
@@ -1033,7 +1061,7 @@ This work is based upon research supported by the South African Research Chairs 
 % \label{eq:norm_ls}
 % \|\bb-\bB\bx\|_F^2. 
 % \end{equation}
-% In this paper, we denote the Hermitian transpose with $(*)^H$ and the Frobenius norm with $\|*\|_F$.
+% In this paper, we denote the Hermitian transpose with $(\cdot)^H$ and the Frobenius norm with $\|*\|_F$.
 % 
 % There are a few important observations that we can make while inspecting equation~\ref{eq:normal_equation}:
 % \begin{enumerate}
@@ -1123,6 +1151,7 @@ where
 \end{cases},
 \end{equation}
 \begin{equation}
+\label{eq:D_mat}
 [\bD]_{ij} = 
 \begin{cases}
  g_i \conj{y}_j  \left | g_{\psi_{ij}} \right |^2  & \textrm{if} ~ \psi_{ij}\neq0\\
